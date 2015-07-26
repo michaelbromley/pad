@@ -21,7 +21,7 @@ var NameInput = React.createClass({
 var NamesList = React.createClass({
 
     render: function() {
-        var items = this.props.names.map(name => <li>{name}</li>);
+        var items = this.props.names ? this.props.names.map(name => <li>{name}</li>) : [];
 
         return (
             <ul>
@@ -43,8 +43,9 @@ var App = React.createClass({
     refreshList: function() {
         dataService.getNames()
             .then(data => {
+                console.log(data);
                 this.setState({
-                    names: data
+                    names: data.data
                 });
             });
     },

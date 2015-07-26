@@ -34,13 +34,13 @@ System.register(["services/dataService.js"], function (_export) {
                 displayName: "NamesList",
 
                 render: function render() {
-                    var items = this.props.names.map(function (name) {
+                    var items = this.props.names ? this.props.names.map(function (name) {
                         return React.createElement(
                             "li",
                             null,
                             name
                         );
-                    });
+                    }) : [];
 
                     return React.createElement(
                         "ul",
@@ -63,8 +63,9 @@ System.register(["services/dataService.js"], function (_export) {
                     var _this = this;
 
                     dataService.getNames().then(function (data) {
+                        console.log(data);
                         _this.setState({
-                            names: data
+                            names: data.data
                         });
                     });
                 },

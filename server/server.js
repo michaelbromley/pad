@@ -10,7 +10,7 @@ app.use(express.static(path.resolve('../node_modules')));
 app.use(bodyParser.json());
 app.listen(3000);
 
-var db = new Datastore({ filename: 'server/datastore', autoload: true });
+var db = new Datastore({ filename: 'datastore', autoload: true });
 
 app.get('/', function(req, res) {
    res.sendFile(path.resolve('../build/index.html'));
@@ -23,6 +23,5 @@ app.post('/api/names', function(req, res) {
 });
 
 app.get('/api/names', function(req, res) {
-    db.find();
-    res.send();
+    db.find({}, (err, docs) => res.send(docs));
 });
