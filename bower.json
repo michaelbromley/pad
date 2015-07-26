@@ -1,0 +1,18 @@
+{
+  "name": "productNotes",
+  "version": "0.0.0",
+  "authors": [
+    "Michael Bromley <michael@michaelbromley.co.uk>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "react": "~0.13.3"
+  }
+}
