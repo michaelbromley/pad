@@ -1,15 +1,17 @@
 System.register(["services/dataService.js"], function (_export) {
     "use strict";
 
-    var dataService, NameInput, NamesList, App;
+    var dataService, Router, Route, Link, NameInput, NamesList, App;
     return {
         setters: [function (_servicesDataServiceJs) {
             dataService = _servicesDataServiceJs.dataService;
         }],
         execute: function () {
-
             "use strict";
 
+            Router = ReactRouter.Router;
+            Route = ReactRouter.Route;
+            Link = ReactRouter.Link;
             NameInput = React.createClass({
                 displayName: "NameInput",
 

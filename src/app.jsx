@@ -1,6 +1,9 @@
 import { dataService } from 'services/dataService.js';
-
 "use strict";
+
+var Router = ReactRouter.Router;
+var Route = ReactRouter.Route;
+var Link = ReactRouter.Link;
 
 var NameInput = React.createClass({
 
