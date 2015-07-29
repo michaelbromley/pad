@@ -1,4 +1,4 @@
 node_modules
 .idea
 server/datastore
-build
+tmp

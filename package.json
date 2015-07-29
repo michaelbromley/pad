@@ -1,25 +1,30 @@
 {
-  "name": "productNotes",
+  "name": "pad",
+  "scripts": {
+    "build": "webpack --progress --profile --colors",
+    "watch": "webpack-dev-server --hot --inline --progress --colors",
+    "test": "echo \"No unit tests and e2e tests yet\" && exit 1"
+  },
   "version": "0.0.0",
-  "description": "",
-  "main": "gulpfile.js",
+  "description": "A new way to write.",
   "dependencies": {
     "axios": "^0.5.4",
-    "babel": "^5.5.3",
     "body-parser": "^1.12.4",
     "express": "^4.12.4",
-    "gulp": "^3.9.0",
-    "gulp-babel": "^5.1.0",
-    "gulp-react": "^3.0.1",
     "nedb": "^1.1.2",
-    "react": "^0.13.3",
-    "react-router": "^0.13.3",
-    "systemjs": "^0.17.1"
+    "alt": "0.17.1",
+    "babel-runtime": "5.6.18",
+    "react": "0.13.3",
+    "react-router": "0.13.3"
   },
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "devDependencies": {
+    "babel-core": "5.6.18",
+    "babel-loader": "5.3.1",
+    "html-webpack-plugin": "1.6.0",
+    "webpack": "1.10.1",
+    "webpack-dev-server": "1.10.1"
   },
-  "author": "",
-  "license": "ISC"
+  "author": "Michael Bromley",
+  "license": "MIT"
 }
+
