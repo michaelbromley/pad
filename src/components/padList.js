@@ -10,7 +10,12 @@ class PadList extends React.Component {
         super(props);
         this.state = {
             pads: props.pads,
-        }
+        };
+
+        PadStore.listen(store => {
+            console.log('setting state');
+            this.setState({ pads: store.pads });
+        });
     }
 
     static getStores(props) {
@@ -21,6 +26,10 @@ class PadList extends React.Component {
         return PadStore.getState();
     }
 
+    componentDidMount() {
+        PadActions.fetchPads();
+    }
+
     createPad = () => {
         console.log(this.refs);
         PadActions.createPad(this.refs.newPadName.getDOMNode().value);
@@ -29,11 +38,13 @@ class PadList extends React.Component {
     render() {
         return (
             <div>
-                {this.state.pads.forEach(pad => {
+                <ul>
+                {this.state.pads.map(pad => {
                     return (
-                        <div className="pad">{pad.name}</div>
+                        <li><div className="pad">{pad.name}!!!</div></li>
                     );
                 })}
+                </ul>
                 <input type="text" ref="newPadName" />
                 <button onClick={this.createPad}>New Pad</button>
             </div>

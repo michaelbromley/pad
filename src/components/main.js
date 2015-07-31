@@ -2,7 +2,8 @@ import React from 'react';
 import {RouteHandler, Link} from 'react-router';
 import PadList from 'components/padList';
 
-class Main extends React.Component {  
+class Main extends React.Component {
+
   render() {
     return (
       <div>
