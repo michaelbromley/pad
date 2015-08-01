@@ -36,6 +36,15 @@ class PadStore {
         console.log(response);
         this.pads.push(response.data);
     }
+
+    @bind(PadActions.deletePadSuccess)
+    deletePadSuccess(response) {
+        console.log('pad successfully deleted');
+        var id = response.data,
+            index = this.pads.map(pad => pad._id).indexOf(id);
+
+        this.pads.splice(index, 1);
+    }
 }
 
 export default PadStore;

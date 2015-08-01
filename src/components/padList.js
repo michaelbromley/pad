@@ -34,6 +34,10 @@ class PadList extends React.Component {
         PadActions.createPad(this.refs.newPadName.getDOMNode().value);
     };
 
+    deletePad = (id) => {
+        PadActions.deletePad(id);
+    };
+
     render() {
         return (
             <div>
@@ -41,7 +45,7 @@ class PadList extends React.Component {
                 {this.state.pads.map(pad => {
                     console.log(pad);
                     return (
-                        <li><Link to="pad" params={{ id: pad._id }}>{pad.name}</Link></li>
+                        <li><Link to="pad" params={{ id: pad._id }}>{pad.name}</Link> <button onClick={this.deletePad.bind(this, pad._id)}>x</button></li>
                     );
                 })}
                 </ul>

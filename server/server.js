@@ -27,3 +27,10 @@ app.post('/api/pads', function(req, res) {
 app.get('/api/pads', function(req, res) {
     db.find({}, (err, docs) => res.send(docs));
 });
+
+app.delete('/api/pads/:id', function(req, res) {
+    console.log(req.params);
+    var id = req.params.id;
+    console.log('deleteing pad with id ' + req.params.id);
+    db.remove({_id: req.params.id}, () => res.send(id));
+});
