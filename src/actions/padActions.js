@@ -7,7 +7,7 @@ import {createActions} from 'alt/utils/decorators';
 class PadActions {
     constructor() {
         this.generateActions(
-            'createPad',
+            'createPadSuccess',
             'receivedPadResults',
             'fetchingPadResultsFailed'
         );
@@ -17,6 +17,12 @@ class PadActions {
         this.dispatch();
         return axios.get(`${config.API_URL}/pads`)
             .then(data => this.actions.receivedPadResults(data.data));
+    }
+
+    createPad(name) {
+        console.log('creating pad...');
+        return axios.post(`${config.API_URL}/pads`, { name: name })
+            .then(data => this.actions.createPadSuccess(data));
     }
 }
 

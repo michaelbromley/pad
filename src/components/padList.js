@@ -26,12 +26,11 @@ class PadList extends React.Component {
         return PadStore.getState();
     }
 
-    componentDidMount() {
+    componentWillMount() {
         PadActions.fetchPads();
     }
 
     createPad = () => {
-        console.log(this.refs);
         PadActions.createPad(this.refs.newPadName.getDOMNode().value);
     };
 

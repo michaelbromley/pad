@@ -30,12 +30,11 @@ class PadStore {
         this.pads = pads;
     }
 
-    @bind(PadActions.createPad)
-    onCreatePad(name) {
-        console.log('creating new pad ' + name);
-        var id = (+new Date() + Math.floor(Math.random() * 999999)).toString(36);
-        this.pads.push({ id: id, name: name });
-        console.log(this.pads);
+    @bind(PadActions.createPadSuccess)
+    createPadSuccess(response) {
+        console.log('created new pad');
+        console.log(response);
+        this.pads.push(response.data);
     }
 }
 

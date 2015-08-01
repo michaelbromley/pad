@@ -20,8 +20,8 @@ var db = new Datastore({ filename: __dirname + '/datastore', autoload: true });
 
 app.post('/api/pads', function(req, res) {
     console.log('body: ' + JSON.stringify(req.body));
-    db.insert({ name: req.body.name });
-    res.send();
+    var pad = req.body;
+    db.insert(pad, () => {res.send(pad)});
 });
 
 app.get('/api/pads', function(req, res) {
