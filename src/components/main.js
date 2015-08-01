@@ -1,5 +1,5 @@
-import React from 'react';  
-import {RouteHandler, Link} from 'react-router';
+import React from 'react';
+import {RouteHandler} from 'react-router';
 import PadList from 'components/padList';
 
 class Main extends React.Component {
@@ -8,7 +8,7 @@ class Main extends React.Component {
     return (
       <div>
         <h1>Pad.</h1>
-        <PadList></PadList>
+        <RouteHandler></RouteHandler>
       </div>
     );
   }

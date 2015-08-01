@@ -1,6 +1,6 @@
 import React from 'react';
 import connectToStores from 'alt/utils/connectToStores';
-import {RouteHandler, Link} from 'react-router';
+import {Link} from 'react-router';
 import PadStore from 'stores/padStore';
 import PadActions from 'actions/padActions';
 
@@ -39,8 +39,9 @@ class PadList extends React.Component {
             <div>
                 <ul>
                 {this.state.pads.map(pad => {
+                    console.log(pad);
                     return (
-                        <li><div className="pad">{pad.name}!!!</div></li>
+                        <li><Link to="pad" params={{ id: pad._id }}>{pad.name}</Link></li>
                     );
                 })}
                 </ul>
