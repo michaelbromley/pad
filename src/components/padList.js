@@ -9,12 +9,8 @@ class PadList extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            pads: props.pads,
+            pads: props.pads
         };
-
-        PadStore.listen(store => {
-            this.setState({ pads: store.pads });
-        });
     }
 
     static getStores(props) {
@@ -26,7 +22,10 @@ class PadList extends React.Component {
     }
 
     componentWillMount() {
-        PadActions.fetchPads();
+        PadActions.fetchPadList();
+        PadStore.listen(store => {
+            this.setState({ pads: store.pads });
+        });
     }
 
     createPad = () => {

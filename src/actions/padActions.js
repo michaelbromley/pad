@@ -9,14 +9,21 @@ class PadActions {
         this.generateActions(
             'createPadSuccess',
             'deletePadSuccess',
+            'receivedPadListResults',
             'receivedPadResults',
             'fetchingPadResultsFailed'
         );
     }
 
-    fetchPads() {
+    fetchPadList() {
         this.dispatch();
         return axios.get(`${config.API_URL}/pads`)
+            .then(data => this.actions.receivedPadListResults(data.data));
+    }
+
+    fetchPad(id) {
+        this.dispatch();
+        return axios.get(`${config.API_URL}/pads/${id}`)
             .then(data => this.actions.receivedPadResults(data.data));
     }
 

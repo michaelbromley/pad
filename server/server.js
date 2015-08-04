@@ -14,18 +14,18 @@ app.listen(3000);
 
 var db = new Datastore({ filename: __dirname + '/datastore', autoload: true });
 
-/*app.get('/', function(req, res) {
-   res.sendFile(path.resolve(__dirname + '/../build/index.html'));
-});*/
+app.get('/api/pads', function(req, res) {
+    db.find({}, (err, docs) => res.send(docs));
+});
+
+app.get('/api/pads/:id', function(req, res) {
+    db.findOne({_id: req.params.id}, (err, docs) => res.send(docs));
+});
 
 app.post('/api/pads', function(req, res) {
     console.log('body: ' + JSON.stringify(req.body));
     var pad = req.body;
     db.insert(pad, () => {res.send(pad)});
-});
-
-app.get('/api/pads', function(req, res) {
-    db.find({}, (err, docs) => res.send(docs));
 });
 
 app.delete('/api/pads/:id', function(req, res) {

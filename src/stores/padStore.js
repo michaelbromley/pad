@@ -7,16 +7,23 @@ class PadStore {
 
     constructor() {
         this.pads = [];
+        this.pad = {};
     }
 
-    @bind(PadActions.fetchPads)
-    onFetchPads() {
+    @bind(PadActions.fetchPadList)
+    onFetchPadList() {
         console.log('fetching pads...');
     }
 
-    @bind(PadActions.receivedPadResults)
-    onReceivedPadResults(pads) {
+    @bind(PadActions.receivedPadListResults)
+    onReceivedPadListResults(pads) {
+        console.log(pads);
         this.pads = pads;
+    }
+
+    @bind(PadActions.receivedPadResults)
+    onRecievedPadResults(pad) {
+        this.pad = pad;
     }
 
     @bind(PadActions.createPadSuccess)
