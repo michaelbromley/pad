@@ -13,7 +13,6 @@ class PadList extends React.Component {
         };
 
         PadStore.listen(store => {
-            console.log('setting state');
             this.setState({ pads: store.pads });
         });
     }
@@ -43,9 +42,11 @@ class PadList extends React.Component {
             <div>
                 <ul>
                 {this.state.pads.map(pad => {
-                    console.log(pad);
                     return (
-                        <li><Link to="pad" params={{ id: pad._id }}>{pad.name}</Link> <button onClick={this.deletePad.bind(this, pad._id)}>x</button></li>
+                        <li key={pad._id}>
+                            <Link to="pad" params={{ id: pad._id }}>{pad.name}</Link>
+                            <button onClick={this.deletePad.bind(this, pad._id)}>x</button>
+                        </li>
                     );
                 })}
                 </ul>

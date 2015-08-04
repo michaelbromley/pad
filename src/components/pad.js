@@ -9,7 +9,6 @@ class Pad extends React.Component {
     }
 
     componentWillMount() {
-        //PadActions.fetchPads();
     }
 
     render() {
