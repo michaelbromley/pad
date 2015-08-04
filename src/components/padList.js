@@ -21,11 +21,15 @@ class PadList extends React.Component {
         return PadStore.getState();
     }
 
-    componentWillMount() {
+    componentDidMount() {
         PadActions.fetchPadList();
-        PadStore.listen(store => {
+        this.cancelListen = PadStore.listen(store => {
             this.setState({ pads: store.pads });
         });
+    }
+
+    componentWillUnmount() {
+        this.cancelListen();
     }
 
     createPad = () => {

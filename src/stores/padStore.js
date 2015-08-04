@@ -17,7 +17,6 @@ class PadStore {
 
     @bind(PadActions.receivedPadListResults)
     onReceivedPadListResults(pads) {
-        console.log(pads);
         this.pads = pads;
     }
 
@@ -29,7 +28,6 @@ class PadStore {
     @bind(PadActions.createPadSuccess)
     createPadSuccess(response) {
         console.log('created new pad');
-        console.log(response);
         this.pads.push(response.data);
     }
 

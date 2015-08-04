@@ -7,7 +7,7 @@ class Main extends React.Component {
   render() {
     return (
       <div>
-        <h1>Pad.</h1>
+        <div className="header">Pad.</div>
         <RouteHandler></RouteHandler>
       </div>
     );
