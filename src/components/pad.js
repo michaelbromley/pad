@@ -1,6 +1,7 @@
 import React from 'react';
 import connectToStores from 'alt/utils/connectToStores';
 import PadStore from 'stores/padStore';
+import PageStore from 'stores/pageStore';
 import PadActions from 'actions/padActions';
 
 @connectToStores
@@ -14,7 +15,7 @@ class Pad extends React.Component {
     }
 
     static getStores(props) {
-        return [PadStore];
+        return [PadStore, PageStore];
     }
 
     static getPropsFromStores(props) {
