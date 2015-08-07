@@ -34,19 +34,18 @@ class Pad extends React.Component {
         this.cancelListen();
     }
 
-    updateTitle(event) {
+    updateTitle = (event) => {
         this.setState({ newPageTitle: event.target.value });
-    }
+    };
 
     createPage = () => {
         var padId = this.state.pad._id,
-            pageTitle = this.refs.newPageTitle.getDOMNode().value;
+            pageTitle = this.state.newPageTitle;
         PadActions.createPage(padId, pageTitle);
         this.setState({ newPageTitle: '' });
     };
 
     render() {
-        console.log(this.state);
         return (
             <div>
                 <h1>Pad: {this.state.pad.name}</h1>
@@ -57,7 +56,7 @@ class Pad extends React.Component {
                         );
                     })}
                 </ul>
-                <input type="text" value={this.state.newPageTitle} onChange={this.updateTitle} />
+                <input value={this.state.newPageTitle} onChange={this.updateTitle} />
                 <button onClick={this.createPage}>New Page</button>
             </div>
         );
