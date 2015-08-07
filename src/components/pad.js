@@ -1,8 +1,8 @@
 import React from 'react';
 import connectToStores from 'alt/utils/connectToStores';
 import PadStore from 'stores/padStore';
-import PageStore from 'stores/pageStore';
 import PadActions from 'actions/padActions';
+import Page from 'components/page.js';
 
 @connectToStores
 class Pad extends React.Component {
@@ -10,12 +10,13 @@ class Pad extends React.Component {
         super(props);
 
         this.state = {
-            pad: props.pad
+            pad: props.pad,
+            newPageTitle: 'SWAG'
         };
     }
 
     static getStores(props) {
-        return [PadStore, PageStore];
+        return [PadStore];
     }
 
     static getPropsFromStores(props) {
@@ -33,10 +34,31 @@ class Pad extends React.Component {
         this.cancelListen();
     }
 
+    updateTitle(event) {
+        this.setState({ newPageTitle: event.target.value });
+    }
+
+    createPage = () => {
+        var padId = this.state.pad._id,
+            pageTitle = this.refs.newPageTitle.getDOMNode().value;
+        PadActions.createPage(padId, pageTitle);
+        this.setState({ newPageTitle: '' });
+    };
+
     render() {
+        console.log(this.state);
         return (
             <div>
                 <h1>Pad: {this.state.pad.name}</h1>
+                <ul>
+                    {this.state.pad.pages.map(page => {
+                        return (
+                            <Page page={page} key={page._id}></Page>
+                        );
+                    })}
+                </ul>
+                <input type="text" value={this.state.newPageTitle} onChange={this.updateTitle} />
+                <button onClick={this.createPage}>New Page</button>
             </div>
         );
     }

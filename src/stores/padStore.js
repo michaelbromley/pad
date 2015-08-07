@@ -7,7 +7,9 @@ class PadStore {
 
     constructor() {
         this.pads = [];
-        this.pad = {};
+        this.pad = {
+            pages: []
+        };
     }
 
     @bind(PadActions.fetchPadList)

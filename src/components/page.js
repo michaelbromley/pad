@@ -1,5 +1,5 @@
 import React from 'react';
-import PageActions from 'actions/pageActions';
+import PadActions from 'actions/pageActions';
 
 class Page extends React.Component {
 
@@ -10,10 +10,10 @@ class Page extends React.Component {
     render() {
         return (
             <div className="page-container">
-                <h2>{this.props.page.name}</h2>
+                <h2>{this.props.page.title}</h2>
             </div>
         );
     }
 }
 
-export default Pad;
+export default Page;

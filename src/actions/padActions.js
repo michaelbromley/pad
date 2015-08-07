@@ -15,6 +15,7 @@ class PadActions {
         );
     }
 
+    // Pad level
     fetchPadList() {
         this.dispatch();
         return axios.get(`${config.API_URL}/pads`)
@@ -22,6 +23,7 @@ class PadActions {
     }
 
     fetchPad(id) {
+        console.log(`fetching pad id: ${id}`);
         this.dispatch();
         return axios.get(`${config.API_URL}/pads/${id}`)
             .then(data => this.actions.receivedPadResults(data.data));
@@ -36,6 +38,14 @@ class PadActions {
     deletePad(id) {
         return axios.delete(`${config.API_URL}/pads/${id}`)
             .then(data => this.actions.deletePadSuccess(data));
+    }
+
+    // Page level
+
+    createPage(padId, title) {
+        console.log('creating page...');
+        return axios.post(`${config.API_URL}/pads/${padId}/pages`, { title: title })
+            .then(data => this.actions.fetchPad(padId));
     }
 }
 
