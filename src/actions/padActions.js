@@ -47,6 +47,12 @@ class PadActions {
         return axios.post(`${config.API_URL}/pads/${padId}/pages`, { title: title })
             .then(data => this.actions.fetchPad(padId));
     }
+
+    deletePage(padId, pageId) {
+        console.log('deleting page...');
+        return axios.delete(`${config.API_URL}/pads/${padId}/pages/${pageId}`)
+            .then(data => this.actions.fetchPad(padId));
+    }
 }
 
 export default PadActions;

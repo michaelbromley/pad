@@ -74,3 +74,14 @@ app.post('/api/pads/:id/pages', function(req, res) {
     db.insert(page, () => res.send(padId));
 });
 
+/**
+ * Delete Page
+ */
+app.delete('/api/pads/:padId/pages/:pageId', function(req, res) {
+    console.log(req.params);
+    var padId = req.params.padId,
+        pageId = req.params.pageId;
+
+    console.log('deleteing pad with id ' + req.params.id);
+    db.remove({_id: pageId, padId: padId}, () => res.send(pageId));
+});

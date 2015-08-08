@@ -45,6 +45,10 @@ class Pad extends React.Component {
         this.setState({ newPageTitle: '' });
     };
 
+    deletePage = (pageId) => {
+        PadActions.deletePage(this.state.pad._id, pageId);
+    };
+
     render() {
         return (
             <div>
@@ -52,7 +56,7 @@ class Pad extends React.Component {
                 <ul>
                     {this.state.pad.pages.map(page => {
                         return (
-                            <Page page={page} key={page._id}></Page>
+                            <Page page={page} key={page._id} onDelete={this.deletePage}></Page>
                         );
                     })}
                 </ul>
