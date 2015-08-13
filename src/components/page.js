@@ -10,8 +10,9 @@ class Page extends React.Component {
     render() {
         return (
             <div className="page-container">
-                <button onClick={this.props.onDelete.bind(this, this.props.page._id)}>x</button>
+                <button style="float: right" onClick={this.props.onDelete.bind(this, this.props.page._id)}>x</button>
                 <h2>{this.props.page.title}</h2>
+
             </div>
         );
     }

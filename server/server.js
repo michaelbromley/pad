@@ -85,3 +85,27 @@ app.delete('/api/pads/:padId/pages/:pageId', function(req, res) {
     console.log('deleteing pad with id ' + req.params.id);
     db.remove({_id: pageId, padId: padId}, () => res.send(pageId));
 });
+
+/**
+ * Create Note
+ */
+app.post('/api/pads/:padId/pages/:pageId/notes', function(req, res) {
+    console.log('creating note: '+ JSON.stringify(req.body) );
+    var pageId = req.params.pageId,
+        note = req.body;
+
+    note.type = 'note';
+    note.pageId = pageId;
+    db.insert(note, () => res.send(pageId));
+});
+
+/**
+ * Delete Note
+ */
+app.delete('/api/pads/:padId/pages/:pageId/notes/:noteId', function(req, res) {
+    var pageId = req.params.pageId,
+        noteId = req.params.noteId;
+
+    console.log('deleteing note with id ' + noteId);
+    db.remove({_id: noteId, pageId: pageId}, () => res.send(pageId));
+});
