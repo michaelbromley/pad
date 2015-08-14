@@ -14,7 +14,7 @@ module.exports = {
     },
     resolve: {
         root: srcPath,
-        extensions: ['', '.js'],
+        extensions: ['', '.js', '.css'],
         modulesDirectories: ['node_modules', 'src']
     },
     output: {
@@ -27,7 +27,8 @@ module.exports = {
 
     module: {
         loaders: [
-            {test: /\.js?$/, exclude: /node_modules/, loader: 'babel?cacheDirectory&stage=0'}
+            {test: /\.js?$/, exclude: /node_modules/, loader: 'babel?cacheDirectory&stage=0'},
+            {test: /\.css$/, loader: "style-loader!css-loader" }
         ]
     },
     plugins: [
