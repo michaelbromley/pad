@@ -3,6 +3,7 @@ import connectToStores from 'alt/utils/connectToStores';
 import PadStore from 'stores/padStore';
 import PadActions from 'actions/padActions';
 import Page from 'components/page.js';
+import TitleInput from 'components/titleInput.js';
 
 @connectToStores
 class Pad extends React.Component {
@@ -52,7 +53,7 @@ class Pad extends React.Component {
     render() {
         return (
             <div>
-                <h1>Pad: {this.state.pad.name}</h1>
+                <TitleInput title={this.state.pad.name} />
                 <ul>
                     {this.state.pad.pages.map(page => {
                         return (
