@@ -8,6 +8,7 @@ class PadActions {
     constructor() {
         this.generateActions(
             'createPadSuccess',
+            'updatePadSuccess',
             'deletePadSuccess',
             'receivedPadListResults',
             'receivedPadResults',
@@ -33,6 +34,11 @@ class PadActions {
         console.log('creating pad...');
         return axios.post(`${config.API_URL}/pads`, { name: name })
             .then(data => this.actions.createPadSuccess(data));
+    }
+
+    updatePad(id, name) {
+        return axios.put(`${config.API_URL}/pads/${id}`, { name: name })
+                    .then(data => this.actions.updatePadSuccess(data));
     }
 
     deletePad(id) {

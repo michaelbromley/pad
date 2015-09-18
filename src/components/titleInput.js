@@ -11,7 +11,7 @@ class TitleInput extends React.Component {
             <div className="titleInput">
                 <h2>{this.props.title}</h2>
                 <div className="input">
-                    <input value={this.props.title} />
+                    <input value={this.props.title} onChange={this.props.onChange.bind(this)} />
                 </div>
             </div>
         );

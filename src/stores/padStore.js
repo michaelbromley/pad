@@ -33,6 +33,11 @@ class PadStore {
         this.pads.push(response.data);
     }
 
+    @bind(PadActions.updatePadSuccess)
+    updatePadSuccess(response) {
+        this.pad.name = response.data.name;
+    }
+
     @bind(PadActions.deletePadSuccess)
     deletePadSuccess(response) {
         console.log('pad successfully deleted');

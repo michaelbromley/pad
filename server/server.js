@@ -48,7 +48,18 @@ app.post('/api/pads', function(req, res) {
     console.log('body: ' + JSON.stringify(req.body));
     var pad = req.body;
     pad.type = 'pad';
-    db.insert(pad, () => {res.send(pad)});
+    db.insert(pad, () => res.send(pad));
+});
+
+/**
+ * Update Pad
+ */
+app.put('/api/pads/:id', function(req, res) {
+    console.log('updating pad:', req.body);
+    var pad = req.body;
+    pad.type = 'pad';
+    pad.id = req.params.id;
+    db.update({_id: req.params.id}, pad, () => res.send(pad));
 });
 
 /**
