@@ -57,7 +57,7 @@ class Pad extends React.Component {
     render() {
         return (
             <div>
-                <TitleInput title={this.state.pad.name} onChange={this.updatePadTitle} />
+                <TitleInput title={this.state.pad.name} onChange={this.updatePadTitle} element="h2" />
                 <ul>
                     {this.state.pad.pages.map(page => {
                         return (
