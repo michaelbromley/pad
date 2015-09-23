@@ -10,16 +10,19 @@ body {
   position: relative;
   outline: none;
 
-  h2 {
+  h1, h2, h3, h4, h5 {
     margin: 0;
     cursor: pointer;
     display: inline-block;
   }
-  h2, .input {
-    font-size: 24px;
-    font-weight: bold;
-  }
+  h1, .input.h1 { font-size: 32px; }
+  h2, .input.h2 { font-size: 24px; }
+  h3, .input.h3 { font-size: 18px; }
+  h4, .input.h4 { font-size: 16px; }
+  h5, .input.h5 { font-size: 14px; }
+
   .input {
+    font-weight: bold;
     display: none;
     position: absolute;
     top: -3px;

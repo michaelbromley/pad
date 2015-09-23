@@ -23,11 +23,12 @@ class TitleInput extends React.Component {
     };
 
     render() {
-        var outerClass = 'title-input ' + (this.state.focus ? 'focus' : '');
+        var outerClass = 'title-input ' + (this.state.focus ? 'focus' : ''),
+            inputClass = 'input ' + this.props.element;
         return (
             <div className={outerClass} tabIndex="0" onClick={this.focus} onFocus={this.focus}>
-                <this.props.element>{this.props.title}</this.props.element >
-                <div className="input">
+                <this.props.element>{this.props.title}</this.props.element>
+                <div className={inputClass}>
                     <input  ref="input" value={this.props.title}
                             onChange={this.props.onChange.bind(this)}
                             onBlur={this.blur} />
