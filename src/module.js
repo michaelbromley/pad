@@ -5,7 +5,7 @@ import routes from 'routes';
 
 // Common styles
 require('flexboxgrid/dist/flexboxgrid.css');
-require('styles/main.css');
+require('styles/main.less');
 
 Router.run(routes, Router.HashLocation, (Root, state) => {
   React.render(<Root {...state}/>, document.getElementById('content'));

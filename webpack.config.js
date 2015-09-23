@@ -14,7 +14,7 @@ module.exports = {
     },
     resolve: {
         root: srcPath,
-        extensions: ['', '.js', '.css'],
+        extensions: ['', '.js', '.less'],
         modulesDirectories: ['node_modules', 'src']
     },
     output: {
@@ -28,7 +28,8 @@ module.exports = {
     module: {
         loaders: [
             {test: /\.js?$/, exclude: /node_modules/, loader: 'babel?cacheDirectory&stage=0'},
-            {test: /\.css$/, loader: "style-loader!css-loader" }
+            {test: /\.css$/, loader: "style!css" },
+            {test: /\.less$/, loader: "style!css!less"}
         ]
     },
     plugins: [
