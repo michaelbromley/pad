@@ -27,11 +27,11 @@ class TitleInput extends React.Component {
             inputClass = 'input ' + this.props.element;
         return (
             <div className={outerClass} tabIndex="0" onClick={this.focus} onFocus={this.focus}>
-                <this.props.element>{this.props.title}</this.props.element>
+                <this.props.element className="label">{this.props.title}</this.props.element>
                 <div className={inputClass}>
-                    <input  ref="input" value={this.props.title}
-                            onChange={this.props.onChange.bind(this)}
-                            onBlur={this.blur} />
+                    <input ref="input" value={this.props.title}
+                           onChange={this.props.onChange.bind(this)}
+                           onBlur={this.blur} />
                 </div>
             </div>
         );

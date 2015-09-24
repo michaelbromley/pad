@@ -17,7 +17,7 @@ class Page extends React.Component {
     render() {
         return (
             <div className="page-container">
-                <button style={{'float': 'right'}} onClick={this.props.onDelete.bind(this, this.props.page._id)}>x</button>
+                <button className="remove-button" onClick={this.props.onDelete.bind(this, this.props.page._id)}>x</button>
                 <TitleInput title={this.props.page.title} onChange={this.onUpdateTitle} element="h3" />
 
             </div>
