@@ -59,6 +59,11 @@ class PadActions {
         return axios.delete(`${config.API_URL}/pads/${padId}/pages/${pageId}`)
             .then(data => this.actions.fetchPad(padId));
     }
+
+    updatePage(padId, page) {
+        return axios.put(`${config.API_URL}/pads/${padId}/pages/${page._id}`, page)
+            .then(data => this.actions.fetchPad(padId));
+    }
 }
 
 export default PadActions;

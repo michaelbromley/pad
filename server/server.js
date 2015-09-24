@@ -98,6 +98,16 @@ app.delete('/api/pads/:padId/pages/:pageId', function(req, res) {
 });
 
 /**
+ * Update Page
+ */
+app.put('/api/pads/:padId/pages/:pageId', function(req, res) {
+    console.log('updating page:', req.body);
+    var page = req.body;
+
+    db.update({_id: page._id}, page, () => res.send(page));
+});
+
+/**
  * Create Note
  */
 app.post('/api/pads/:padId/pages/:pageId/notes', function(req, res) {

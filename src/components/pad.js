@@ -3,7 +3,7 @@ import connectToStores from 'alt/utils/connectToStores';
 import PadStore from 'stores/padStore';
 import PadActions from 'actions/padActions';
 import Page from 'components/page.js';
-import TitleInput from 'components/titleInput.js';
+import TitleInput from 'components/titleInput/titleInput.js';
 
 @connectToStores
 class Pad extends React.Component {
@@ -39,6 +39,10 @@ class Pad extends React.Component {
         PadActions.updatePad(this.state.pad._id, event.target.value);
     };
 
+    updatePage = (page) => {
+        PadActions.updatePage(this.state.pad._id, page);
+    };
+
     updateNewPageTitle = (event) => {
         this.setState({ newPageTitle: event.target.value });
     };
@@ -61,7 +65,7 @@ class Pad extends React.Component {
                 <ul>
                     {this.state.pad.pages.map(page => {
                         return (
-                            <Page page={page} key={page._id} onDelete={this.deletePage}></Page>
+                            <Page page={page} key={page._id} onDelete={this.deletePage} onUpdate={this.updatePage}></Page>
                         );
                     })}
                 </ul>
