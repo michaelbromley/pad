@@ -1,3 +1,5 @@
+'use strict';
+
 var express = require('express'),
     cors = require('cors'),
     bodyParser = require('body-parser'),
@@ -14,12 +16,17 @@ app.listen(3000);
 
 var db = new Datastore({ filename: __dirname + '/datastore', autoload: true });
 
+const types = {
+    PAD: 'pad',
+    PAGE: 'page',
+    NOTE: 'note'
+};
 
 /**
  * List Pads
  */
 app.get('/api/pads', function(req, res) {
-    db.find({type: 'pad'}, (err, docs) => res.send(docs));
+    db.find({type: types.PAD}, (err, docs) => res.send(docs));
 });
 
 
@@ -29,13 +36,22 @@ app.get('/api/pads', function(req, res) {
 app.get('/api/pads/:id', function(req, res) {
     var padId = req.params.id;
 
-    db.findOne({type: 'pad', _id: padId}, (err, pad) => {
+    db.findOne({type: types.PAD, _id: padId}, (err, pad) => {
 
-        db.find({type: 'page', padId: padId}, (err, pages) => {
+        db.find({type: types.PAGE, padId: padId}, (err, pages) => {
             pad.pages = pages;
-            console.log('sending pad:');
-            console.log(pad);
-            res.send(pad);
+            let query = {$and: [
+                { type: types.NOTE },
+                { $or : pages.map(page => ({ pageId: page._id })) }
+            ] };
+
+            db.find(query, (err, notes) => {
+
+                pad.pages.forEach(page => {
+                    page.notes = notes.filter(note => note.pageId === page._id);
+                });
+                res.send(pad);
+            });
         });
 
     });
@@ -115,7 +131,7 @@ app.post('/api/pads/:padId/pages/:pageId/notes', function(req, res) {
     var pageId = req.params.pageId,
         note = req.body;
 
-    note.type = 'note';
+    note.type = types.NOTE;
     note.pageId = pageId;
     db.insert(note, () => res.send(pageId));
 });

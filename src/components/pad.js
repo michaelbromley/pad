@@ -39,10 +39,6 @@ class Pad extends React.Component {
         PadActions.updatePad(this.state.pad._id, event.target.value);
     };
 
-    updatePage = (page) => {
-        PadActions.updatePage(this.state.pad._id, page);
-    };
-
     updateNewPageTitle = (event) => {
         this.setState({ newPageTitle: event.target.value });
     };
@@ -54,8 +50,16 @@ class Pad extends React.Component {
         this.setState({ newPageTitle: '' });
     };
 
+    updatePage = (page) => {
+        PadActions.updatePage(this.state.pad._id, page);
+    };
+
     deletePage = (pageId) => {
         PadActions.deletePage(this.state.pad._id, pageId);
+    };
+
+    createNote = (pageId, content) => {
+        PadActions.createNote(this.state.pad._id, pageId, content);
     };
 
     render() {
@@ -65,7 +69,10 @@ class Pad extends React.Component {
                 <ul>
                     {this.state.pad.pages.map(page => {
                         return (
-                            <Page page={page} key={page._id} onDelete={this.deletePage} onUpdate={this.updatePage}></Page>
+                            <Page page={page} key={page._id}
+                                  onDelete={this.deletePage}
+                                  onUpdate={this.updatePage}
+                                  onCreateNote={this.createNote}></Page>
                         );
                     })}
                 </ul>

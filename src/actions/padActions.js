@@ -64,6 +64,14 @@ class PadActions {
         return axios.put(`${config.API_URL}/pads/${padId}/pages/${page._id}`, page)
             .then(data => this.actions.fetchPad(padId));
     }
+
+    // Note level
+
+    createNote(padId, pageId, content) {
+        console.log('creating note...');
+        return axios.post(`${config.API_URL}/pads/${padId}/pages/${pageId}/notes`, { content: content})
+            .then(data => this.actions.fetchPad(padId));
+    }
 }
 
 export default PadActions;

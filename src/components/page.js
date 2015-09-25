@@ -6,20 +6,36 @@ class Page extends React.Component {
 
     constructor(props) {
         super(props);
+        this.state = {};
     }
 
     onUpdateTitle = (event) => {
-        var page = this.props.page;
+        let page = this.props.page;
         page.title = event.target.value;
         this.props.onUpdate(page);
     };
 
+    createNote = () => {
+        this.props.onCreateNote(this.props.page._id, this.refs.newNoteContent.getDOMNode().value);
+    };
+
     render() {
+
+        let notes = this.props.page.notes.map(note => {
+            return <li>{note.content}</li>;
+        });
+        console.log(notes);
         return (
             <div className="page-container">
                 <button className="remove-button" onClick={this.props.onDelete.bind(this, this.props.page._id)}>x</button>
                 <TitleInput title={this.props.page.title} onChange={this.onUpdateTitle} element="h3" />
-
+                <ul>
+                    {notes}
+                    <li>
+                        <textarea ref="newNoteContent"></textarea>
+                        <button onClick={this.createNote}>add note</button>
+                    </li>
+                </ul>
             </div>
         );
     }
