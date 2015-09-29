@@ -11,8 +11,8 @@ class Pad extends React.Component {
         super(props);
 
         this.state = {
-            pad: props.pad,
-            newPageTitle: ''
+            newPageTitle: '',
+            pad: props.pad
         };
     }
 
@@ -35,8 +35,16 @@ class Pad extends React.Component {
         this.cancelListen();
     }
 
-    updatePadTitle = (event) => {
-        PadActions.updatePad(this.state.pad._id, event.target.value);
+    setPadTitle = (title) => {
+        var pad = this.state.pad;
+        pad.name = title;
+        this.setState({
+            pad: pad
+        });
+    };
+
+    updatePadTitle = () => {
+        PadActions.updatePad(this.state.pad._id, this.state.pad.name);
     };
 
     updateNewPageTitle = (event) => {
@@ -65,7 +73,7 @@ class Pad extends React.Component {
     render() {
         return (
             <div>
-                <TitleInput title={this.state.pad.name} onChange={this.updatePadTitle} element="h2" />
+                <TitleInput title={this.state.pad.name} onChange={this.setPadTitle} onBlur={this.updatePadTitle} element="h2" />
                 <ul>
                     {this.state.pad.pages.map(page => {
                         return (

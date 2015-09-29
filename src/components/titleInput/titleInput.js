@@ -16,10 +16,15 @@ class TitleInput extends React.Component {
         setTimeout(() => React.findDOMNode(this.refs.input).focus(), 0);
     };
 
-    blur = () => {
+    change = (event) => {
+        this.props.onChange(event.target.value);
+    };
+
+    blur = (event) => {
         this.setState({
             focus: false
         });
+        this.props.onBlur(event.target.value);
     };
 
     render() {
@@ -30,7 +35,7 @@ class TitleInput extends React.Component {
                 <this.props.element className="label">{this.props.title}</this.props.element>
                 <div className={inputClass}>
                     <input ref="input" value={this.props.title}
-                           onChange={this.props.onChange.bind(this)}
+                           onChange={this.change}
                            onBlur={this.blur} />
                 </div>
             </div>

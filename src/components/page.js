@@ -9,9 +9,9 @@ class Page extends React.Component {
         this.state = {};
     }
 
-    onUpdateTitle = (event) => {
+    onUpdateTitle = (title) => {
         let page = this.props.page;
-        page.title = event.target.value;
+        page.title = title;
         this.props.onUpdate(page);
     };
 
@@ -24,7 +24,6 @@ class Page extends React.Component {
         let notes = this.props.page.notes.map(note => {
             return <li>{note.content}</li>;
         });
-        console.log(notes);
         return (
             <div className="page-container">
                 <button className="remove-button" onClick={this.props.onDelete.bind(this, this.props.page._id)}>x</button>

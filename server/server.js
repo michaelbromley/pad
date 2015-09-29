@@ -74,7 +74,7 @@ app.put('/api/pads/:id', function(req, res) {
     console.log('updating pad:', req.body);
     var pad = req.body;
     pad.type = 'pad';
-    pad.id = req.params.id;
+    pad._id = req.params.id;
     db.update({_id: req.params.id}, pad, () => res.send(pad));
 });
 
