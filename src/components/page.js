@@ -15,6 +15,12 @@ class Page extends React.Component {
         this.props.onUpdate(page);
     };
 
+    onSetTitle = (title) => {
+        let page = this.props.page;
+        page.title = title;
+        this.props.onChange(page);
+    };
+
     createNote = () => {
         this.props.onCreateNote(this.props.page._id, this.refs.newNoteContent.getDOMNode().value);
     };
@@ -27,7 +33,7 @@ class Page extends React.Component {
         return (
             <div className="page-container">
                 <button className="remove-button" onClick={this.props.onDelete.bind(this, this.props.page._id)}>x</button>
-                <TitleInput title={this.props.page.title} onChange={this.onUpdateTitle} element="h3" />
+                <TitleInput title={this.props.page.title} onBlur={this.onUpdateTitle} onChange={this.onSetTitle} element="h3" />
                 <ul>
                     {notes}
                     <li>

@@ -58,6 +58,16 @@ class Pad extends React.Component {
         this.setState({ newPageTitle: '' });
     };
 
+    setPage = (page) => {
+        var pad = this.state.pad;
+        var index = pad.pages.map(page => page._id).indexOf(page._id);
+        pad.pages[index] = page;
+
+        this.setState({
+            pad: pad
+        });
+    };
+
     updatePage = (page) => {
         PadActions.updatePage(this.state.pad._id, page);
     };
@@ -79,6 +89,7 @@ class Pad extends React.Component {
                         return (
                             <Page page={page} key={page._id}
                                   onDelete={this.deletePage}
+                                  onChange={this.setPage}
                                   onUpdate={this.updatePage}
                                   onCreateNote={this.createNote}></Page>
                         );
