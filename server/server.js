@@ -117,10 +117,17 @@ app.delete('/api/pads/:padId/pages/:pageId', function(req, res) {
  * Update Page
  */
 app.put('/api/pads/:padId/pages/:pageId', function(req, res) {
-    console.log('updating page:', req.body);
+    console.log('updating page:', req.body.title);
     var page = req.body;
+    var notes = page.notes;
+    delete page.notes;
 
-    db.update({_id: page._id}, page, () => res.send(page));
+    db.update({_id: page._id}, page, () => {
+        notes.map(note => {
+            db.update({_id: note._id}, note);
+        });
+        res.send(page);
+    });
 });
 
 /**
