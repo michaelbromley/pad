@@ -2,7 +2,7 @@ import React from 'react';
 import connectToStores from 'alt/utils/connectToStores';
 import PadStore from 'stores/padStore';
 import PadActions from 'actions/padActions';
-import Page from 'components/page.js';
+import Page from 'components/page/page.js';
 import TitleInput from 'components/titleInput/titleInput.js';
 
 @connectToStores

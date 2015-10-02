@@ -10,6 +10,11 @@ class NoteEditor extends React.Component {
         };
     }
 
+    componentDidMount() {
+        let textarea = this.refs.input.getDOMNode();
+        textarea.setAttribute('style', 'height:' + (textarea.scrollHeight) + 'px;overflow-y:hidden;');
+    }
+
     focus = () => {
         this.setState({
             focus: true
@@ -20,6 +25,7 @@ class NoteEditor extends React.Component {
         let note = this.props.note;
         note.content = event.target.value;
         this.props.onChange(note);
+        this.autoSize(event.target);
     };
 
     blur = (event) => {
@@ -52,13 +58,18 @@ class NoteEditor extends React.Component {
         }
     };
 
+    autoSize(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = (textarea.scrollHeight) + 'px';
+    }
+
     render() {
-        var outerClass = 'title-input ' + (this.state.focus ? 'focus' : ''),
+        var outerClass = 'note-editor ' + (this.state.focus ? 'focus' : ''),
             inputClass = 'input ' + this.props.element,
             previewHtml = this.parseMarkdown(this.props.note.content);
         return (
             <div className={outerClass} tabIndex="0" onClick={this.focus} onFocus={this.focus}>
-                <textarea value={this.props.note.content}
+                <textarea value={this.props.note.content} className="input"
                           ref="input"
                           onChange={this.change}
                           onBlur={this.blur}

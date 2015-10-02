@@ -1,0 +1,25 @@
+.note-editor {
+
+  position: relative;
+
+  .input {
+    width: 100%;
+    display: none;
+  }
+
+  .preview {
+    width: 100%;
+    opacity: 1;
+  }
+
+  &.focus {
+    .preview {
+      opacity: 0;
+      height: 0;
+      overflow: hidden;
+    }
+    .input {
+      display: block;
+    }
+  }
+}

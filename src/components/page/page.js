@@ -22,8 +22,8 @@ class Page extends React.Component {
         this.props.onChange(page);
     };
 
-    createNote = () => {
-        this.props.onCreateNote(this.props.page._id, this.refs.newNoteContent.getDOMNode().value);
+    createNote = (note) => {
+        this.props.onCreateNote(this.props.page._id, note.title);
     };
 
     onUpdateNote = (note) => {
@@ -49,13 +49,14 @@ class Page extends React.Component {
         });
         return (
             <div className="page-container">
-                <button className="remove-button" onClick={this.props.onDelete.bind(this, this.props.page._id)}>x</button>
+                <div className="remove-button" onClick={this.props.onDelete.bind(this, this.props.page._id)}>x</div>
                 <TitleInput title={this.props.page.title} onBlur={this.onUpdateTitle} onChange={this.onSetTitle} element="h3" />
                 <ul className="notes-list">
                     {notes}
                     <li>
-                        <textarea ref="newNoteContent"></textarea>
-                        <button onClick={this.createNote}>add note</button>
+                        <NoteEditor note={{}}
+                                    onBlur={this.createNote}
+                                    onChange={this.onSetNote}></NoteEditor>
                     </li>
                 </ul>
             </div>
