@@ -1,5 +1,5 @@
 import React from 'react';
-import markdown from 'markdown';
+import marked from 'marked';
 
 class NoteEditor extends React.Component {
     constructor(props) {
@@ -31,7 +31,7 @@ class NoteEditor extends React.Component {
 
     parseMarkdown(md) {
         return {
-            __html: markdown.parse(md || '')
+            __html: marked(md || '')
         };
     }
 
