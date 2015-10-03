@@ -1,4 +1,4 @@
-import config from 'util/config';
+import config from 'common/config';
 import axios from 'axios';
 
 

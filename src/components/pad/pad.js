@@ -1,8 +1,9 @@
 import React from 'react';
-import * as model from 'models/model';
-import * as data from 'services/dataService';
-import Page from 'components/page/page.js';
-import TitleInput from 'components/titleInput/titleInput.js';
+import {types} from 'common/model';
+import * as data from 'common/dataService';
+import Page from 'components/page/page';
+import TitleInput from 'components/titleInput/titleInput';
+import NoteEditor from 'components/noteEditor/noteEditor';
 
 
 class Pad extends React.Component {
@@ -70,19 +71,32 @@ class Pad extends React.Component {
 
     render() {
         let pad = this.state.padCollection[0] || {};
-        let pages = this.state.padCollection.filter(item => item.type === model.type.PAGE);
+        let pages = this.state.padCollection.filter(item => item.type === types.PAGE);
+        let items = this.state.padCollection.slice(1);
         return (
             <div>
                 <TitleInput title={pad.name} onChange={this.setPadTitle} onBlur={this.updatePadTitle} element="h2" />
                 <ul>
-                    {pages.map(page => {
-                        return (
-                            <Page page={page} key={page._id}
-                                  onDelete={this.deletePage}
-                                  onChange={this.setPage}
-                                  onUpdate={this.updatePage}
-                                  onCreateNote={this.createNote}></Page>
-                        );
+                    {items.map(item => {
+                        if (item.type === types.PAGE) {
+                            return (
+                                <li key={item._id}>
+                                    <Page page={item}
+                                          onDelete={this.deletePage}
+                                          onChange={this.setPage}
+                                          onUpdate={this.updatePage}
+                                          onCreateNote={this.createNote}></Page>
+                                </li>
+                            );
+                        } else {
+                            return (
+                                <li key={item._id}>
+                                    <NoteEditor note={item}
+                                                onBlur={this.onUpdateNote}
+                                                onChange={this.onSetNote} ></NoteEditor>
+                                </li>
+                            );
+                        }
                     })}
                 </ul>
                 <input value={this.state.newPageTitle} onChange={this.updateNewPageTitle} />

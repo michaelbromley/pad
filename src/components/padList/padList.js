@@ -1,6 +1,6 @@
 import React from 'react';
 import {Link} from 'react-router';
-import Data from 'services/dataService';
+import Data from 'common/dataService';
 
 class PadList extends React.Component {
 

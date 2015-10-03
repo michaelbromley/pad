@@ -50,7 +50,7 @@ function getType(item) {
  * @returns {*}
  */
 function spliceArray(target, arr, index) {
-    let targetClone = target.map(identity);
+    let targetClone = target.slice();
     console.log('targetClone', targetClone);
     Array.prototype.splice.apply(targetClone, [index, 0].concat(arr));
     return targetClone;

@@ -1,6 +1,6 @@
 import React from 'react';
 import TitleInput from 'components/titleInput/titleInput';
-import NoteEditor from 'components/note/noteEditor';
+import NoteEditor from 'components/noteEditor/noteEditor';
 
 class Page extends React.Component {
 
@@ -40,24 +40,10 @@ class Page extends React.Component {
     };
 
     render() {
-
-        let notes = this.props.page.notes.map(note => {
-            return <li key={note._id}><NoteEditor note={note}
-                                   onBlur={this.onUpdateNote}
-                                   onChange={this.onSetNote} ></NoteEditor></li>;
-        });
         return (
             <div className="page-container">
                 <div className="remove-button" onClick={this.props.onDelete.bind(this, this.props.page._id)}>x</div>
                 <TitleInput title={this.props.page.title} onBlur={this.onUpdateTitle} onChange={this.onSetTitle} element="h3" />
-                <ul className="notes-list">
-                    {notes}
-                    <li>
-                        <NoteEditor note={{}}
-                                    onBlur={this.createNote}
-                                    onChange={this.onSetNote}></NoteEditor>
-                    </li>
-                </ul>
             </div>
         );
     }
