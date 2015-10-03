@@ -2,7 +2,7 @@ import React from 'react';
 import {Route, DefaultRoute} from 'react-router';
 
 import Main from 'components/main';
-import PadList from 'components/padList';
+import PadList from 'components/padList/padList';
 import Pad from 'components/pad/pad';
 
 const routes = (

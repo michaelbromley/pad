@@ -1,6 +1,6 @@
 import React from 'react';
 import {RouteHandler} from 'react-router';
-import PadList from 'components/padList';
+import PadList from 'components/padList/padList';
 
 class Main extends React.Component {
 

@@ -1,43 +1,29 @@
 import React from 'react';
-import connectToStores from 'alt/utils/connectToStores';
 import {Link} from 'react-router';
-import PadStore from 'stores/padStore';
-import PadActions from 'actions/padActions';
+import Data from 'services/dataService';
 
-@connectToStores
 class PadList extends React.Component {
+
     constructor(props) {
         super(props);
         this.state = {
-            pads: props.pads
+            pads: []
         };
     }
 
-    static getStores(props) {
-        return [PadStore];
-    }
-
-    static getPropsFromStores(props) {
-        return PadStore.getState();
-    }
-
     componentDidMount() {
-        PadActions.fetchPadList();
-        this.cancelListen = PadStore.listen(store => {
-            this.setState({ pads: store.pads });
-        });
-    }
-
-    componentWillUnmount() {
-        this.cancelListen();
+        Data.fetchPadList()
+            .then(pads => {
+                this.setState({ pads: pads });
+            });
     }
 
     createPad = () => {
-        PadActions.createPad(this.refs.newPadName.getDOMNode().value);
+        //PadActions.createPad(this.refs.newPadName.getDOMNode().value);
     };
 
     deletePad = (id) => {
-        PadActions.deletePad(id);
+        //PadActions.deletePad(id);
     };
 
     render() {

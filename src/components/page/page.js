@@ -1,5 +1,4 @@
 import React from 'react';
-import PadActions from 'actions/pageActions';
 import TitleInput from 'components/titleInput/titleInput';
 import NoteEditor from 'components/note/noteEditor';
 

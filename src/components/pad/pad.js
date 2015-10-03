@@ -1,38 +1,26 @@
 import React from 'react';
-import connectToStores from 'alt/utils/connectToStores';
-import PadStore from 'stores/padStore';
-import PadActions from 'actions/padActions';
+import * as model from 'models/model';
+import * as data from 'services/dataService';
 import Page from 'components/page/page.js';
 import TitleInput from 'components/titleInput/titleInput.js';
 
-@connectToStores
+
 class Pad extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
             newPageTitle: '',
-            pad: props.pad
+            padCollection: []
         };
     }
 
-    static getStores(props) {
-        return [PadStore];
-    }
 
-    static getPropsFromStores(props) {
-        return PadStore.getState();
-    }
     componentDidMount() {
-        PadActions.fetchPad(this.props.params.id);
-
-        this.cancelListen = PadStore.listen(store => {
-            this.setState({ pad: store.pad });
+        data.fetchPad(this.props.params.id).then(pad => {
+            console.log('pad fetched:', pad);
+            this.setState({ padCollection: pad });
         });
-    }
-
-    componentWillUnmount() {
-        this.cancelListen();
     }
 
     setPadTitle = (title) => {
@@ -44,7 +32,7 @@ class Pad extends React.Component {
     };
 
     updatePadTitle = () => {
-        PadActions.updatePad(this.state.pad._id, this.state.pad.name);
+        //PadActions.updatePad(this.state.pad._id, this.state.pad.name);
     };
 
     updateNewPageTitle = (event) => {
@@ -54,7 +42,7 @@ class Pad extends React.Component {
     createPage = () => {
         var padId = this.state.pad._id,
             pageTitle = this.state.newPageTitle;
-        PadActions.createPage(padId, pageTitle);
+        //PadActions.createPage(padId, pageTitle);
         this.setState({ newPageTitle: '' });
     };
 
@@ -69,23 +57,25 @@ class Pad extends React.Component {
     };
 
     updatePage = (page) => {
-        PadActions.updatePage(this.state.pad._id, page);
+        //PadActions.updatePage(this.state.pad._id, page);
     };
 
     deletePage = (pageId) => {
-        PadActions.deletePage(this.state.pad._id, pageId);
+        //PadActions.deletePage(this.state.pad._id, pageId);
     };
 
     createNote = (pageId, content) => {
-        PadActions.createNote(this.state.pad._id, pageId, content);
+        //PadActions.createNote(this.state.pad._id, pageId, content);
     };
 
     render() {
+        let pad = this.state.padCollection[0] || {};
+        let pages = this.state.padCollection.filter(item => item.type === model.type.PAGE);
         return (
             <div>
-                <TitleInput title={this.state.pad.name} onChange={this.setPadTitle} onBlur={this.updatePadTitle} element="h2" />
+                <TitleInput title={pad.name} onChange={this.setPadTitle} onBlur={this.updatePadTitle} element="h2" />
                 <ul>
-                    {this.state.pad.pages.map(page => {
+                    {pages.map(page => {
                         return (
                             <Page page={page} key={page._id}
                                   onDelete={this.deletePage}
