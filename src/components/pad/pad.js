@@ -12,10 +12,11 @@ class Pad extends React.Component {
 
         this.state = {
             newPageTitle: '',
-            padCollection: []
+            padCollection: [],
+            selectedItem: '',
+            selectedItemActive: false
         };
     }
-
 
     componentDidMount() {
         data.fetchPad(this.props.params.id).then(pad => {
@@ -69,35 +70,44 @@ class Pad extends React.Component {
         //PadActions.createNote(this.state.pad._id, pageId, content);
     };
 
-    render() {
-        let pad = this.state.padCollection[0] || {};
-        let pages = this.state.padCollection.filter(item => item.type === types.PAGE);
-        let items = this.state.padCollection.slice(1);
+    renderNote(note) {
         return (
-            <div>
+            <li key={note._id}>
+                <NoteEditor note={note}
+                            onBlur={this.onUpdateNote}
+                            onChange={this.onSetNote} ></NoteEditor>
+            </li>
+        );
+    }
+
+    render() {
+        let pad = this.state.padCollection[0] || {},
+            pages = this.state.padCollection.filter(item => item.type === types.PAGE),
+            notes = this.state.padCollection.filter(item => item.type === types.NOTE);
+        return (
+            <div className="pad-collection-list">
                 <TitleInput title={pad.name} onChange={this.setPadTitle} onBlur={this.updatePadTitle} element="h2" />
                 <ul>
-                    {items.map(item => {
-                        if (item.type === types.PAGE) {
+                    {pages.map(page => {
                             return (
-                                <li key={item._id}>
-                                    <Page page={item}
+                                <li key={page._id}>
+                                    <Page page={page}
                                           onDelete={this.deletePage}
                                           onChange={this.setPage}
                                           onUpdate={this.updatePage}
-                                          onCreateNote={this.createNote}></Page>
+                                          onCreateNote={this.createNote}>
+                                        <ul className="notes-list">
+                                            {
+                                                notes.filter(note => note.pageId === page._id).map(note => {
+                                                   return this.renderNote(note);
+                                                })
+                                            }
+                                        </ul>
+                                    </Page>
                                 </li>
                             );
-                        } else {
-                            return (
-                                <li key={item._id}>
-                                    <NoteEditor note={item}
-                                                onBlur={this.onUpdateNote}
-                                                onChange={this.onSetNote} ></NoteEditor>
-                                </li>
-                            );
-                        }
-                    })}
+                    })
+                    }
                 </ul>
                 <input value={this.state.newPageTitle} onChange={this.updateNewPageTitle} />
                 <button onClick={this.createPage}>New Page</button>

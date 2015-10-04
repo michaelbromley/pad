@@ -44,6 +44,7 @@ class Page extends React.Component {
             <div className="page-container">
                 <div className="remove-button" onClick={this.props.onDelete.bind(this, this.props.page._id)}>x</div>
                 <TitleInput title={this.props.page.title} onBlur={this.onUpdateTitle} onChange={this.onSetTitle} element="h3" />
+                {this.props.children}
             </div>
         );
     }
