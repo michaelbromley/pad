@@ -9,8 +9,10 @@ module.exports = {
     target: 'web',
     cache: true,
     entry: {
-        module: path.join(srcPath, 'module.js'),
-        common: ['react', 'react-router', 'alt']
+        app: path.join(srcPath, 'app.ts'),
+        common: [
+            'angular2/node_modules/reflect-metadata'
+        ]
     },
     resolve: {
         root: srcPath,
@@ -21,13 +23,12 @@ module.exports = {
         path: path.join(__dirname, 'tmp'),
         publicPath: '',
         filename: '[name].js',
-        library: ['Example', '[name]'],
         pathInfo: true
     },
 
     module: {
         loaders: [
-            {test: /\.js?$/, exclude: /node_modules/, loader: 'babel?cacheDirectory&stage=0'},
+            {test: /\.ts?$/, exclude: /node_modules/, loader: 'ts-loader'},
             {test: /\.css$/, loader: "style!css" },
             {test: /\.less$/, loader: "style!css!less"}
         ]

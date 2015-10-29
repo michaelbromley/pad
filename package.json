@@ -8,8 +8,7 @@
   "version": "0.0.0",
   "description": "A new way to write.",
   "dependencies": {
-    "axios": "^0.5.4",
-    "babel-runtime": "5.6.18",
+    "angular2": "^2.0.0-alpha.45",
     "body-parser": "^1.12.4",
     "cors": "^2.7.1",
     "express": "^4.12.4",
@@ -17,18 +16,16 @@
     "keyboardjs": "^2.1.1",
     "marked": "^0.3.5",
     "nedb": "^1.1.2",
-    "react": "0.13.3",
-    "react-router": "0.13.3"
+    "ts-loader": "^0.6.0"
   },
   "devDependencies": {
-    "babel-core": "5.6.18",
-    "babel-loader": "5.3.1",
     "css-loader": "^0.16.0",
     "html-webpack-plugin": "1.6.0",
     "less": "^2.5.1",
     "less-loader": "^2.2.1",
     "style-loader": "^0.12.3",
-    "webpack": "1.10.1",
+    "typescript": "^1.6.2",
+    "webpack": "^1.12.2",
     "webpack-dev-server": "1.10.1"
   },
   "author": "Michael Bromley",
