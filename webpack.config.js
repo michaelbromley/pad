@@ -11,12 +11,13 @@ module.exports = {
     entry: {
         app: path.join(srcPath, 'app.ts'),
         common: [
-            'angular2/node_modules/reflect-metadata'
+            'angular2/node_modules/reflect-metadata',
+            'angular2/node_modules/zone.js'
         ]
     },
     resolve: {
         root: srcPath,
-        extensions: ['', '.js', '.less'],
+        extensions: ['', '.js', '.less', '.ts'],
         modulesDirectories: ['node_modules', 'src']
     },
     output: {
@@ -28,7 +29,7 @@ module.exports = {
 
     module: {
         loaders: [
-            {test: /\.ts?$/, exclude: /node_modules/, loader: 'ts-loader'},
+            {test: /\.ts$/, loader: 'ts-loader'},
             {test: /\.css$/, loader: "style!css" },
             {test: /\.less$/, loader: "style!css!less"}
         ]
