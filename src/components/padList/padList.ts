@@ -1,22 +1,14 @@
 import DataService from '../../common/dataService';
 import {Component, NgFor} from 'angular2/angular2';
+import {RouterLink} from 'angular2/router';
 
 @Component({
     selector: 'pad-list',
-    template: `<div>
-        Found {{ pads.length }} pads.
-        <ul>
-            <li *ng-for="#pad of pads">
-                <span>this is {{ pad.name }}</span>
-            </li>
-        </ul>
-        <input type="text"/>
-        <button>New Pad</button>
-    </div>`,
-    directives: [NgFor],
+    template: require('./padList.html'),
+    directives: [NgFor, RouterLink],
     providers: [DataService]
 })
-class PadListCmp {
+class PadList {
 
     public pads: any[] = [];
 
@@ -29,4 +21,4 @@ class PadListCmp {
     }
 }
 
-export default PadListCmp;
+export default PadList;

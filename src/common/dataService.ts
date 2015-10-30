@@ -14,7 +14,7 @@ class DataService {
 
     public fetchPad(id) {
         return this.http.get(`${config.API_URL}/pads/${id}`)
-            .then(res => res.data);
+            .map((res: Response) => res.json());
     }
 
     public createItem(item) {

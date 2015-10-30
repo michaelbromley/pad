@@ -1,123 +1,107 @@
-import {types} from 'common/model';
-
-
-let collection,
-    selectedItem,
-    selectedItemIsActive,
-    selectedItemAddress = [-1],
-    collectionMap;
-
-export const init = (padCollection) => {
+var model_1 = require('./model');
+var collection, selectedItem, selectedItemIsActive, selectedItemAddress = [-1], collectionMap;
+exports.init = function (padCollection) {
     collection = padCollection;
     selectedItem = undefined;
     selectedItemIsActive = false;
     collectionMap = buildMap(collection);
 };
-
-export const getSelectedItemId = () => {
+exports.getSelectedItemId = function () {
     return selectedItem ? selectedItem._id : '';
 };
-
-export const getSelectedItemAddress = () => {
+exports.getSelectedItemAddress = function () {
     return selectedItemAddress;
 };
-
-export const down = () => {
-    let downAddress = selectedItemAddress.slice();
+exports.down = function () {
+    var downAddress = selectedItemAddress.slice();
     downAddress.push(0);
     if (getValue(collectionMap, downAddress)) {
         selectedItemAddress = downAddress;
-    } else {
+    }
+    else {
         selectedItemIsActive = true;
         console.log('enter edit mode!');
     }
 };
-
-export const up = () => {
-   if (selectedItemIsActive) {
-       selectedItemIsActive = false;
-       console.log('exit edit mode!');
-   } else {
-       if (1 < selectedItemAddress.length) {
-           selectedItemAddress.pop();
-       }
-   }
+exports.up = function () {
+    if (selectedItemIsActive) {
+        selectedItemIsActive = false;
+        console.log('exit edit mode!');
+    }
+    else {
+        if (1 < selectedItemAddress.length) {
+            selectedItemAddress.pop();
+        }
+    }
 };
-
-export const prev = () => {
-    let prevAddress = decrementLast(selectedItemAddress);
+exports.prev = function () {
+    var prevAddress = decrementLast(selectedItemAddress);
     if (getValue(collectionMap, prevAddress)) {
         selectedItemAddress = prevAddress;
-    } else {
+    }
+    else {
         console.log('reached start!');
     }
 };
-
-export const next = () => {
-    let nextAddress = incrementLast(selectedItemAddress);
+exports.next = function () {
+    var nextAddress = incrementLast(selectedItemAddress);
     if (getValue(collectionMap, nextAddress)) {
         selectedItemAddress = nextAddress;
-    } else {
+    }
+    else {
         console.log('reached end!');
     }
 };
-
 /**
  * Increment the last element in an array of numbers, and return a new array.
  * @param array
  * @returns {Array|*|DOMElement<HTMLAttributes>|{}}
  */
 function incrementLast(array) {
-    return array.map((num, i, arr) => {
-            return num + (i === arr.length - 1);
-        }
-    );
+    return array.map(function (num, i, arr) {
+        return num + +(i === arr.length - 1);
+    });
 }
-
 function decrementLast(array) {
-    return array.map((num, i, arr) => {
-            return num - (i === arr.length - 1);
-        }
-    );
+    return array.map(function (num, i, arr) {
+        return num - +(i === arr.length - 1);
+    });
 }
-
 function getValue(array, address) {
-    let val = array;
-    address.forEach(index => {
+    var val = array;
+    address.forEach(function (index) {
         if (val instanceof Array) {
             val = val[index];
         }
     });
     return val;
 }
-
 function buildMap(collection) {
-    let map = [],
-        lastPage = [];
-    for (let i = 0; i < collection.length; i ++) {
-        let item = collection[i];
-        if (item.type === types.PAGE) {
+    var map = [], lastPage = [];
+    for (var i = 0; i < collection.length; i++) {
+        var item = collection[i];
+        if (item.type === model_1.types.PAGE) {
             if (0 < lastPage.length) {
                 map.push(lastPage);
             }
             lastPage = [[]];
-        } else if (item.type === types.NOTE) {
+        }
+        else if (item.type === model_1.types.NOTE) {
             lastPage.push([]);
-        } else if (item.type === types.PAD) {
+        }
+        else if (item.type === model_1.types.PAD) {
             map.push([]);
         }
     }
     map.push(lastPage);
     return map;
 }
-
-const getSubCollection = (padCollection, selectedItem) => {
-    if (selectedItem.type === types.PAGE || selectedItem.type === types.PAD) {
-        return padCollection.filter(item => item.type === types.PAGE);
+var getSubCollection = function (padCollection, selectedItem) {
+    if (selectedItem.type === model_1.types.PAGE || selectedItem.type === model_1.types.PAD) {
+        return padCollection.filter(function (item) { return item.type === model_1.types.PAGE; });
     }
-    if (selectedItem.type === types.NOTE) {
-        return padCollection.filter(item => item.pageId === selectedItem.pageId);
+    if (selectedItem.type === model_1.types.NOTE) {
+        return padCollection.filter(function (item) { return item.pageId === selectedItem.pageId; });
     }
     return padCollection[0];
 };
-    

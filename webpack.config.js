@@ -31,7 +31,8 @@ module.exports = {
         loaders: [
             {test: /\.ts$/, loader: 'ts-loader'},
             {test: /\.css$/, loader: "style!css" },
-            {test: /\.less$/, loader: "style!css!less"}
+            {test: /\.less$/, loader: "style!css!less"},
+            {test: /\.html/, loader: "html-loader"}
         ]
     },
     plugins: [

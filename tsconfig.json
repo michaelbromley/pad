@@ -8,7 +8,7 @@
     "moduleResolution": "node"
   },
   "files": [
-    "src/app.ts",
-    "typings/tsd.d.ts"
+    "typings/tsd.d.ts",
+    "src/app.ts"
   ]
 }

@@ -22,7 +22,7 @@ var DataService = (function () {
     };
     DataService.prototype.fetchPad = function (id) {
         return this.http.get(config_1.default.API_URL + "/pads/" + id)
-            .then(function (res) { return res.data; });
+            .map(function (res) { return res.json(); });
     };
     DataService.prototype.createItem = function (item) {
         return this.http.post(config_1.default.API_URL + "/items", item);

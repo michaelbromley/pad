@@ -1,0 +1,10 @@
+<div>
+    Found {{ pads.length }} pads.
+    <ul>
+        <li *ng-for="#pad of pads">
+            <a [router-link]="[ '/Pad', {id: pad._id } ]">{{ pad.name }}</a>
+        </li>
+    </ul>
+    <input type="text"/>
+    <button>New Pad</button>
+</div>

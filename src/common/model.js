@@ -1,33 +1,34 @@
-export const types = {
+exports.types = {
     PAD: 'pad',
     PAGE: 'page',
     NOTE: 'note'
 };
-
-export class Pad {
-    _id = '';
-    title = '';
-    type = types.PAD;
-}
-
-export class Page {
-
-    constructor(padId) {
+var Pad = (function () {
+    function Pad() {
+        this._id = '';
+        this.title = '';
+        this.type = exports.types.PAD;
+    }
+    return Pad;
+})();
+exports.Pad = Pad;
+var Page = (function () {
+    function Page(padId) {
+        this._id = '';
+        this.title = '';
+        this.type = exports.types.PAGE;
         this.padId = padId;
     }
-
-    _id = '';
-    title = '';
-    type = types.PAGE;
-}
-
-export class Note {
-
-    constructor(pageId) {
+    return Page;
+})();
+exports.Page = Page;
+var Note = (function () {
+    function Note(pageId) {
+        this._id = '';
+        this.content = '';
+        this.type = exports.types.NOTE;
         this.pageId = pageId;
     }
-
-    _id = '';
-    content = '';
-    type = types.NOTE;
-}
+    return Note;
+})();
+exports.Note = Note;

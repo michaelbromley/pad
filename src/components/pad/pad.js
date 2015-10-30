@@ -1,127 +1,74 @@
-import React from 'react';
-import keyboardJS from 'keyboardjs';
-import {types} from 'common/model';
-import * as data from 'common/dataService';
-import Page from 'components/page/page';
-import TitleInput from 'components/titleInput/titleInput';
-import NoteEditor from 'components/noteEditor/noteEditor';
-import * as navigator from 'common/navigator';
-
-
-class Pad extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            newPageTitle: '',
-            padCollection: [],
-            selectedItemAddress: ''
-        };
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") return Reflect.decorate(decorators, target, key, desc);
+    switch (arguments.length) {
+        case 2: return decorators.reduceRight(function(o, d) { return (d && d(o)) || o; }, target);
+        case 3: return decorators.reduceRight(function(o, d) { return (d && d(target, key)), void 0; }, void 0);
+        case 4: return decorators.reduceRight(function(o, d) { return (d && d(target, key, o)) || o; }, desc);
     }
-
-    componentDidMount() {
-        data.fetchPad(this.props.params.id).then(pad => {
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var angular2_1 = require('angular2/angular2');
+var router_1 = require('angular2/router');
+var model_1 = require('../../common/model');
+var dataService_1 = require('../../common/dataService');
+//import Page from '../page/page';
+var titleInput_1 = require('../titleInput/titleInput');
+//import NoteEditor from '../noteEditor/noteEditor';
+var navigator = require('../../common/navigator');
+var keyboardJS = require('keyboardjs');
+var PadCmp = (function () {
+    function PadCmp(dataService, params) {
+        var _this = this;
+        this.dataService = dataService;
+        this.newPageTitle = '';
+        this.padCollection = [];
+        this.selectedItemAddress = '';
+        this.pad = {};
+        this.pages = [];
+        this.notes = [];
+        dataService.fetchPad(params.get('id')).subscribe(function (pad) {
             console.log('pad fetched:', pad);
-            this.setState({ padCollection: pad });
+            _this.padCollection = pad;
+            _this.pad = _this.padCollection[0] || {};
+            _this.pages = _this.padCollection.filter(function (item) { return item.type === model_1.types.PAGE; });
+            _this.notes = _this.padCollection.filter(function (item) { return item.type === model_1.types.NOTE; });
+            console.log('this.pad', _this.pad);
+            console.log('this.pages', _this.pages);
+            console.log('this.notes', _this.notes);
             navigator.init(pad);
         });
-
-        keyboardJS.bind('down', () => {
+        keyboardJS.bind('down', function () {
             navigator.next();
-            this.setState({
-                selectedItemAddress: navigator.getSelectedItemAddress()
-            });
+            _this.selectedItemAddress = navigator.getSelectedItemAddress();
         });
-        keyboardJS.bind('up', () => {
+        keyboardJS.bind('up', function () {
             navigator.prev();
-            this.setState({
-                selectedItemAddress: navigator.getSelectedItemAddress()
-            });
+            _this.selectedItemAddress = navigator.getSelectedItemAddress();
         });
-        keyboardJS.bind('enter', () => {
+        keyboardJS.bind('enter', function () {
             navigator.down();
-            this.setState({
-                selectedItemAddress: navigator.getSelectedItemAddress()
-            });
+            _this.selectedItemAddress = navigator.getSelectedItemAddress();
         });
-        keyboardJS.bind('escape', () => {
+        keyboardJS.bind('escape', function () {
             navigator.up();
-            this.setState({
-                selectedItemAddress: navigator.getSelectedItemAddress()
-            });
+            _this.selectedItemAddress = navigator.getSelectedItemAddress();
         });
     }
-
-    createItem = (item) => {
-
+    PadCmp.prototype.checkSelected = function (address) {
+        return this.selectedItemAddress.toString() === address.toString() ? 'selected' : '';
     };
-
-    changeItem = (item) => {
-
-    };
-
-    updateItem = (item) => {
-
-    };
-
-    deleteItem = (item) => {
-
-    };
-
-    renderNote(note, address) {
-        return (
-            <li key={note._id} className={this.checkSelected(address)}>
-                <NoteEditor note={note}
-                            onBlur={this.updateItem}
-                            onChange={this.changeItem} ></NoteEditor>
-            </li>
-        );
-    }
-
-    checkSelected = (address) => {
-        return this.state.selectedItemAddress.toString() === address.toString() ? 'selected' : '';
-    };
-
-    render() {
-        let pad = this.state.padCollection[0] || {},
-            pages = this.state.padCollection.filter(item => item.type === types.PAGE),
-            notes = this.state.padCollection.filter(item => item.type === types.NOTE);
-
-        console.log('selectedItemAddress:', navigator.getSelectedItemAddress());
-        return (
-            <div className="pad-collection-list">
-                <ul>
-                    <li className={this.checkSelected([0])}>
-                        <TitleInput title={pad.name} onChange={this.changeItem} onBlur={this.updateItem} element="h2" />
-                    </li>
-                    {pages.map((page, index0) => {
-
-                        return (
-                            <li key={page._id} className={this.checkSelected([index0 + 1])}>
-                                <ul className="notes-list">
-                                    <li className={this.checkSelected([index0 + 1, 0])}>
-                                        <Page page={page}
-                                              onDelete={this.deleteItem}
-                                              onChange={this.changeItem}
-                                              onUpdate={this.updateItem}
-                                              onCreateNote={this.createItem}></Page>
-                                    </li>
-                                    {
-                                        notes.filter(note => note.pageId === page._id).map((note, index1) => {
-                                            return this.renderNote(note, [index0 + 1, index1 + 1]);
-                                        })
-                                    }
-                                </ul>
-                            </li>
-                        );
-                    })
-                    }
-                </ul>
-                <input value={this.state.newPageTitle} onChange={this.createItem} />
-                <button onClick={this.createItem}>New Page</button>
-            </div>
-        );
-    }
-}
-
-export default Pad;
+    PadCmp = __decorate([
+        angular2_1.Component({
+            selector: 'pad',
+            template: require('./pad.html'),
+            directives: [angular2_1.CORE_DIRECTIVES, titleInput_1.default],
+            providers: [dataService_1.default]
+        }), 
+        __metadata('design:paramtypes', [dataService_1.default, router_1.RouteParams])
+    ], PadCmp);
+    return PadCmp;
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = PadCmp;
