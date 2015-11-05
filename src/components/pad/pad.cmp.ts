@@ -2,17 +2,17 @@ import {Component, CORE_DIRECTIVES} from 'angular2/angular2';
 import {RouteParams} from 'angular2/router';
 import {types} from '../../common/model';
 import DataService from '../../common/dataService';
-//import Page from '../page/page';
-import TitleInput from '../titleInput/titleInput';
-//import NoteEditor from '../noteEditor/noteEditor';
+import PageCmp from '../page/page.cmp';
+import TitleInputCmp from '../titleInput/titleInput.cmp';
+import NoteEditorCmp from '../noteEditor/noteEditor.cmp';
 import * as navigator from '../../common/navigator';
 import {Note, Pad, Page} from "../../common/model";
 const keyboardJS = require('keyboardjs');
 
 @Component({
     selector: 'pad',
-    template: require('./pad.html'),
-    directives: [CORE_DIRECTIVES, TitleInput],
+    template: require('./pad.cmp.html'),
+    directives: [CORE_DIRECTIVES, TitleInputCmp, PageCmp, NoteEditorCmp],
     providers: [DataService]
 })
 class PadCmp {
@@ -31,7 +31,6 @@ class PadCmp {
 
             this.pad = this.padCollection[0] || <Pad>{};
             this.pages = this.padCollection.filter(item => item.type === types.PAGE);
-            this.notes = this.padCollection.filter(item => item.type === types.NOTE);
             navigator.init(pad);
         });
 
@@ -53,7 +52,12 @@ class PadCmp {
         });
     }
 
-    public updateItem(event) {
+    public getNotesInPage(pageId: string): Note[] {
+        return this.padCollection.filter(item => item.pageId === pageId);
+    }
+
+    public updateItem(item) {
+        this.dataService.updateItem(item).subscribe(() => console.log('updated item:', item.title));
     }
 
     public updatePadTitle(newName) {

@@ -1,0 +1,13 @@
+<div class="note-editor" tabIndex="0"
+     [ng-class]="{ focus: focussed }"
+     (click)="focus()"
+     (focus)="focus()">
+
+               <textarea class="input"
+                         [(ng-model)]="note.content"
+                         (blur)="blurHandler()"
+                         (keydown)="keyHandler($event)">
+               </textarea>
+
+    <div class="preview">{{ note.content }}</div>
+</div>

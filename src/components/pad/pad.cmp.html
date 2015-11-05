@@ -1,0 +1,19 @@
+<div class="pad-collection-list">
+    <ul>
+        <li [class]="checkSelected([0])">
+            <title-input [title]="pad.name" (blur)="updatePadTitle($event)" element="h2" ></title-input>
+        </li>
+        <li *ng-for="#page of pages; #index0 = index" [class]="checkSelected([index0 + 1])">
+            <ul class="notes-list">
+                <li [class]="checkSelected([index0 + 1, 0])">
+                    <page [page]="page" (update)="updateItem($event)"></page>
+                </li>
+                <li *ng-for="#note of getNotesInPage(page._id); #index1 = index" [class]="checkSelected([index0 + 1, index1])">
+                    <note-editor [note]="note" (blur)="updateItem($event)"></note-editor>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <input [value]="newPageTitle" (change)="createItem" />
+    <button (click)="createItem">New Page</button>
+</div>

@@ -2,8 +2,8 @@
 import {Component, bootstrap, provide} from 'angular2/angular2';
 import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS, LocationStrategy, HashLocationStrategy} from 'angular2/router';
 import {HTTP_PROVIDERS, RequestOptions, BaseRequestOptions, Headers} from 'angular2/http';
-import PadList from './components/padList/padList';
-import Pad from './components/pad/pad';
+import PadListCmp from './components/padList/padList.cmp';
+import PadCmp from './components/pad/pad.cmp';
 
 // Common styles
 require('flexboxgrid/dist/flexboxgrid.css');
@@ -23,8 +23,8 @@ require('styles/main.less');
     ]
 })
 @RouteConfig([
-    { path: '/', component: PadList, as: 'PadList' },
-    { path: '/pad/:id', component: Pad, as: 'Pad' }
+    { path: '/', component: PadListCmp, as: 'PadList' },
+    { path: '/pad/:id', component: PadCmp, as: 'Pad' }
 ])
 class AppComponent { }
 

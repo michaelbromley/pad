@@ -11,25 +11,32 @@ import {Component, CORE_DIRECTIVES, FORM_DIRECTIVES, Input, Output, EventEmitter
      </div>`,
     directives: [CORE_DIRECTIVES, FORM_DIRECTIVES]
 })
-class TitleInput {
+class TitleInputCmp {
 
     public focussed: boolean = false;
+    private originalTitle: string;
     @Input() public title: string;
     @Input() public element: string;
 
     @Output() private blur = new EventEmitter();
 
-    constructor() {
+    constructor() {}
+
+    onChanges() {
+        this.originalTitle = this.title;
     }
 
     focus = () => {
         this.focussed = true;
     };
 
-    blurHandler = (event) => {
+    blurHandler = () => {
         this.focussed = false;
-        this.blur.next(this.title);
+        if (this.originalTitle !== this.title) {
+            this.blur.next(this.title);
+            this.originalTitle = this.title;
+        }
     };
 }
 
-export default TitleInput;
+export default TitleInputCmp;

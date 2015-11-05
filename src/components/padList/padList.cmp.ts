@@ -4,11 +4,11 @@ import {RouterLink} from 'angular2/router';
 
 @Component({
     selector: 'pad-list',
-    template: require('./padList.html'),
+    template: require('./padList.cmp.html'),
     directives: [NgFor, RouterLink],
     providers: [DataService]
 })
-class PadList {
+class PadListCmp {
 
     public pads: any[] = [];
 
@@ -20,4 +20,4 @@ class PadList {
     }
 }
 
-export default PadList;
+export default PadListCmp;
