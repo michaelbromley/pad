@@ -16,7 +16,6 @@ class PadList {
         this.dataService.fetchPadList()
             .subscribe(pads => {
                 this.pads = pads;
-                console.log('this.pads:', this.pads);
             });
     }
 }

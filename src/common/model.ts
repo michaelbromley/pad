@@ -6,7 +6,7 @@ export const types = {
 
 export class Pad {
     public _id: string = '';
-    public title: string = '';
+    public name: string = '';
     public type: string = types.PAD;
 }
 

@@ -29,7 +29,7 @@ module.exports = {
 
     module: {
         loaders: [
-            {test: /\.ts$/, loader: 'ts-loader'},
+            {test: /\.ts$/, loader: 'ts-loader?transpileOnly=true'},
             {test: /\.css$/, loader: "style!css" },
             {test: /\.less$/, loader: "style!css!less"},
             {test: /\.html/, loader: "html-loader"}

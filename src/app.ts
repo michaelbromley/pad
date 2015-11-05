@@ -1,7 +1,7 @@
 // Bootstrapping module
 import {Component, bootstrap, provide} from 'angular2/angular2';
 import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS, LocationStrategy, HashLocationStrategy} from 'angular2/router';
-import {HTTP_PROVIDERS} from 'angular2/http';
+import {HTTP_PROVIDERS, RequestOptions, BaseRequestOptions, Headers} from 'angular2/http';
 import PadList from './components/padList/padList';
 import Pad from './components/pad/pad';
 
@@ -28,4 +28,10 @@ require('styles/main.less');
 ])
 class AppComponent { }
 
-bootstrap(AppComponent, [HTTP_PROVIDERS]);
+var defaultHeaders = new Headers();
+defaultHeaders.append('Content-Type', 'application/json');
+class appRequestOptions extends BaseRequestOptions {
+  headers = defaultHeaders;
+}
+
+bootstrap(AppComponent, [HTTP_PROVIDERS, provide(RequestOptions, {useClass: appRequestOptions})]);

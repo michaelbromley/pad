@@ -1,7 +1,7 @@
 <div class="pad-collection-list">
     <ul>
         <li [class]="checkSelected([0])">
-            <title-input [title]="pad.name" (change)="changeItem" (blur)="updateItem" element="h2" />
+            <title-input [title]="pad.name" (blur)="updatePadTitle($event)" element="h2" />
         </li>
         <li *ng-for="#page of pages; #index0 = index" [class]="checkSelected([index0 + 1])">
             <ul class="notes-list">

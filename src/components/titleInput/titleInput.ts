@@ -1,4 +1,4 @@
-import {Component, CORE_DIRECTIVES} from 'angular2/angular2';
+import {Component, CORE_DIRECTIVES, FORM_DIRECTIVES, Input, Output, EventEmitter} from 'angular2/angular2';
 
 @Component({
     selector: 'title-input',
@@ -6,19 +6,18 @@ import {Component, CORE_DIRECTIVES} from 'angular2/angular2';
      <div class="title-input" [ng-class]="{ focus: focussed }" tabIndex="0" (click)="focus()" (focus)="focus()">
         <h1 class="label">{{ title }}</h1>
         <div class="input {{ element }}">
-            <input #input [value]="title"
-                   (change)="change()"
-                   (blur)="blur()" />
+            <input [(ng-model)]="title" (blur)="blurHandler()" />
         </div>
      </div>`,
-    directives: [CORE_DIRECTIVES],
-    inputs: ['title', 'element']
+    directives: [CORE_DIRECTIVES, FORM_DIRECTIVES]
 })
 class TitleInput {
 
     public focussed: boolean = false;
-    public title: string;
-    public element: string;
+    @Input() public title: string;
+    @Input() public element: string;
+
+    @Output() private blur = new EventEmitter();
 
     constructor() {
     }
@@ -27,13 +26,9 @@ class TitleInput {
         this.focussed = true;
     };
 
-    change = (event) => {
-        //this.props.onChange(event.target.value);
-    };
-
-    blur = (event) => {
+    blurHandler = (event) => {
         this.focussed = false;
-        //this.props.onBlur(event.target.value);
+        this.blur.next(this.title);
     };
 }
 

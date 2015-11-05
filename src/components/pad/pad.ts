@@ -27,15 +27,11 @@ class PadCmp {
     constructor(private dataService: DataService,
                 params: RouteParams) {
         dataService.fetchPad(params.get('id')).subscribe(pad => {
-            console.log('pad fetched:', pad);
             this.padCollection = pad;
 
             this.pad = this.padCollection[0] || <Pad>{};
             this.pages = this.padCollection.filter(item => item.type === types.PAGE);
             this.notes = this.padCollection.filter(item => item.type === types.NOTE);
-            console.log('this.pad', this.pad);
-            console.log('this.pages', this.pages);
-            console.log('this.notes', this.notes);
             navigator.init(pad);
         });
 
@@ -55,6 +51,14 @@ class PadCmp {
             navigator.up();
             this.selectedItemAddress = navigator.getSelectedItemAddress();
         });
+    }
+
+    public updateItem(event) {
+    }
+
+    public updatePadTitle(newName) {
+        this.pad.name = newName;
+        this.dataService.updateItem(this.pad).subscribe(() => console.log('updated pad title!'));
     }
 
     public checkSelected(address) {

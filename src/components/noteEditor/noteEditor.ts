@@ -7,7 +7,7 @@ import marked from 'marked';
                 <textarea value={this.props.note.content} className="input"
                           ref="input"
                           onChange={this.change}
-                          onBlur={this.blur}
+                          onBlur={this.blurHandler}
                           onKeyDown={this.keyHandler}></textarea>
                 <div className="preview" dangerouslySetInnerHTML={previewHtml}></div>
             </div>`

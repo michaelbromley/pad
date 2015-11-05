@@ -1,5 +1,5 @@
 import config from '../common/config';
-import {Http, HTTP_PROVIDERS, Response} from 'angular2/http';
+import {Http, HTTP_PROVIDERS, Headers, Response} from 'angular2/http';
 import {Injectable} from 'angular2/angular2';
 
 @Injectable()
@@ -22,7 +22,7 @@ class DataService {
     }
 
     public updateItem(item) {
-        return this.http.put(`${config.API_URL}/items/${item._id}`, item);
+        return this.http.put(`${config.API_URL}/items/${item._id}`, JSON.stringify(item));
     }
 
     public deleteItem(item) {
