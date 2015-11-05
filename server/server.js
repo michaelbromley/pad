@@ -33,7 +33,8 @@ function identity(arg) {
  */
 function getType(item) {
     if (!item.hasOwnProperty('type')) {
-        throw new Error('Type not specified.');
+        console.log('bad item:', item);
+        throw new Error('Type not specified');
     }
     let validType = Object.keys(types).map(key => types[key]).indexOf(item.type) > -1;
     if (!validType) {
@@ -51,7 +52,6 @@ function getType(item) {
  */
 function spliceArray(target, arr, index) {
     let targetClone = target.slice();
-    console.log('targetClone', targetClone);
     Array.prototype.splice.apply(targetClone, [index, 0].concat(arr));
     return targetClone;
 }
@@ -97,14 +97,9 @@ app.get('/api/pads/:id', function(req, res) {
 
         padCollection.push(pad);
 
-        console.log('padCollection 1:', padCollection);
-
         db.find({type: types.PAGE, padId: padId}, (err, pages) => {
 
             padCollection = padCollection.concat(pages);
-
-            console.log('padCollection 2:', padCollection);
-
 
             let query = {$and: [
                 { type: types.NOTE },
@@ -118,11 +113,8 @@ app.get('/api/pads/:id', function(req, res) {
                     let index = padCollection.map(item => item._id).indexOf(pageId),
                         group = groupedNotes[pageId];
 
-                    console.log('index:', index);
-                    console.log('group:', group);
                     padCollection = spliceArray(padCollection, group, index + 1);
                 }
-                console.log('padCollection 3:', padCollection);
 
 
                 res.send(padCollection);
