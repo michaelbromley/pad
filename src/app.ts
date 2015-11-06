@@ -1,9 +1,10 @@
 // Bootstrapping module
-import {Component, bootstrap, provide} from 'angular2/angular2';
+import {Component, bootstrap, provide, HostListener} from 'angular2/angular2';
 import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS, LocationStrategy, HashLocationStrategy} from 'angular2/router';
 import {HTTP_PROVIDERS, RequestOptions, BaseRequestOptions, Headers} from 'angular2/http';
 import PadListCmp from './components/padList/padList.cmp';
 import PadCmp from './components/pad/pad.cmp';
+import uiState from './common/uiState';
 
 // Common styles
 require('flexboxgrid/dist/flexboxgrid.css');
@@ -26,7 +27,13 @@ require('styles/main.less');
     { path: '/', component: PadListCmp, as: 'PadList' },
     { path: '/pad/:id', component: PadCmp, as: 'Pad' }
 ])
-class AppComponent { }
+class AppComponent {
+
+    @HostListener('window:keydown', ['$event'])
+    public keyHandler(event: KeyboardEvent) {
+        uiState.keyHandler(event);
+    }
+}
 
 var defaultHeaders = new Headers();
 defaultHeaders.append('Content-Type', 'application/json');

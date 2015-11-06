@@ -1,11 +1,12 @@
 import {Component, FORM_DIRECTIVES, CORE_DIRECTIVES, Input, Output, EventEmitter, ElementRef} from 'angular2/angular2';
-import marked from 'marked';
 import {Note} from "../../common/model";
+import MarkdownPipe from "./markdownPipe";
 
 @Component({
     selector: 'note-editor',
     template: require('./noteEditor.cmp.html'),
-    directives: [FORM_DIRECTIVES, CORE_DIRECTIVES]
+    directives: [FORM_DIRECTIVES, CORE_DIRECTIVES],
+    pipes: [MarkdownPipe]
 })
 class NoteEditorCmp {
 
@@ -33,12 +34,6 @@ class NoteEditorCmp {
             this.originalContent = this.note.content;
         }
     };
-
-    parseMarkdown(md) {
-        return {
-            __html: marked(md || '')
-        };
-    }
 
     keyHandler = (event) => {
         let keyCode = event.keyCode || event.which,

@@ -1,5 +1,5 @@
-<div class="pad-collection-list">
-    <ul>
+<div class="pad-collection-container" (keydown)="awd">
+    <ul class="pad-collection-list">
         <li [class]="checkSelected([0])">
             <title-input [title]="pad.name" (blur)="updatePadTitle($event)" element="h2" ></title-input>
         </li>

@@ -33,23 +33,6 @@ class PadCmp {
             this.pages = this.padCollection.filter(item => item.type === types.PAGE);
             navigator.init(pad);
         });
-
-        keyboardJS.bind('down', () => {
-            navigator.next();
-            this.selectedItemAddress = navigator.getSelectedItemAddress();
-        });
-        keyboardJS.bind('up', () => {
-            navigator.prev();
-            this.selectedItemAddress = navigator.getSelectedItemAddress();
-        });
-        keyboardJS.bind('enter', () => {
-            navigator.down();
-            this.selectedItemAddress = navigator.getSelectedItemAddress();
-        });
-        keyboardJS.bind('escape', () => {
-            navigator.up();
-            this.selectedItemAddress = navigator.getSelectedItemAddress();
-        });
     }
 
     public getNotesInPage(pageId: string): Note[] {
@@ -66,7 +49,7 @@ class PadCmp {
     }
 
     public checkSelected(address) {
-        return this.selectedItemAddress.toString() === address.toString() ? 'selected' : '';
+        return navigator.getSelectedItemAddress().toString() === address.toString() ? 'selected' : '';
     }
 }
 

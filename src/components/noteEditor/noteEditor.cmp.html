@@ -9,5 +9,5 @@
                          (keydown)="keyHandler($event)">
                </textarea>
 
-    <div class="preview">{{ note.content }}</div>
+    <div class="preview" [inner-html]="note.content | markdown"></div>
 </div>
