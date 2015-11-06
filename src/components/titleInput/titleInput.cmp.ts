@@ -1,14 +1,9 @@
-import {Component, CORE_DIRECTIVES, FORM_DIRECTIVES, Input, Output, EventEmitter} from 'angular2/angular2';
+import {Component, CORE_DIRECTIVES, FORM_DIRECTIVES, Input, Output, EventEmitter, ElementRef} from 'angular2/angular2';
+import UiState from '../../common/uiState';
 
 @Component({
     selector: 'title-input',
-    template: `
-     <div class="title-input" [ng-class]="{ focus: focussed }" tabIndex="0" (click)="focus()" (focus)="focus()">
-        <h1 class="label">{{ title }}</h1>
-        <div class="input {{ element }}">
-            <input [(ng-model)]="title" (blur)="blurHandler()" />
-        </div>
-     </div>`,
+    template: require('./titleInput.cmp.html'),
     directives: [CORE_DIRECTIVES, FORM_DIRECTIVES]
 })
 class TitleInputCmp {
@@ -17,20 +12,41 @@ class TitleInputCmp {
     private originalTitle: string;
     @Input() public title: string;
     @Input() public element: string;
+    @Input() public address: number[];
 
     @Output() private blur = new EventEmitter();
 
-    constructor() {}
+    constructor(private uiState: UiState, private elRef: ElementRef) {
+        uiState.focus().subscribe(val => {
+            if (val === this.address.toString()) {
+                this.focus();
+            } else {
+                this.blurHandler();
+            }
+        });
+        uiState.blur().subscribe(val => {
+            if (val === this.address.toString()) {
+                this.blurHandler();
+            }
+        });
+    }
 
-    onChanges() {
+    private onChanges() {
         this.originalTitle = this.title;
     }
 
-    focus = () => {
-        this.focussed = true;
-    };
+    public clickHandler() {
+        this.uiState.setFocus(this.address);
+    }
 
-    blurHandler = () => {
+    private focus() {
+        this.focussed = true;
+        setTimeout(() => {
+            this.elRef.nativeElement.querySelector('input').focus();
+        });
+    }
+
+    private blurHandler() {
         this.focussed = false;
         if (this.originalTitle !== this.title) {
             this.blur.next(this.title);

@@ -1,123 +1,143 @@
+import {Injectable} from 'angular2/angular2';
 import {types} from './model';
 
-
-let collection,
-    selectedItem,
-    selectedItemIsActive,
-    selectedItemAddress: number[] = [-1],
-    collectionMap;
-
-export const init = (padCollection) => {
-    collection = padCollection;
-    selectedItem = undefined;
-    selectedItemIsActive = false;
-    collectionMap = buildMap(collection);
-};
-
-export const getSelectedItemId = () => {
-    return selectedItem ? selectedItem._id : '';
-};
-
-export const getSelectedItemAddress = () => {
-    return selectedItemAddress;
-};
-
-export const down = () => {
-    let downAddress = selectedItemAddress.slice();
-    downAddress.push(0);
-    if (getValue(collectionMap, downAddress)) {
-        selectedItemAddress = downAddress;
-    } else {
-        selectedItemIsActive = true;
-        console.log('enter edit mode!');
-    }
-};
-
-export const up = () => {
-   if (selectedItemIsActive) {
-       selectedItemIsActive = false;
-       console.log('exit edit mode!');
-   } else {
-       if (1 < selectedItemAddress.length) {
-           selectedItemAddress.pop();
-       }
-   }
-};
-
-export const prev = () => {
-    let prevAddress = decrementLast(selectedItemAddress);
-    if (getValue(collectionMap, prevAddress)) {
-        selectedItemAddress = prevAddress;
-    } else {
-        console.log('reached start!');
-    }
-};
-
-export const next = () => {
-    let nextAddress = incrementLast(selectedItemAddress);
-    if (getValue(collectionMap, nextAddress)) {
-        selectedItemAddress = nextAddress;
-    } else {
-        console.log('reached end!');
-    }
-};
+const NONE = -1; // value to show that nothing is selected
 
 /**
- * Increment the last element in an array of numbers, and return a new array.
- * @param array
- * @returns {Array|*|DOMElement<HTMLAttributes>|{}}
+ * The Navigator is responsible for keeping a pointer to a particular address in a padCollection. This allows
+ * an abstracted way to navigate around the padCollection, and allows us to query the "selected" address at
+ * any time.
  */
-function incrementLast(array) {
-    return array.map((num, i, arr) => {
-            return num + +(i === arr.length - 1);
-        }
-    );
-}
+@Injectable()
+class Navigator {
+    private selectedItemAddress: number[] = [NONE];
+    private collectionMap: number[];
 
-function decrementLast(array) {
-    return array.map((num, i, arr) => {
-            return num - +(i === arr.length - 1);
-        }
-    );
-}
+    constructor() {
+        console.log('constructing navigator instance!');
+    }
+    
+    public init(padCollection: any[]) {
+        this.collectionMap = this.buildMap(padCollection);
+    }
+    
+    public getSelectedItemAddress() {
+        return this.selectedItemAddress;
+    }
 
-function getValue(array, address) {
-    let val = array;
-    address.forEach(index => {
-        if (val instanceof Array) {
-            val = val[index];
+    public setSelectedItemAddress(newAddress: number[]) {
+        if (this.getValue(this.collectionMap, newAddress)) {
+            this.selectedItemAddress = newAddress;
+        } else {
+            throw new Error(`Navigator#setSelectedItemAddress: address ${newAddress} does not exist.`);
         }
-    });
-    return val;
-}
+    }
 
-function buildMap(collection) {
-    let map = [],
-        lastPage = [];
-    for (let i = 0; i < collection.length; i ++) {
-        let item = collection[i];
-        if (item.type === types.PAGE) {
-            if (0 < lastPage.length) {
-                map.push(lastPage);
+    public deselectAll() {
+        this.selectedItemAddress = [NONE];
+    }
+
+    /**
+     * Go down one level of the tree. Returns true if a deeper level was found,
+     * and false if we are already at the deepest level.
+     */
+    public down(): boolean {
+        let downAddress = this.selectedItemAddress.slice();
+        downAddress.push(0);
+        if (this.getValue(this.collectionMap, downAddress)) {
+            this.selectedItemAddress = downAddress;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public up() {
+        if (1 === this.selectedItemAddress.length) {
+            this.selectedItemAddress[0] = NONE;
+        } else {
+            this.selectedItemAddress.pop();
+        }
+
+    }
+    
+    public prev = () => {
+        if (this.selectedItemAddress[0] === NONE) {
+            this.selectedItemAddress = this.getLastItemAddress();
+        } else {
+            let prevAddress = this.decrementLast(this.selectedItemAddress);
+            if (this.getValue(this.collectionMap, prevAddress)) {
+                this.selectedItemAddress = prevAddress;
+            } else {
+                this.up();
             }
-            lastPage = [[]];
-        } else if (item.type === types.NOTE) {
-            lastPage.push([]);
-        } else if (item.type === types.PAD) {
-            map.push([]);
         }
+    };
+    
+    public next = () => {
+        let nextAddress = this.incrementLast(this.selectedItemAddress);
+        if (this.getValue(this.collectionMap, nextAddress)) {
+            this.selectedItemAddress = nextAddress;
+        } else {
+            this.up();
+        }
+    };
+
+    private getLastItemAddress() {
+        return [this.collectionMap.length - 1];
     }
-    map.push(lastPage);
-    return map;
+    
+    /**
+     * Increment the last element in an array of numbers, and return a new array.
+     */
+    private incrementLast(array: number[]): number[] {
+        return array.map((num, i, arr) => {
+                return num + +(i === arr.length - 1);
+            }
+        );
+    }
+    
+    private decrementLast(array: number[]): number[] {
+        return array.map((num, i, arr) => {
+                return num - +(i === arr.length - 1);
+            }
+        );
+    }
+    
+    private getValue(array: number[], address: number[]): any {
+        let val: any = array;
+        address.forEach(index => {
+            if (val instanceof Array) {
+                val = val[index];
+            }
+        });
+        return val;
+    }
+    
+    private buildMap(collection: any[]): number[] {
+        let map = [],
+            lastPage = [];
+        for (let i = 0; i < collection.length; i ++) {
+            let item = collection[i];
+            if (item.type === types.PAGE) {
+                if (0 < lastPage.length) {
+                    map.push(lastPage);
+                }
+                lastPage = [[]];
+            } else if (item.type === types.NOTE) {
+                lastPage.push([]);
+            } else if (item.type === types.PAD) {
+                map.push([]);
+            }
+        }
+        map.push(lastPage);
+        return map;
+    }
 }
 
-const getSubCollection = (padCollection, selectedItem) => {
-    if (selectedItem.type === types.PAGE || selectedItem.type === types.PAD) {
-        return padCollection.filter(item => item.type === types.PAGE);
-    }
-    if (selectedItem.type === types.NOTE) {
-        return padCollection.filter(item => item.pageId === selectedItem.pageId);
-    }
-    return padCollection[0];
-};
+export default Navigator;
+    
+    
+
+
     

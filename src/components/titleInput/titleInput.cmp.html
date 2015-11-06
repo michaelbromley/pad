@@ -1,0 +1,6 @@
+<div class="title-input" [ng-class]="{ focus: focussed }" (click)="clickHandler()">
+    <h1 class="label">{{ title }}</h1>
+    <div class="input {{ element }}">
+        <input [(ng-model)]="title" />
+    </div>
+</div>

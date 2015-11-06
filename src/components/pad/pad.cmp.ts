@@ -2,17 +2,16 @@ import {Component, CORE_DIRECTIVES} from 'angular2/angular2';
 import {RouteParams} from 'angular2/router';
 import {types} from '../../common/model';
 import DataService from '../../common/dataService';
-import PageCmp from '../page/page.cmp';
 import TitleInputCmp from '../titleInput/titleInput.cmp';
 import NoteEditorCmp from '../noteEditor/noteEditor.cmp';
-import * as navigator from '../../common/navigator';
+import UiState from '../../common/uiState';
 import {Note, Pad, Page} from "../../common/model";
 const keyboardJS = require('keyboardjs');
 
 @Component({
     selector: 'pad',
     template: require('./pad.cmp.html'),
-    directives: [CORE_DIRECTIVES, TitleInputCmp, PageCmp, NoteEditorCmp],
+    directives: [CORE_DIRECTIVES, TitleInputCmp, NoteEditorCmp],
     providers: [DataService]
 })
 class PadCmp {
@@ -25,14 +24,17 @@ class PadCmp {
     public notes: Note[] = [];
 
     constructor(private dataService: DataService,
-                params: RouteParams) {
+                params: RouteParams,
+                private uiState: UiState) {
+
         dataService.fetchPad(params.get('id')).subscribe(pad => {
             this.padCollection = pad;
 
             this.pad = this.padCollection[0] || <Pad>{};
             this.pages = this.padCollection.filter(item => item.type === types.PAGE);
-            navigator.init(pad);
+            uiState.initPadCollection(pad);
         });
+
     }
 
     public getNotesInPage(pageId: string): Note[] {
@@ -49,7 +51,7 @@ class PadCmp {
     }
 
     public checkSelected(address) {
-        return navigator.getSelectedItemAddress().toString() === address.toString() ? 'selected' : '';
+        return this.uiState.addressIsSelected(address);
     }
 }
 

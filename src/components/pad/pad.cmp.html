@@ -1,15 +1,15 @@
 <div class="pad-collection-container" (keydown)="awd">
     <ul class="pad-collection-list">
-        <li [class]="checkSelected([0])">
-            <title-input [title]="pad.name" (blur)="updatePadTitle($event)" element="h2" ></title-input>
+        <li [class.selected]="checkSelected([0])">
+            <title-input [title]="pad.name" (blur)="updatePadTitle($event)" [element]="h2" [address]="[0]" ></title-input>
         </li>
-        <li *ng-for="#page of pages; #index0 = index" [class]="checkSelected([index0 + 1])">
+        <li *ng-for="#page of pages; #index0 = index" [class.selected]="checkSelected([index0 + 1])" class="page-container">
             <ul class="notes-list">
-                <li [class]="checkSelected([index0 + 1, 0])">
-                    <page [page]="page" (update)="updateItem($event)"></page>
+                <li [class.selected]="checkSelected([index0 + 1, 0])">
+                    <title-input [title]="page.title" (update)="updateItem($event)" element="h3" [address]="[index0 + 1, 0]" ></title-input>
                 </li>
-                <li *ng-for="#note of getNotesInPage(page._id); #index1 = index" [class]="checkSelected([index0 + 1, index1])">
-                    <note-editor [note]="note" (blur)="updateItem($event)"></note-editor>
+                <li *ng-for="#note of getNotesInPage(page._id); #index1 = index" [class.selected]="checkSelected([index0 + 1, index1 + 1])">
+                    <note-editor [note]="note" (blur)="updateItem($event)" [address]="[index0 + 1, index1 + 1]"></note-editor>
                 </li>
             </ul>
         </li>

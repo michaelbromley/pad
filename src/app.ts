@@ -4,7 +4,8 @@ import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS, LocationStrategy, Hash
 import {HTTP_PROVIDERS, RequestOptions, BaseRequestOptions, Headers} from 'angular2/http';
 import PadListCmp from './components/padList/padList.cmp';
 import PadCmp from './components/pad/pad.cmp';
-import uiState from './common/uiState';
+import UiState from './common/uiState';
+import Navigator from './common/navigator';
 
 // Common styles
 require('flexboxgrid/dist/flexboxgrid.css');
@@ -20,7 +21,8 @@ require('styles/main.less');
     </div>`,
     providers: [
         ROUTER_PROVIDERS,
-        provide(LocationStrategy, {useClass: HashLocationStrategy})
+        provide(LocationStrategy, {useClass: HashLocationStrategy}),
+        UiState
     ]
 })
 @RouteConfig([
@@ -29,9 +31,11 @@ require('styles/main.less');
 ])
 class AppComponent {
 
+    constructor(private uiState: UiState) {}
+
     @HostListener('window:keydown', ['$event'])
     public keyHandler(event: KeyboardEvent) {
-        uiState.keyHandler(event);
+        this.uiState.keyHandler(event);
     }
 }
 
@@ -41,4 +45,4 @@ class appRequestOptions extends BaseRequestOptions {
   headers = defaultHeaders;
 }
 
-bootstrap(AppComponent, [HTTP_PROVIDERS, provide(RequestOptions, {useClass: appRequestOptions})]);
+bootstrap(AppComponent, [HTTP_PROVIDERS, provide(RequestOptions, {useClass: appRequestOptions}), Navigator]);
