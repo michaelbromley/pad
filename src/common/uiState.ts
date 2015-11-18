@@ -86,17 +86,27 @@ export class UiState {
         } else {
             if (event.keyCode === Keys.escape) {
                 event.preventDefault();
-                this.currentAddressIsFocussed = false;
-                this.fireBlurEvent();
+                this.blurSelectedItem();
             }
+        }
+        console.log(this.navigator.getSelectedItemAddress());
+    }
+
+    public blurSelectedItem() {
+        if (this.currentAddressIsFocussed) {
+            this.currentAddressIsFocussed = false;
+            this.fireBlurEvent();
         }
     }
 
     public setCreate(type: string) {
+        console.log('setCreate()');
         let newItem;
         if (type === types.PAGE) {
             newItem = new Page(this.navigator.getCurrentPadId());
             newItem.title = "Untitled Page";
+            let currPageOrder = this.navigator.getSelectedItemAddress()[0];
+            newItem.order = -1 < currPageOrder ? currPageOrder + 1 : 1;
         }
         if (type === types.NOTE) {
             newItem = new Note(this.navigator.getCurrentPageId());

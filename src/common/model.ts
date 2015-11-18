@@ -26,6 +26,7 @@ export class Page implements IPadItem {
     public _id: string = '';
     public title: string = '';
     public type: string = types.PAGE;
+    public order: number;
 
     constructor(padId) {
         this.padId = padId;

@@ -51,7 +51,8 @@ class NoteEditorCmp {
         }
     }
 
-    public clickHandler() {
+    public clickHandler(event: MouseEvent) {
+        event.stopPropagation();
         this.uiState.setFocus(this.address);
     }
 

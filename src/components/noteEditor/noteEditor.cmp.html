@@ -1,6 +1,6 @@
 <div class="note-editor"
      [ng-class]="{ focus: focussed }"
-     (click)="clickHandler()">
+     (click)="clickHandler($event)">
 
                <textarea class="input"
                          [(ng-model)]="note.content"

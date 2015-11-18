@@ -39,6 +39,11 @@ class AppComponent {
     public keyHandler(event: KeyboardEvent) {
         this.uiState.keyHandler(event);
     }
+
+    @HostListener('window:click', ['$event'])
+    public clickHandler(event: MouseEvent) {
+        this.uiState.blurSelectedItem();
+    }
 }
 
 var defaultHeaders = new Headers();

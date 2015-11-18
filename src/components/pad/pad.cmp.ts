@@ -32,7 +32,7 @@ class PadCmp {
                 return this.dataService.createItem(val).subscribe();
             })
             .subscribe(val => {
-                console.log('created new item', val);
+                //console.log('created new item', val);
                 this.initPadCollection();
             });
 
@@ -42,7 +42,7 @@ class PadCmp {
                 return this.dataService.deleteItem(item).subscribe();
             })
             .subscribe(val => {
-                console.log('deleted item', val);
+                //console.log('deleted item', val);
                 this.initPadCollection();
             });
 

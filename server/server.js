@@ -97,7 +97,7 @@ app.get('/api/pads/:id', function(req, res) {
 
         padCollection.push(pad);
 
-        db.find({type: types.PAGE, padId: padId}, (err, pages) => {
+        db.find({type: types.PAGE, padId: padId}).sort({ order: 1 }).exec((err, pages) => {
 
             padCollection = padCollection.concat(pages);
 
@@ -129,8 +129,21 @@ app.get('/api/pads/:id', function(req, res) {
  */
 app.post('/api/items', function(req, res) {
     let item = req.body;
-    getType(item);
-    db.insert(item, () => res.send(item));
+    let type = getType(item);
+    db.insert(item, () => {
+        // update the order of any later items
+        if (type === types.PAGE) {
+            db.update({
+                type: type,
+                padId: item.padId,
+                _id: { $ne: item._id },
+                order: { $gte: item.order }}, { $inc: { order: 1 }}, { multi: true }, () => {
+                res.send(item)
+            });
+        } else {
+            res.send(item)
+        }
+    });
 });
 
 

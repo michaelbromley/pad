@@ -36,7 +36,8 @@ class TitleInputCmp {
         this.title = this.item[this.titleProp];
     }
 
-    public clickHandler() {
+    public clickHandler(event: MouseEvent){
+        event.stopPropagation();
         this.uiState.setFocus(this.address);
     }
 

@@ -1,4 +1,4 @@
-<div class="title-input" [ng-class]="{ focus: focussed }" (click)="clickHandler()">
+<div class="title-input" [ng-class]="{ focus: focussed }" (click)="clickHandler($event)">
     <h1 class="label">{{ title }}</h1>
     <div class="input {{ element }}">
         <input [(ng-model)]="title" />
