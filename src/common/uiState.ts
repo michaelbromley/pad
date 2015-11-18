@@ -84,8 +84,6 @@ export class UiState {
                 this.fireBlurEvent();
             }
         }
-
-        console.log('navigator address:', this.navigator.getSelectedItemAddress());
     }
 
     public setCreate(type: string) {

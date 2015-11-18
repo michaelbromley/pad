@@ -9,8 +9,9 @@ import {UiState} from '../../common/uiState';
 class TitleInputCmp {
 
     public focussed: boolean = false;
-    private originalTitle: string;
-    @Input() public title: string;
+    private title: string;
+    @Input() public item: any;
+    @Input() public titleProp: string;
     @Input() public element: string;
     @Input() public address: number[];
 
@@ -32,7 +33,7 @@ class TitleInputCmp {
     }
 
     private onChanges() {
-        this.originalTitle = this.title;
+        this.title = this.item[this.titleProp];
     }
 
     public clickHandler() {
@@ -48,9 +49,9 @@ class TitleInputCmp {
 
     private blurHandler() {
         this.focussed = false;
-        if (this.originalTitle !== this.title) {
-            this.blur.next(this.title);
-            this.originalTitle = this.title;
+        if (this.title !== this.item[this.titleProp]) {
+            this.item[this.titleProp] = this.title;
+            this.blur.next(this.item);
         }
     };
 }

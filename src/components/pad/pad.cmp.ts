@@ -50,12 +50,8 @@ class PadCmp {
     }
 
     public updateItem(item) {
-        this.dataService.updateItem(item).subscribe(() => console.log('updated item:', item.title));
-    }
-
-    public updatePadTitle(newName) {
-        this.pad.name = newName;
-        this.dataService.updateItem(this.pad).subscribe(() => console.log('updated pad title!'));
+        console.log('updating: ', item);
+        this.dataService.updateItem(item).subscribe(() => console.log('updated item:', item.titleProp));
     }
 
     public checkSelected(address) {

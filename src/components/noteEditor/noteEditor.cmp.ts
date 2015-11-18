@@ -19,7 +19,6 @@ class NoteEditorCmp {
 
     constructor(private uiState: UiState, private elRef: ElementRef) {
         uiState.focus().subscribe(val => {
-            console.log('noteEditor: focus event');
             if (val === this.address.toString()) {
                 this.focus();
             } else {
@@ -32,7 +31,7 @@ class NoteEditorCmp {
             }
         });
     }
-
+ 
     private onChanges() {
         this.originalContent = this.note.content;
     }
