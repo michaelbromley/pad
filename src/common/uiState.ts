@@ -1,7 +1,7 @@
 import {Injectable, EventEmitter} from 'angular2/angular2';
 //import {} from 'angular2/router';
 import Navigator from './navigator';
-import {IPadItem, types, Page} from "./model";
+import {IPadItem, types, Page, Note} from "./model";
 
 /**
  * These are the possible states the app can be in (i.e. at what level of the hierarchy is the user at)
@@ -28,6 +28,7 @@ export class UiState {
     private _focus: EventEmitter = new EventEmitter();
     private _blur: EventEmitter = new EventEmitter();
     private _create: EventEmitter = new EventEmitter();
+    private _deleteSelected: EventEmitter = new EventEmitter();
 
     private currentAddressIsFocussed: boolean = false;
 
@@ -61,12 +62,15 @@ export class UiState {
         if (!this.currentAddressIsFocussed) {
             switch (event.keyCode) {
                 case Keys.up:
+                    event.preventDefault();
                     this.navigator.prev();
                     break;
                 case Keys.down:
+                    event.preventDefault();
                     this.navigator.next();
                     break;
                 case Keys.enter:
+                    event.preventDefault();
                     let canGoDeeper = this.navigator.down();
                     if (!canGoDeeper) {
                         this.currentAddressIsFocussed = true;
@@ -74,12 +78,14 @@ export class UiState {
                     }
                     break;
                 case Keys.escape:
+                    event.preventDefault();
                     this.navigator.up();
                     break;
                 default:
             }
         } else {
             if (event.keyCode === Keys.escape) {
+                event.preventDefault();
                 this.currentAddressIsFocussed = false;
                 this.fireBlurEvent();
             }
@@ -90,8 +96,20 @@ export class UiState {
         let newItem;
         if (type === types.PAGE) {
             newItem = new Page(this.navigator.getCurrentPadId());
+            newItem.title = "Untitled Page";
+        }
+        if (type === types.NOTE) {
+            newItem = new Note(this.navigator.getCurrentPageId());
+            newItem.content = "Untitled Note";
         }
         this._create.next(newItem);
+    }
+
+    public setDeleteSelected() {
+        let selectedItem = {
+            _id: this.navigator.getSelectedItemId()
+        };
+        this._deleteSelected.next(selectedItem);
     }
 
     public setFocus(address: number[]) {
@@ -115,6 +133,10 @@ export class UiState {
 
     public create() {
         return this._create.toRx();
+    }
+
+    public deleteSelected() {
+        return this._deleteSelected.toRx();
     }
 
     private fireFocusEvent() {

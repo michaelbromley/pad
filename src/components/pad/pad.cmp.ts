@@ -22,27 +22,40 @@ class PadCmp {
     public notes: Note[] = [];
 
     constructor(private dataService: DataService,
-                params: RouteParams,
+                private params: RouteParams,
                 private uiState: UiState) {
 
-        dataService.fetchPad(params.get('id')).subscribe(pad => {
-            this.padCollection = pad;
 
+        uiState.create()
+            .map(val => {
+                console.log('creating:', val);
+                return this.dataService.createItem(val).subscribe();
+            })
+            .subscribe(val => {
+                console.log('created new item', val);
+                this.initPadCollection();
+            });
+
+        uiState.deleteSelected()
+            .map(item => {
+                console.log('deleting selected item', item);
+                return this.dataService.deleteItem(item).subscribe();
+            })
+            .subscribe(val => {
+                console.log('deleted item', val);
+                this.initPadCollection();
+            });
+
+        this.initPadCollection();
+    }
+
+    private initPadCollection() {
+        this.dataService.fetchPad(this.params.get('id')).subscribe(pad => {
+            this.padCollection = pad;
             this.pad = this.padCollection[0] || <Pad>{};
             this.pages = this.padCollection.filter(item => item.type === types.PAGE);
-            uiState.initPadCollection(pad);
+            this.uiState.initPadCollection(pad);
         });
-
-        //debugger;
-        let create$ = uiState.create().map(val => {
-            return this.dataService.createItem(val).subscribe();
-        });
-
-        create$.subscribe(val => {
-            console.log('created item', val);
-        });
-
-
     }
 
     public getNotesInPage(pageId: string): Note[] {

@@ -28,6 +28,14 @@ class ContextMenuCmp {
     public createPage() {
         this.uiState.setCreate(types.PAGE);
     }
+
+    public createNote() {
+        this.uiState.setCreate(types.NOTE);
+    }
+
+    public deleteSelected() {
+        this.uiState.setDeleteSelected();
+    }
 }
 
 export default ContextMenuCmp;

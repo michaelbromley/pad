@@ -4,7 +4,10 @@
             <button (click)="createPage()">New Page</button>
         </li>
         <li [class.visible]="isPageContext()">
-            <button>New Note</button>
+            <button (click)="createNote()">New Note</button>
+        </li>
+        <li class="visible">
+            <button (click)="deleteSelected()">Delete Selected</button>
         </li>
     </ul>
 </div>

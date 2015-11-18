@@ -18,7 +18,9 @@ class DataService {
     }
 
     public createItem(item) {
-        return this.http.post(`${config.API_URL}/items`, item);
+        delete item._id;
+        return this.http.post(`${config.API_URL}/items`, JSON.stringify(item))
+            .map((res: Response) => res.json());
     }
 
     public updateItem(item) {
@@ -26,7 +28,7 @@ class DataService {
     }
 
     public deleteItem(item) {
-        return this.http.delete(`${config.API_URL}/pads/${item._id}`);
+        return this.http.delete(`${config.API_URL}/items/${item._id}`);
     }
 
 }

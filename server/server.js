@@ -153,7 +153,7 @@ app.put('/api/items/:id', function(req, res) {
 /**
  * Delete Item
  */
-app.delete('/api/item/:id', function(req, res) {
+app.delete('/api/items/:id', function(req, res) {
     let id = req.params.id;
     db.remove({_id: id}, () => res.send(id));
 });
