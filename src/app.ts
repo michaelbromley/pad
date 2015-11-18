@@ -4,7 +4,8 @@ import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS, LocationStrategy, Hash
 import {HTTP_PROVIDERS, RequestOptions, BaseRequestOptions, Headers} from 'angular2/http';
 import PadListCmp from './components/padList/padList.cmp';
 import PadCmp from './components/pad/pad.cmp';
-import UiState from './common/uiState';
+import ContextMenuCmp from './components/contextMenu/contextMenu.cmp';
+import {UiState} from './common/uiState';
 import Navigator from './common/navigator';
 
 // Common styles
@@ -13,10 +14,11 @@ require('styles/main.less');
 
 @Component({
     selector: 'app',
-    directives: [ROUTER_DIRECTIVES],
+    directives: [ROUTER_DIRECTIVES, ContextMenuCmp],
     template: `
-    <div>
+    <div class="app-container">
         <div className="header">Pad.</div>
+        <context-menu></context-menu>
         <router-outlet></router-outlet>
     </div>`,
     providers: [

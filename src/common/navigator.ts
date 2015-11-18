@@ -25,6 +25,32 @@ class Navigator {
         return this.selectedItemAddress;
     }
 
+    public getSelectedItemId(): string {
+       return this.getItemIdAtAddress(this.selectedItemAddress);
+    }
+
+    public getCurrentPageId(): string {
+        if (1 < this.selectedItemAddress.length) {
+            let parentAddress = this.selectedItemAddress.slice(0);
+            parentAddress.pop();
+            return this.getItemIdAtAddress(parentAddress);
+        }
+    }
+
+    public getCurrentPadId() {
+        return this.getItemIdAtAddress([0]);
+    }
+
+    private getItemIdAtAddress(address: number[]): string {
+        let val = this.getValue(this.collectionMap, address),
+            unwrap = (val) => typeof val === 'string' ? val : unwrap(val[0]);
+
+        if (typeof val === 'undefined') {
+            return '';
+        }
+        return unwrap(val);
+    }
+
     public setSelectedItemAddress(newAddress: number[]) {
         if (this.getValue(this.collectionMap, newAddress)) {
             this.selectedItemAddress = newAddress;
@@ -44,7 +70,8 @@ class Navigator {
     public down(): boolean {
         let downAddress = this.selectedItemAddress.slice();
         downAddress.push(0);
-        if (this.getValue(this.collectionMap, downAddress)) {
+        let objectAtAddress = this.getValue(this.collectionMap, downAddress);
+        if (objectAtAddress instanceof Array) {
             this.selectedItemAddress = downAddress;
             return true;
         } else {
@@ -109,6 +136,8 @@ class Navigator {
         address.forEach(index => {
             if (val instanceof Array) {
                 val = val[index];
+            } else {
+                val = undefined;
             }
         });
         return val;
@@ -117,19 +146,21 @@ class Navigator {
     private buildMap(collection: any[]): number[] {
         let map = [],
             lastPage = [];
+
         for (let i = 0; i < collection.length; i ++) {
             let item = collection[i];
             if (item.type === types.PAGE) {
                 if (0 < lastPage.length) {
                     map.push(lastPage);
                 }
-                lastPage = [[]];
+                lastPage = [[item._id]];
             } else if (item.type === types.NOTE) {
-                lastPage.push([]);
+                lastPage.push([item._id]);
             } else if (item.type === types.PAD) {
-                map.push([]);
+                map.push([item._id]);
             }
         }
+        console.log('map', map);
         map.push(lastPage);
         return map;
     }

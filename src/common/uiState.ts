@@ -1,6 +1,17 @@
 import {Injectable, EventEmitter} from 'angular2/angular2';
+//import {} from 'angular2/router';
 import Navigator from './navigator';
+import {IPadItem, types, Page} from "./model";
 
+/**
+ * These are the possible states the app can be in (i.e. at what level of the hierarchy is the user at)
+ */
+export enum UiContext {
+    PadList,
+    Pad,
+    Page,
+    Note
+}
 
 const Keys = {
     up: 38,
@@ -12,10 +23,12 @@ const Keys = {
 };
 
 @Injectable()
-class UiState {
+export class UiState {
 
     private _focus: EventEmitter = new EventEmitter();
     private _blur: EventEmitter = new EventEmitter();
+    private _create: EventEmitter = new EventEmitter();
+
     private currentAddressIsFocussed: boolean = false;
 
     constructor(private navigator: Navigator) {
@@ -26,8 +39,21 @@ class UiState {
         this.navigator.init(padCollection);
     }
 
+    public getUiContext(): UiContext {
+        if (this.navigator.getSelectedItemAddress().length === 1) {
+            return UiContext.Pad;
+        } else {
+            return UiContext.Page;
+        }
+        //return UiContext.PadList;
+    }
+
     public addressIsSelected(address: number[]): boolean {
         return this.navigator.getSelectedItemAddress().toString() === address.toString();
+    }
+
+    public itemIsSelected(item: any): boolean {
+        return this.navigator.getSelectedItemId() === item._id;
     }
 
     public keyHandler(event: KeyboardEvent) {
@@ -58,6 +84,16 @@ class UiState {
                 this.fireBlurEvent();
             }
         }
+
+        console.log('navigator address:', this.navigator.getSelectedItemAddress());
+    }
+
+    public setCreate(type: string) {
+        let newItem;
+        if (type === types.PAGE) {
+            newItem = new Page(this.navigator.getCurrentPadId());
+        }
+        this._create.next(newItem);
     }
 
     public setFocus(address: number[]) {
@@ -79,6 +115,10 @@ class UiState {
         return this._blur.toRx();
     }
 
+    public create() {
+        return this._create.toRx();
+    }
+
     private fireFocusEvent() {
         this._focus.next(this.navigator.getSelectedItemAddress().toString());
     }
@@ -88,5 +128,3 @@ class UiState {
     }
 
 }
-
-export default UiState;

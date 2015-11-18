@@ -1,5 +1,5 @@
 import {Component, CORE_DIRECTIVES, FORM_DIRECTIVES, Input, Output, EventEmitter, ElementRef} from 'angular2/angular2';
-import UiState from '../../common/uiState';
+import {UiState} from '../../common/uiState';
 
 @Component({
     selector: 'title-input',

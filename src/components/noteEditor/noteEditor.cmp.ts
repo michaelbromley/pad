@@ -1,7 +1,7 @@
 import {Component, FORM_DIRECTIVES, CORE_DIRECTIVES, Input, Output, EventEmitter, ElementRef} from 'angular2/angular2';
 import {Note} from "../../common/model";
 import MarkdownPipe from "./markdownPipe";
-import UiState from "../../common/uiState";
+import {UiState} from "../../common/uiState";
 
 @Component({
     selector: 'note-editor',
@@ -19,6 +19,7 @@ class NoteEditorCmp {
 
     constructor(private uiState: UiState, private elRef: ElementRef) {
         uiState.focus().subscribe(val => {
+            console.log('noteEditor: focus event');
             if (val === this.address.toString()) {
                 this.focus();
             } else {

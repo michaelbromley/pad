@@ -4,13 +4,23 @@ export const types = {
     NOTE: 'note'
 };
 
-export class Pad {
+export interface IPadItem {
+    _id: string;
+    type: string;
+    name?: string;
+    title?: string;
+    content?: string;
+    padId?: string;
+    pageId?: string
+}
+
+export class Pad implements IPadItem {
     public _id: string = '';
     public name: string = '';
     public type: string = types.PAD;
 }
 
-export class Page {
+export class Page implements IPadItem {
 
     public padId: string;
     public _id: string = '';
@@ -24,7 +34,7 @@ export class Page {
 
 }
 
-export class Note {
+export class Note implements IPadItem {
 
     public pageId: string;
     public _id: string = '';
