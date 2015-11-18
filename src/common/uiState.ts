@@ -29,6 +29,7 @@ export class UiState {
     private _blur: EventEmitter = new EventEmitter();
     private _create: EventEmitter = new EventEmitter();
     private _deleteSelected: EventEmitter = new EventEmitter();
+    private _reOrder: EventEmitter = new EventEmitter();
 
     private currentAddressIsFocussed: boolean = false;
 
@@ -122,6 +123,14 @@ export class UiState {
         this._deleteSelected.next(selectedItem);
     }
 
+    public setReOrder(increment: number) {
+        let selectedItemId = this.navigator.getSelectedItemId();
+        this._reOrder.next({
+            id: selectedItemId,
+            increment: increment
+        });
+    }
+
     public setFocus(address: number[]) {
         this.navigator.setSelectedItemAddress(address);
         this.currentAddressIsFocussed = true;
@@ -147,6 +156,10 @@ export class UiState {
 
     public deleteSelected() {
         return this._deleteSelected.toRx();
+    }
+
+    public reOrder() {
+        return this._reOrder.toRx();
     }
 
     private fireFocusEvent() {

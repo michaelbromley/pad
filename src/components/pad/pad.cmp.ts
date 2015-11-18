@@ -46,6 +46,22 @@ class PadCmp {
                 this.initPadCollection();
             });
 
+        uiState.reOrder()
+            .map(val => {
+                let item = this.pages.filter(page => page._id === val.id)[0];
+                if (item) {
+                    let newOrder = item.order + val.increment;
+                    if (0 < newOrder && newOrder <= this.pages.length) {
+                        item.order = newOrder;
+                        return this.dataService.updateItem(item).subscribe();
+                    }
+                }
+            })
+            .subscribe(val => {
+                //console.log('reordered item', val);
+                this.initPadCollection();
+            });
+
         this.initPadCollection();
     }
 

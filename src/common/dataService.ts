@@ -30,7 +30,6 @@ class DataService {
     public deleteItem(item) {
         return this.http.delete(`${config.API_URL}/items/${item._id}`);
     }
-
 }
 
 export default DataService;

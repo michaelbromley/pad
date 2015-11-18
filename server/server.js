@@ -79,6 +79,32 @@ function groupBy(objArray, prop) {
 }
 
 /**
+ * Given an item with an "order" property, find all items following it in sequence and update their orders
+ * to come after it.
+ *
+ * @param item
+ * @param oldOrder
+ * @param cb
+ */
+function reOrderFollowingItems(item, oldOrder, cb) {
+    if (item.type === types.PAGE) {
+        let query = {
+            type: item.type,
+            padId: item.padId,
+            _id: { $ne: item._id },
+            order: { $gte: item.order }};
+
+        if (oldOrder && item.order < oldOrder) {
+            query.order.$lt = oldOrder;
+        }
+
+        db.update(query, { $inc: { order: 1 }}, { multi: true }, cb);
+    } else {
+        cb();
+    }
+}
+
+/**
  * List Pads
  */
 app.get('/api/pads', function(req, res) {
@@ -129,20 +155,9 @@ app.get('/api/pads/:id', function(req, res) {
  */
 app.post('/api/items', function(req, res) {
     let item = req.body;
-    let type = getType(item);
+    getType(item);
     db.insert(item, () => {
-        // update the order of any later items
-        if (type === types.PAGE) {
-            db.update({
-                type: type,
-                padId: item.padId,
-                _id: { $ne: item._id },
-                order: { $gte: item.order }}, { $inc: { order: 1 }}, { multi: true }, () => {
-                res.send(item)
-            });
-        } else {
-            res.send(item)
-        }
+        reOrderFollowingItems(item, -1, () => res.send(item));
     });
 });
 
@@ -160,7 +175,16 @@ app.get('/api/items/:id', function(req, res) {
 app.put('/api/items/:id', function(req, res) {
     let item = req.body;
     getType(item);
-    db.update({_id: req.params.id}, item, (item) => res.send(item));
+    db.findOne({ _id: item._id}, (err, oldItem) => {
+        db.update({_id: req.params.id}, item, () => {
+            if (oldItem.order !== item.order) {
+                reOrderFollowingItems(item, oldItem.order, () => res.send(item));
+            } else {
+                res.send(item);
+            }
+        });
+    });
+
 });
 
 /**

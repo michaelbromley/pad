@@ -36,6 +36,14 @@ class ContextMenuCmp {
     public deleteSelected() {
         this.uiState.setDeleteSelected();
     }
+
+    public moveUp() {
+        this.uiState.setReOrder(-1);
+    }
+
+    public moveDown() {
+        this.uiState.setReOrder(1);
+    }
 }
 
 export default ContextMenuCmp;
