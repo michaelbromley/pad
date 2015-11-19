@@ -1,6 +1,7 @@
 import {Injectable, EventEmitter} from 'angular2/angular2';
 //import {} from 'angular2/router';
 import Navigator from './navigator';
+import {Scroller} from './scroller';
 import {IPadItem, types, Page, Note} from "./model";
 
 /**
@@ -32,9 +33,12 @@ export class UiState {
     private _reOrder: EventEmitter = new EventEmitter();
 
     private currentAddressIsFocussed: boolean = false;
+    private scroller;
 
     constructor(private navigator: Navigator) {
         console.log('constructing uiState');
+        // TODO: why does ng2 DI break when I try to inject this?
+        this.scroller = new Scroller();
     }
 
     public initPadCollection(padCollection) {
@@ -70,6 +74,7 @@ export class UiState {
                     event.preventDefault();
                     this.navigator.next();
                     break;
+                case Keys.right:
                 case Keys.enter:
                     event.preventDefault();
                     let canGoDeeper = this.navigator.down();
@@ -78,6 +83,7 @@ export class UiState {
                         this.fireFocusEvent();
                     }
                     break;
+                case Keys.left:
                 case Keys.escape:
                     event.preventDefault();
                     this.navigator.up();
@@ -90,15 +96,18 @@ export class UiState {
                 this.blurSelectedItem();
             }
         }
+        this.scroller.scrollIntoView(this.navigator.getSelectedItemId());
         console.log(this.navigator.getSelectedItemAddress());
     }
 
     public selectNext() {
-        return this.navigator.next();
+        this.navigator.next();
+        this.scroller.scrollIntoView(this.navigator.getSelectedItemId());
     }
 
     public selectPrev() {
-        return this.navigator.prev();
+        this.navigator.prev();
+        this.scroller.scrollIntoView(this.navigator.getSelectedItemId());
     }
 
     public blurSelectedItem() {

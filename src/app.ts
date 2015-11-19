@@ -7,6 +7,7 @@ import PadCmp from './components/pad/pad.cmp';
 import ContextMenuCmp from './components/contextMenu/contextMenu.cmp';
 import {UiState} from './common/uiState';
 import Navigator from './common/navigator';
+import {Scroller} from './common/scroller';
 
 // Common styles
 require('flexboxgrid/dist/flexboxgrid.css');
@@ -23,8 +24,7 @@ require('styles/main.less');
     </div>`,
     providers: [
         ROUTER_PROVIDERS,
-        provide(LocationStrategy, {useClass: HashLocationStrategy}),
-        UiState
+        provide(LocationStrategy, {useClass: HashLocationStrategy})
     ]
 })
 @RouteConfig([
@@ -51,5 +51,4 @@ defaultHeaders.append('Content-Type', 'application/json');
 class appRequestOptions extends BaseRequestOptions {
   headers = defaultHeaders;
 }
-
-bootstrap(AppComponent, [HTTP_PROVIDERS, provide(RequestOptions, {useClass: appRequestOptions}), Navigator]);
+bootstrap(AppComponent, [HTTP_PROVIDERS, provide(RequestOptions, {useClass: appRequestOptions}), UiState, Scroller, Navigator]);
