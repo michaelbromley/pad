@@ -80,7 +80,7 @@ function groupBy(objArray, prop) {
 
 /**
  * Given an item with an "order" property, find all items following it in sequence and update their orders
- * to come after it.
+ * to come after it. -1 is a special value of oldOrder to signify a newly-created item.
  *
  * @param item
  * @param oldOrder
@@ -88,17 +88,38 @@ function groupBy(objArray, prop) {
  */
 function reOrderFollowingItems(item, oldOrder, cb) {
     if (item.type === types.PAGE) {
+        let inc;
         let query = {
             type: item.type,
             padId: item.padId,
-            _id: { $ne: item._id },
-            order: { $gte: item.order }};
+            _id: { $ne: item._id }
+        };
 
-        if (oldOrder && item.order < oldOrder) {
-            query.order.$lt = oldOrder;
+
+        if (oldOrder === -1) {
+            // item is being newly-inserted
+            query.order = {
+                $gte: item.order
+            };
+            inc = 1;
+        } else if (item.order < oldOrder) {
+            // item has moved earlier in sequence
+            query.order = {
+                $gte: item.order,
+                $lt: oldOrder
+            };
+            inc = 1;
+        } else if (oldOrder < item.order) {
+
+            // item has move later in sequence
+            query.order = {
+                $gt: oldOrder,
+                $lte: item.order
+            };
+            inc = -1;
         }
 
-        db.update(query, { $inc: { order: 1 }}, { multi: true }, cb);
+        db.update(query, { $inc: { order: inc }}, { multi: true }, cb);
     } else {
         cb();
     }
