@@ -1,7 +1,7 @@
-import {Injectable} from 'angular2/angular2';
+//import {Injectable} from 'angular2/angular2';
 
 
-@Injectable()
+//@Injectable()
 export class Scroller {
 
     public scrollIntoView(itemId: string) {

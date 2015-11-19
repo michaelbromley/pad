@@ -8,6 +8,7 @@ import ContextMenuCmp from './components/contextMenu/contextMenu.cmp';
 import {UiState} from './common/uiState';
 import Navigator from './common/navigator';
 import {Scroller} from './common/scroller';
+import {Keyboard} from './common/keyboard';
 
 // Common styles
 require('flexboxgrid/dist/flexboxgrid.css');
@@ -33,11 +34,17 @@ require('styles/main.less');
 ])
 class AppComponent {
 
-    constructor(private uiState: UiState) {}
+    constructor(private uiState: UiState, private keyboard: Keyboard) {}
 
     @HostListener('window:keydown', ['$event'])
-    public keyHandler(event: KeyboardEvent) {
+    public keyDownHandler(event: KeyboardEvent) {
+        this.keyboard.keydown(event);
         this.uiState.keyHandler(event);
+    }
+
+    @HostListener('window:keyup', ['$event'])
+    public keyUpHandler(event: KeyboardEvent) {
+        this.keyboard.keyup(event);
     }
 
     @HostListener('window:click', ['$event'])
@@ -51,4 +58,4 @@ defaultHeaders.append('Content-Type', 'application/json');
 class appRequestOptions extends BaseRequestOptions {
   headers = defaultHeaders;
 }
-bootstrap(AppComponent, [HTTP_PROVIDERS, provide(RequestOptions, {useClass: appRequestOptions}), UiState, Scroller, Navigator]);
+bootstrap(AppComponent, [HTTP_PROVIDERS, provide(RequestOptions, {useClass: appRequestOptions}), UiState, Scroller, Navigator, Keyboard]);

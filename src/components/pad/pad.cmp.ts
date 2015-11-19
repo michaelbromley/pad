@@ -53,7 +53,7 @@ class PadCmp {
                     limit = this.pages.length
                 } else if (val.type === types.NOTE) {
                     item = this.padCollection.filter(note => note._id === val.id)[0];
-                    limit = this.padCollection.filter(note => note.pageId === item.pageId).length;
+                    limit = this.padCollection.filter(note => note.pageId === item.pageId).length + 1;
                 }
 
                 if (item) {

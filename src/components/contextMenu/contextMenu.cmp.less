@@ -1,17 +1,22 @@
 .context-menu-container {
-  border: 1px solid green;
-  width: 150px;
-  min-height: 400px;
+
   position: absolute;
-  top: 50px;
   left: -160px;
 
-  ul.actions {
-    li {
-      display: none;
+  .context-menu {
+    border: 1px solid green;
+    width: 150px;
+    min-height: 400px;
+    position: fixed;
+    top: 50px;
 
-      &.visible {
-        display: block;
+    ul.actions {
+      li {
+        display: none;
+
+        &.visible {
+          display: block;
+        }
       }
     }
   }

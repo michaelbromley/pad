@@ -25,12 +25,8 @@ class ContextMenuCmp {
         return this.uiState.getUiContext();
     }
 
-    public createPage() {
-        this.uiState.setCreate(types.PAGE);
-    }
-
-    public createNote() {
-        this.uiState.setCreate(types.NOTE);
+    public createItem() {
+        this.uiState.setCreate();
     }
 
     public deleteSelected() {

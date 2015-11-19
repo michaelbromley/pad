@@ -1,19 +1,21 @@
 <div class="context-menu-container">
-    <ul class="actions">
-        <li [class.visible]="isPadContext()">
-            <button (click)="createPage()">New Page</button>
-        </li>
-        <li [class.visible]="isPageContext()">
-            <button (click)="createNote()">New Note</button>
-        </li>
-        <li class="visible">
-            <button (click)="deleteSelected()">Delete Selected</button>
-        </li>
-        <li class="visible">
-            <button (click)="moveUp()">Move Up</button>
-        </li>
-        <li class="visible">
-            <button (click)="moveDown()">move Down</button>
-        </li>
-    </ul>
+    <div class="context-menu">
+        <ul class="actions">
+            <li [class.visible]="isPadContext()">
+                <button (click)="createItem()">New Page</button>
+            </li>
+            <li [class.visible]="isPageContext()">
+                <button (click)="createItem()">New Note</button>
+            </li>
+            <li class="visible">
+                <button (click)="deleteSelected()">Delete Selected</button>
+            </li>
+            <li class="visible">
+                <button (click)="moveUp()">Move Up</button>
+            </li>
+            <li class="visible">
+                <button (click)="moveDown()">move Down</button>
+            </li>
+        </ul>
+    </div>
 </div>

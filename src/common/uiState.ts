@@ -3,6 +3,7 @@ import {Injectable, EventEmitter} from 'angular2/angular2';
 import Navigator from './navigator';
 import {Scroller} from './scroller';
 import {IPadItem, types, Page, Note} from "./model";
+import {Keyboard} from "./keyboard";
 
 /**
  * These are the possible states the app can be in (i.e. at what level of the hierarchy is the user at)
@@ -13,15 +14,6 @@ export enum UiContext {
     Page,
     Note
 }
-
-const Keys = {
-    up: 38,
-    down: 40,
-    left: 37,
-    right: 39,
-    enter: 13,
-    escape: 27
-};
 
 @Injectable()
 export class UiState {
@@ -35,7 +27,7 @@ export class UiState {
     private currentAddressIsFocussed: boolean = false;
     private scroller;
 
-    constructor(private navigator: Navigator) {
+    constructor(private navigator: Navigator, private keyboard: Keyboard) {
         console.log('constructing uiState');
         // TODO: why does ng2 DI break when I try to inject this?
         this.scroller = new Scroller();
@@ -63,41 +55,45 @@ export class UiState {
     }
 
     public keyHandler(event: KeyboardEvent) {
+        const isPressed = (...keys: string[]) => {
+            return this.keyboard.isPressedOnly(...keys);
+        };
 
         if (!this.currentAddressIsFocussed) {
-            switch (event.keyCode) {
-                case Keys.up:
-                    event.preventDefault();
-                    this.navigator.prev();
-                    break;
-                case Keys.down:
-                    event.preventDefault();
-                    this.navigator.next();
-                    break;
-                case Keys.right:
-                case Keys.enter:
-                    event.preventDefault();
-                    let canGoDeeper = this.navigator.down();
-                    if (!canGoDeeper) {
-                        this.currentAddressIsFocussed = true;
-                        this.fireFocusEvent();
-                    }
-                    break;
-                case Keys.left:
-                case Keys.escape:
-                    event.preventDefault();
-                    this.navigator.up();
-                    break;
-                default:
+            if (isPressed('up')) {
+                event.preventDefault();
+                this.navigator.prev();
+            } else if (isPressed('down')) {
+                event.preventDefault();
+                this.navigator.next();
+            } else if (isPressed('right')) {
+                this.navigator.down();
+            } else if (isPressed('enter')) {
+                event.preventDefault();
+                let canGoDeeper = this.navigator.down();
+                if (!canGoDeeper) {
+                    this.currentAddressIsFocussed = true;
+                    this.fireFocusEvent();
+                }
+            } else if (isPressed('left') || isPressed('esc')) {
+                event.preventDefault();
+                this.navigator.up();
+            } else if (isPressed('alt', 'ctrl', 'n')) {
+                this.setCreate();
+            } else if (isPressed('alt', 'ctrl', 'd')) {
+                this.setDeleteSelected();
+            } else if (isPressed('alt', 'ctrl', 'up')) {
+                this.setReOrder(-1);
+            } else if (isPressed('alt', 'ctrl', 'down')) {
+                this.setReOrder(1);
             }
         } else {
-            if (event.keyCode === Keys.escape) {
+            if (isPressed('esc')) {
                 event.preventDefault();
                 this.blurSelectedItem();
             }
         }
         this.scroller.scrollIntoView(this.navigator.getSelectedItemId());
-        console.log(this.navigator.getSelectedItemAddress());
     }
 
     public selectNext() {
@@ -117,8 +113,8 @@ export class UiState {
         }
     }
 
-    public setCreate(type: string) {
-        console.log('setCreate()');
+    public setCreate() {
+        let type = this.getUiContext() === UiContext.Pad ? types.PAGE : types.NOTE;
         let newItem;
         if (type === types.PAGE) {
             newItem = new Page(this.navigator.getCurrentPadId());

@@ -104,7 +104,6 @@ class Navigator {
     public next = () => {
         let nextAddress = this.incrementLast(this.selectedItemAddress);
         let objectAtAddress = this.getValue(this.collectionMap, nextAddress);
-        console.log('objectAtAddress', objectAtAddress);
         if (objectAtAddress instanceof Array && objectAtAddress[0]) {
             this.selectedItemAddress = nextAddress;
         } else {
