@@ -1,8 +1,9 @@
 import {Injectable, EventEmitter} from 'angular2/angular2';
+import {Router, Location} from 'angular2/router';
 //import {} from 'angular2/router';
 import Navigator from './navigator';
 import {Scroller} from './scroller';
-import {IPadItem, types, Page, Note} from "./model";
+import {IPadItem, types, Pad, Page, Note} from "./model";
 import {Keyboard} from "./keyboard";
 
 /**
@@ -25,25 +26,35 @@ export class UiState {
     private _reOrder: EventEmitter = new EventEmitter();
 
     private currentAddressIsFocussed: boolean = false;
+    private lastPressedKeys: number[] = [];
+    public currentPadId: string;
     private scroller;
 
-    constructor(private navigator: Navigator, private keyboard: Keyboard) {
-        console.log('constructing uiState');
+    constructor(private router: Router,
+                private location: Location,
+                private navigator: Navigator,
+                private keyboard: Keyboard) {
         // TODO: why does ng2 DI break when I try to inject this?
         this.scroller = new Scroller();
     }
 
-    public initPadCollection(padCollection) {
-        this.navigator.init(padCollection);
+    public initUiView(viewContents) {
+        if (this.getUiContext() === UiContext.PadList) {
+            this.currentPadId = undefined;
+        } else {
+            this.currentPadId = viewContents[0] && viewContents[0]._id;
+        }
+        this.navigator.init(viewContents);
     }
 
     public getUiContext(): UiContext {
-        if (this.navigator.getSelectedItemAddress().length === 1) {
+        if (this.location.path() === '') {
+            return UiContext.PadList;
+        } else if (this.navigator.getSelectedItemAddress().length === 1) {
             return UiContext.Pad;
         } else {
             return UiContext.Page;
         }
-        //return UiContext.PadList;
     }
 
     public addressIsSelected(address: number[]): boolean {
@@ -54,10 +65,18 @@ export class UiState {
         return this.navigator.getSelectedItemId() === item._id;
     }
 
-    public keyHandler(event: KeyboardEvent) {
+    public keydown(event: KeyboardEvent) {
         const isPressed = (...keys: string[]) => {
             return this.keyboard.isPressedOnly(...keys);
         };
+
+        this.keyboard.keydown(event);
+
+        let pressedKeys = this.keyboard.getPressedKeys();
+        if (this.lastPressedKeys.toString() === pressedKeys.toString()) {
+            return;
+        }
+        this.lastPressedKeys = pressedKeys;
 
         if (!this.currentAddressIsFocussed) {
             if (isPressed('up')) {
@@ -70,14 +89,23 @@ export class UiState {
                 this.navigator.down();
             } else if (isPressed('enter')) {
                 event.preventDefault();
-                let canGoDeeper = this.navigator.down();
-                if (!canGoDeeper) {
-                    this.currentAddressIsFocussed = true;
-                    this.fireFocusEvent();
+
+                if (this.getUiContext() === UiContext.PadList) {
+                    this.router.navigate(['Pad', { id: this.navigator.getSelectedItemId()}]);
+                } else {
+                    let canGoDeeper = this.navigator.down();
+                    if (!canGoDeeper) {
+                        this.currentAddressIsFocussed = true;
+                        this.fireFocusEvent();
+                    }
                 }
             } else if (isPressed('left') || isPressed('esc')) {
                 event.preventDefault();
-                this.navigator.up();
+                if (this.navigator.getSelectedItemAddress()[0] === -1) {
+                    this.router.navigate(['PadList']);
+                } else {
+                    this.navigator.up();
+                }
             } else if (isPressed('alt', 'ctrl', 'n')) {
                 this.setCreate();
             } else if (isPressed('alt', 'ctrl', 'd')) {
@@ -94,6 +122,12 @@ export class UiState {
             }
         }
         this.scroller.scrollIntoView(this.navigator.getSelectedItemId());
+        console.log('pressed keys', pressedKeys);
+    }
+
+    public keyup(event: KeyboardEvent) {
+        this.keyboard.keyup(event);
+        this.lastPressedKeys = this.keyboard.getPressedKeys();
     }
 
     public selectNext() {
@@ -114,33 +148,49 @@ export class UiState {
     }
 
     public setCreate() {
-        let type = this.getUiContext() === UiContext.Pad ? types.PAGE : types.NOTE;
+        console.log('calling setCreate()');
         let newItem;
-        if (type === types.PAGE) {
+        let currentOrder;
+        let context = this.getUiContext();
+
+        if (context === UiContext.Pad) {
             newItem = new Page(this.navigator.getCurrentPadId());
-            newItem.title = "Untitled Page";
-            let currPageOrder = this.navigator.getSelectedItemAddress()[0];
-            newItem.order = -1 < currPageOrder ? currPageOrder + 1 : 1;
-        }
-        if (type === types.NOTE) {
+            newItem.title = 'Untitled Page';
+            currentOrder = this.navigator.getSelectedItemAddress()[0];
+        } else if (context === UiContext.Page) {
             newItem = new Note(this.navigator.getCurrentPageId());
-            newItem.content = "Untitled Note";
-            let currNoteOrder = this.navigator.getSelectedItemAddress()[1];
-            newItem.order = -1 < currNoteOrder ? currNoteOrder + 1 : 1;
+            newItem.content = 'Untitled Note';
+            currentOrder = this.navigator.getSelectedItemAddress()[1];
+        } else {
+            newItem = new Pad();
+            newItem.name = 'Untitled Pad';
+            currentOrder = this.navigator.getSelectedItemAddress()[0];
         }
+
+        newItem.order = -1 < currentOrder ? currentOrder + 1 : 1;
         this._create.next(newItem);
     }
 
     public setDeleteSelected() {
-        let selectedItem = {
-            _id: this.navigator.getSelectedItemId()
-        };
-        this._deleteSelected.next(selectedItem);
+        let id = this.navigator.getSelectedItemId();
+        if (id) {
+            let selectedItem = {
+                _id: this.navigator.getSelectedItemId()
+            };
+            this._deleteSelected.next(selectedItem);
+        }
     }
 
     public setReOrder(increment: number) {
         let selectedItemId = this.navigator.getSelectedItemId();
-        let type = this.navigator.getSelectedItemAddress().length === 1 ? types.PAGE : types.NOTE;
+        let type;
+
+        if (this.getUiContext() === UiContext.PadList) {
+            type = types.PAD;
+        } else {
+            type = this.navigator.getSelectedItemAddress().length === 1 ? types.PAGE : types.NOTE;
+        }
+
         this._reOrder.next({
             type: type,
             id: selectedItemId,

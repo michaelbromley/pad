@@ -7,8 +7,10 @@ import PadCmp from './components/pad/pad.cmp';
 import ContextMenuCmp from './components/contextMenu/contextMenu.cmp';
 import {UiState} from './common/uiState';
 import Navigator from './common/navigator';
+import DataService from './common/dataService';
 import {Scroller} from './common/scroller';
 import {Keyboard} from './common/keyboard';
+import {PadService} from './common/padService';
 
 // Common styles
 require('flexboxgrid/dist/flexboxgrid.css');
@@ -23,10 +25,7 @@ require('styles/main.less');
         <context-menu></context-menu>
         <router-outlet></router-outlet>
     </div>`,
-    providers: [
-        ROUTER_PROVIDERS,
-        provide(LocationStrategy, {useClass: HashLocationStrategy})
-    ]
+    providers: []
 })
 @RouteConfig([
     { path: '/', component: PadListCmp, as: 'PadList' },
@@ -34,17 +33,16 @@ require('styles/main.less');
 ])
 class AppComponent {
 
-    constructor(private uiState: UiState, private keyboard: Keyboard) {}
+    constructor(private uiState: UiState) {}
 
     @HostListener('window:keydown', ['$event'])
     public keyDownHandler(event: KeyboardEvent) {
-        this.keyboard.keydown(event);
-        this.uiState.keyHandler(event);
+        this.uiState.keydown(event);
     }
 
     @HostListener('window:keyup', ['$event'])
     public keyUpHandler(event: KeyboardEvent) {
-        this.keyboard.keyup(event);
+        this.uiState.keyup(event);
     }
 
     @HostListener('window:click', ['$event'])
@@ -58,4 +56,14 @@ defaultHeaders.append('Content-Type', 'application/json');
 class appRequestOptions extends BaseRequestOptions {
   headers = defaultHeaders;
 }
-bootstrap(AppComponent, [HTTP_PROVIDERS, provide(RequestOptions, {useClass: appRequestOptions}), UiState, Scroller, Navigator, Keyboard]);
+bootstrap(AppComponent, [
+    HTTP_PROVIDERS,
+    ROUTER_PROVIDERS,
+    provide(LocationStrategy, {useClass: HashLocationStrategy}),
+    provide(RequestOptions, {useClass: appRequestOptions}),
+    UiState,
+    Scroller,
+    DataService,
+    PadService,
+    Navigator,
+    Keyboard]);

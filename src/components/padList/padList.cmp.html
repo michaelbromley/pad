@@ -1,10 +1,10 @@
-<div>
+<div class="pad-list-container">
     Found {{ pads.length }} pads.
-    <ul>
-        <li *ng-for="#pad of pads">
+    <ul class="pad-list">
+        <li *ng-for="#pad of pads; #index0 = index"
+            [class.selected]="checkSelected([index0])"
+            [id]="'_' + pad._id">
             <a [router-link]="[ '/Pad', {id: pad._id } ]">{{ pad.name }}</a>
         </li>
     </ul>
-    <input type="text"/>
-    <button>New Pad</button>
 </div>

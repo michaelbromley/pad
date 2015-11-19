@@ -1,11 +1,10 @@
 <div class="context-menu-container">
     <div class="context-menu">
         <ul class="actions">
-            <li [class.visible]="isPadContext()">
-                <button (click)="createItem()">New Page</button>
-            </li>
-            <li [class.visible]="isPageContext()">
-                <button (click)="createItem()">New Note</button>
+            <li class="visible">
+                <button (click)="createItem()">
+                    {{ newItemLabel() }}
+                </button>
             </li>
             <li class="visible">
                 <button (click)="deleteSelected()">Delete Selected</button>

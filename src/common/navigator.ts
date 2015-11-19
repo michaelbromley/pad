@@ -13,9 +13,7 @@ class Navigator {
     private selectedItemAddress: number[] = [NONE];
     private collectionMap: number[];
 
-    constructor() {
-        console.log('constructing navigator instance!');
-    }
+    constructor() {}
     
     public init(padCollection: any[]) {
         this.collectionMap = this.buildMap(padCollection);
@@ -43,7 +41,7 @@ class Navigator {
 
     private getItemIdAtAddress(address: number[]): string {
         let val = this.getValue(this.collectionMap, address),
-            unwrap = (val) => typeof val === 'string' ? val : unwrap(val[0]);
+            unwrap = (val) => typeof val === 'string' || typeof val === 'undefined' ? val : unwrap(val[0]);
 
         if (typeof val === 'undefined') {
             return '';
@@ -99,6 +97,7 @@ class Navigator {
                 this.up();
             }
         }
+        console.log('address:', this.selectedItemAddress);
     };
     
     public next = () => {
@@ -109,6 +108,7 @@ class Navigator {
         } else {
             this.up();
         }
+        console.log('address:', this.selectedItemAddress);
     };
 
     private getLastItemAddress() {
@@ -161,7 +161,6 @@ class Navigator {
                 map.push([item._id]);
             }
         }
-        console.log('map', map);
         map.push(lastPage);
         return map;
     }

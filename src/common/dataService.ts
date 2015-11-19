@@ -5,6 +5,8 @@ import {Injectable} from 'angular2/angular2';
 @Injectable()
 class DataService {
 
+    private busy: boolean = false;
+
     constructor(private http: Http) {}
 
     public fetchPadList() {
@@ -18,9 +20,11 @@ class DataService {
     }
 
     public createItem(item) {
+        this.beginRequest();
         delete item._id;
         return this.http.post(`${config.API_URL}/items`, JSON.stringify(item))
-            .map((res: Response) => res.json());
+            .map((res:Response) => res.json())
+            .do(() => this.endRequest());
     }
 
     public updateItem(item) {
@@ -29,6 +33,16 @@ class DataService {
 
     public deleteItem(item) {
         return this.http.delete(`${config.API_URL}/items/${item._id}`);
+    }
+
+    private beginRequest() {
+        this.busy = true;
+        console.log('starting request');
+    }
+
+    private endRequest() {
+        this.busy = false;
+        console.log('request ended');
     }
 }
 

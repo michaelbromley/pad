@@ -18,6 +18,7 @@ export class Pad implements IPadItem {
     public _id: string = '';
     public name: string = '';
     public type: string = types.PAD;
+    public order: number;
 }
 
 export class Page implements IPadItem {

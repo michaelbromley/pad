@@ -88,52 +88,47 @@ function groupBy(objArray, prop) {
  */
 function reOrderFollowingItems(item, oldOrder, cb) {
 
-    if (item.type === types.PAGE || item.type === types.NOTE) {
-        let inc;
-        let query = {
-            type: item.type,
-            _id: { $ne: item._id }
-        };
+    let inc;
+    let query = {
+        type: item.type,
+        _id: { $ne: item._id }
+    };
 
-        if (item.type === types.PAGE) {
-            query.padId = item.padId;
-        } else if (item.type === types.NOTE) {
-            query.pageId = item.pageId;
-        }
-
-        if (oldOrder === -1) {
-            // item is being newly-inserted
-            query.order = {
-                $gte: item.order
-            };
-            inc = 1;
-        } else if (item.order < oldOrder) {
-            // item has moved earlier in sequence
-            query.order = {
-                $gte: item.order,
-                $lt: oldOrder
-            };
-            inc = 1;
-        } else if (oldOrder < item.order) {
-            // item has move later in sequence
-            query.order = {
-                $gt: oldOrder,
-                $lte: item.order
-            };
-            inc = -1;
-        }
-
-        db.update(query, {$inc: {order: inc}}, {multi: true}, cb);
-    } else {
-        cb();
+    if (item.type === types.PAGE) {
+        query.padId = item.padId;
+    } else if (item.type === types.NOTE) {
+        query.pageId = item.pageId;
     }
+
+    if (oldOrder === -1) {
+        // item is being newly-inserted
+        query.order = {
+            $gte: item.order
+        };
+        inc = 1;
+    } else if (item.order < oldOrder) {
+        // item has moved earlier in sequence
+        query.order = {
+            $gte: item.order,
+            $lt: oldOrder
+        };
+        inc = 1;
+    } else if (oldOrder < item.order) {
+        // item has move later in sequence
+        query.order = {
+            $gt: oldOrder,
+            $lte: item.order
+        };
+        inc = -1;
+    }
+    db.update(query, {$inc: {order: inc}}, {multi: true}, cb);
 }
 
 /**
  * List Pads
  */
 app.get('/api/pads', function(req, res) {
-    db.find({type: types.PAD}, (err, docs) => res.send(docs));
+    db.find({type: types.PAD}).sort({ order: 1}).exec((err, docs) => res.send(docs));
 });
 
 

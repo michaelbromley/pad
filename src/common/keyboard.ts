@@ -113,4 +113,11 @@ export class Keyboard {
         }
         return result;
     }
+
+    /**
+     * Get an array of the pressed key codes
+     */
+    public getPressedKeys(): number[] {
+        return Object.keys(this.pressed).filter(code => this.pressed[code]).map(str => parseInt(str));
+    }
 }

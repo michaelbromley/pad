@@ -13,6 +13,17 @@ class ContextMenuCmp {
 
     }
 
+    public newItemLabel() {
+        let context = this.getContext();
+        if (context === UiContext.PadList) {
+            return 'New Pad';
+        } else if (context === UiContext.Pad) {
+            return 'New Page';
+        } else {
+            return 'New Note';
+        }
+    }
+
     public isPadContext() {
         return this.getContext() === UiContext.Pad;
     }
