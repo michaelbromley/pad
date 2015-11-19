@@ -93,6 +93,14 @@ export class UiState {
         console.log(this.navigator.getSelectedItemAddress());
     }
 
+    public selectNext() {
+        return this.navigator.next();
+    }
+
+    public selectPrev() {
+        return this.navigator.prev();
+    }
+
     public blurSelectedItem() {
         if (this.currentAddressIsFocussed) {
             this.currentAddressIsFocussed = false;
@@ -112,6 +120,8 @@ export class UiState {
         if (type === types.NOTE) {
             newItem = new Note(this.navigator.getCurrentPageId());
             newItem.content = "Untitled Note";
+            let currNoteOrder = this.navigator.getSelectedItemAddress()[1];
+            newItem.order = -1 < currNoteOrder ? currNoteOrder + 1 : 1;
         }
         this._create.next(newItem);
     }
@@ -125,7 +135,9 @@ export class UiState {
 
     public setReOrder(increment: number) {
         let selectedItemId = this.navigator.getSelectedItemId();
+        let type = this.navigator.getSelectedItemAddress().length === 1 ? types.PAGE : types.NOTE;
         this._reOrder.next({
+            type: type,
             id: selectedItemId,
             increment: increment
         });

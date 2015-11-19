@@ -19,7 +19,6 @@ class PadCmp {
     public selectedItemAddress: any = '';
     public pad: Pad = <Pad>{};
     public pages: Page[] = [];
-    public notes: Note[] = [];
 
     constructor(private dataService: DataService,
                 private params: RouteParams,
@@ -48,12 +47,26 @@ class PadCmp {
 
         uiState.reOrder()
             .map(val => {
-                let item = this.pages.filter(page => page._id === val.id)[0];
+                let item, limit;
+                if (val.type === types.PAGE) {
+                    item = this.pages.filter(page => page._id === val.id)[0];
+                    limit = this.pages.length
+                } else if (val.type === types.NOTE) {
+                    item = this.padCollection.filter(note => note._id === val.id)[0];
+                    limit = this.padCollection.filter(note => note.pageId === item.pageId).length;
+                }
+
                 if (item) {
                     let newOrder = item.order + val.increment;
-                    if (0 < newOrder && newOrder <= this.pages.length) {
+                    if (0 < newOrder && newOrder <= limit) {
                         item.order = newOrder;
-                        return this.dataService.updateItem(item).subscribe();
+                        return this.dataService.updateItem(item).subscribe(() => {
+                            if (0 < val.increment) {
+                                this.uiState.selectNext();
+                            } else {
+                                this.uiState.selectPrev();
+                            }
+                        });
                     }
                 }
             })

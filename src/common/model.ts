@@ -41,6 +41,7 @@ export class Note implements IPadItem {
     public _id: string = '';
     public content: string = '';
     public type: string = types.NOTE;
+    public order: number;
 
     constructor(pageId) {
         this.pageId = pageId;

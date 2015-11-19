@@ -87,14 +87,19 @@ function groupBy(objArray, prop) {
  * @param cb
  */
 function reOrderFollowingItems(item, oldOrder, cb) {
-    if (item.type === types.PAGE) {
+
+    if (item.type === types.PAGE || item.type === types.NOTE) {
         let inc;
         let query = {
             type: item.type,
-            padId: item.padId,
             _id: { $ne: item._id }
         };
 
+        if (item.type === types.PAGE) {
+            query.padId = item.padId;
+        } else if (item.type === types.NOTE) {
+            query.pageId = item.pageId;
+        }
 
         if (oldOrder === -1) {
             // item is being newly-inserted
@@ -110,7 +115,6 @@ function reOrderFollowingItems(item, oldOrder, cb) {
             };
             inc = 1;
         } else if (oldOrder < item.order) {
-
             // item has move later in sequence
             query.order = {
                 $gt: oldOrder,
@@ -119,7 +123,7 @@ function reOrderFollowingItems(item, oldOrder, cb) {
             inc = -1;
         }
 
-        db.update(query, { $inc: { order: inc }}, { multi: true }, cb);
+        db.update(query, {$inc: {order: inc}}, {multi: true}, cb);
     } else {
         cb();
     }
@@ -153,7 +157,7 @@ app.get('/api/pads/:id', function(req, res) {
                 { $or : pages.map(page => ({ pageId: page._id })) }
             ] };
 
-            db.find(query, (err, notes) => {
+            db.find(query).sort({ order: 1 }).exec((err, notes) => {
 
                 let groupedNotes = groupBy(notes, 'pageId');
                 for(let pageId in groupedNotes) {
