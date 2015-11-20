@@ -13,11 +13,15 @@ import {IPadItem} from "./model";
 @Injectable()
 export class PadService {
 
-    public pads: Pad[] = [];
+    private pads: Pad[] = [];
+    private padsFiltered: Pad[] = [];
     public pad: Pad = <Pad>{};
-    public padCollection: any[] = [];
-    public pages: Page[] = [];
+    private padCollection: any[] = [];
+    private padCollectionFiltered: any[] = [];
+    private pages: Page[] = [];
+    private pagesFiltered: Page[] = [];
 
+    private filterQuery: string = '';
     private _change: EventEmitter = new EventEmitter();
 
     constructor(private uiState: UiState, private dataService: DataService) {
@@ -65,40 +69,60 @@ export class PadService {
             }).subscribe();
     }
 
+    /**
+     * Getters - returns the data after applying a filter
+     */
+    public getPads(): Pad[] {
+        return this.padsFiltered;
+    }
+
+    public getPadCollection(): any[] {
+        return this.padCollectionFiltered;
+    }
+
+    public getPages(): Page[] {
+        return this.pagesFiltered;
+    }
+
     private init() {
         this.padCollection = [];
         this.pads = [];
         this.pages = [];
+        this.filterQuery = '';
     }
 
-    /*private insertNewItemIntoCollection(item: any) {
-        if (item.type === types.PAD) {
-            this.pads.splice(item.order, 0, item);
+    public setFilterQuery(val: string) {
+        if (this.filterQuery === val) {
+            return;
         }
-        if (item.type === types.PAGE) {
-
+        this.filterQuery = val.toLowerCase();
+        if (this.uiState.getUiContext() === UiContext.PadList) {
+            this.padsFiltered = this.pads.filter(pad => {
+                return -1 < pad.name.toLowerCase().indexOf(this.filterQuery);
+            });
+            this.uiState.updateUiView(this.padsFiltered);
+        } else {
+            this.padCollectionFiltered = this.padCollection.filter(item => {
+                if (item.type !== types.NOTE) {
+                    return true;
+                }
+                return -1 < item.content.toLowerCase().indexOf(this.filterQuery);
+            });
+            this.pagesFiltered = this.createPagesArray(this.padCollectionFiltered).filter(page => {
+                // include the page only if either a note it contains passes the filter, or
+                // if the page itself passes the filter.
+                if (-1 < page.title.toLowerCase().indexOf(this.filterQuery)) {
+                    return true;
+                }
+                let filteredNotes = this.padCollectionFiltered.filter(item => {
+                    return item.pageId && item.pageId === page._id;
+                });
+                return 0 < filteredNotes.length;
+            })
         }
-        this.updateItemsOrderProperty();
-        this.updateContents();
-        this._change.next(item);
-    }*/
-
-    /**
-     * Update the "order" property for each item in the current collections.
-     */
-    /*private updateItemsOrderProperty() {
-        const setOrderByIndex = (item, index) => {
-            item.order = index + 1;
-            return item;
-        };
-        this.pads = this.pads.map(setOrderByIndex);
-        this.pages = this.pages.map(setOrderByIndex);
-        this.pages.forEach(page => {
-            this.padCollection
-                .filter(item => item.type === types.NOTE && item.pageId === page._id)
-                .forEach(setOrderByIndex);
-        });
-    }*/
+        this.uiState.deselectAll();
+        this._change.next({});
+    }
 
     /**
      * Do a full reload from the dataService
@@ -112,21 +136,13 @@ export class PadService {
     }
 
     /**
-     * Update after a local change has been made without the need for a full reload.
+     * Fetch the list of pads from the server.
      */
-    /*public updateContents() {
-        if (this.uiState.getUiContext() === UiContext.PadList) {
-            this.uiState.updateUiView(this.pads);
-        } else {
-            this.uiState.updateUiView(this.padCollection);
-        }
-    }*/
-
     public loadPadList(isUpdate: boolean = false) {
         this.init();
         return this.dataService.fetchPadList()
             .subscribe(pads => {
-                this.pads = pads;
+                this.pads = this.padsFiltered = pads;
                 if (isUpdate) {
                     this.uiState.updateUiView(this.pads);
                 } else {
@@ -143,9 +159,9 @@ export class PadService {
     public loadPadCollection(id: string, isUpdate: boolean = false) {
         this.init();
         return this.dataService.fetchPad(id).subscribe(pad => {
-            this.padCollection = pad;
+            this.padCollection = this.padCollectionFiltered = pad;
             this.pad = this.padCollection[0] || <Pad>{};
-            this.pages = this.createPagesArray(this.padCollection);
+            this.pages = this.pagesFiltered = this.createPagesArray(this.padCollection);
             if (isUpdate) {
                 this.uiState.updateUiView(pad);
             } else {

@@ -133,6 +133,21 @@ export class Keyboard {
     }
 
     /**
+     * Returns true if the keyCode corresponds to a printable character (not a control key).
+     * Based on http://stackoverflow.com/a/12467610/772859
+     */
+    public isPrintableChar(keyCode: number): boolean {
+        var valid =
+            (keyCode > 47 && keyCode < 58)   || // number keys
+            (keyCode > 64 && keyCode < 91)   || // letter keys
+            (keyCode > 95 && keyCode < 112)  || // numpad keys
+            (keyCode > 185 && keyCode < 193) || // ;=,-./` (in order)
+            (keyCode > 218 && keyCode < 223);   // [\]' (in order)
+
+        return valid;
+    }
+
+    /**
      * Get an array of the pressed key codes
      */
     public getPressedKeys(): number[] {

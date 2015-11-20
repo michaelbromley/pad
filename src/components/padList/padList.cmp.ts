@@ -18,7 +18,7 @@ class PadListCmp {
 
         let sub = padService.change().subscribe(() => {
             console.log('[padlist] change event');
-            this.pads = padService.pads;
+            this.pads = padService.getPads();
         });
 
         this.subscriptions.push(sub);

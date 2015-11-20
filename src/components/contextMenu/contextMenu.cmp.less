@@ -25,17 +25,16 @@
       padding: 0;
       margin: 0;
       li {
-        visibility: hidden;
+        max-height: 0;
         display: block;
         opacity: 0;
         color: @color-gray-dark;
         font-size: @font-size-small;
         text-transform: uppercase;
+        transition: opacity 0.3s, max-height 0.3s;
 
-        transition: opacity 0.3s, visibility 0s 0.3s;
         &.visible {
-          transition: opacity 0.5s, visibility 0s;
-          visibility: visible;
+          max-height: 60px;
           opacity: 1;
         }
       }

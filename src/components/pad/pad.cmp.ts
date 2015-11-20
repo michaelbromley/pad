@@ -28,9 +28,9 @@ class PadCmp {
 
         let sub = padService.change().subscribe(() => {
             console.log('[pad] change event');
-            this.padCollection = padService.padCollection;
+            this.padCollection = padService.getPadCollection();
             this.pad = padService.pad;
-            this.pages = padService.pages;
+            this.pages = padService.getPages();
         });
         this.subscriptions.push(sub);
     }

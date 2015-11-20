@@ -6,6 +6,11 @@
         </div>
 
         <ul class="actions">
+            <li [class.visible]="!isAnythingFocussed()">
+                <div class="pad-btn">
+                    Type to search
+                </div>
+            </li>
             <li class="visible">
                 <div class="pad-btn" (click)="createItem()">
                     {{ newItemLabel() }}

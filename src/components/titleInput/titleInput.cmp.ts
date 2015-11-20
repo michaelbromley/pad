@@ -52,7 +52,7 @@ class TitleInputCmp {
         this.focussed = false;
         if (this.title !== this.item[this.titleProp]) {
             this.item[this.titleProp] = this.title;
-            this.blur.next(this.item);
+            this.blur.next(this.item); // TODO: delete?
         }
     };
 }

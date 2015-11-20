@@ -33,6 +33,10 @@ class ContextMenuCmp {
         return this.getContext() === UiContext.Page;
     }
 
+    public isAnythingFocussed() {
+        return this.uiState.isCurrentAddressFocussed();
+    }
+
     public canDelete(): boolean {
         return this.uiState.getAllowedOperations().remove;
     }

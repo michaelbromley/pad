@@ -28,12 +28,14 @@ export interface IAllowedOperations {
 export class UiState {
 
     private _focus: EventEmitter = new EventEmitter();
+    private _searchBarFocusChange: EventEmitter = new EventEmitter();
     private _blur: EventEmitter = new EventEmitter();
     private _create: EventEmitter = new EventEmitter();
     private _deleteSelected: EventEmitter = new EventEmitter();
     private _reOrder: EventEmitter = new EventEmitter();
 
     private currentAddressIsFocussed: boolean = false;
+    private searchBarIsFocussed: boolean = false;
     private lastPressedKeys: number[] = [];
     public currentPadId: string;
     private scroller;
@@ -53,11 +55,15 @@ export class UiState {
             this.currentPadId = viewContents[0] && viewContents[0]._id;
         }
         this.navigator.init(viewContents);
-        this.navigator.deselectAll();
+        this.deselectAll();
     }
 
     public updateUiView(viewContents) {
         this.navigator.init(viewContents);
+    }
+
+    public deselectAll() {
+        this.navigator.deselectAll();
     }
 
     public getUiContext(): UiContext {
@@ -91,7 +97,7 @@ export class UiState {
         }
         this.lastPressedKeys = pressedKeys;
 
-        if (!this.currentAddressIsFocussed) {
+        if (!this.currentAddressIsFocussed && !this.searchBarIsFocussed) {
             if (isPressed('up')) {
                 event.preventDefault();
                 this.navigator.prev();
@@ -136,14 +142,36 @@ export class UiState {
                 if (this.getAllowedOperations().move) {
                     this.setReOrder(1);
                 }
+            } else {
+                if (this.keyboard.isPrintableChar(event.keyCode)) {
+                    this.focusSearchBar(event.keyCode);
+                }
             }
         } else {
             if (isPressed('esc')) {
                 event.preventDefault();
                 this.blurSelectedItem();
+                this.blurSearchBar();
+            }
+            if (isPressed('down')) {
+                this.blurSearchBar();
             }
         }
         this.scroller.scrollIntoView(this.navigator.getSelectedItemId());
+    }
+
+    private focusSearchBar(keyCode: number) {
+        this.blurSelectedItem();
+        this.navigator.deselectAll();
+        this.searchBarIsFocussed = true;
+        this._searchBarFocusChange.next(keyCode);
+    }
+
+    private blurSearchBar() {
+        if (this.searchBarIsFocussed) {
+            this.searchBarIsFocussed = false;
+            this._searchBarFocusChange.next(undefined);
+        }
     }
 
     public keyup(event: KeyboardEvent) {
@@ -260,6 +288,10 @@ export class UiState {
         this.fireFocusEvent();
     }
 
+    public isCurrentAddressFocussed() {
+        return this.currentAddressIsFocussed;
+    }
+
     public unsetFocus() {
         this.currentAddressIsFocussed = false;
         this.fireBlurEvent();
@@ -271,6 +303,10 @@ export class UiState {
 
     public blur() {
         return this._blur.toRx();
+    }
+
+    public searchBarFocusChange() {
+        return this._searchBarFocusChange.toRx();
     }
 
     public create() {

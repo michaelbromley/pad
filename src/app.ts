@@ -9,6 +9,7 @@ import {HTTP_PROVIDERS, RequestOptions, BaseRequestOptions, Headers} from 'angul
 import PadListCmp from './components/padList/padList.cmp';
 import PadCmp from './components/pad/pad.cmp';
 import ContextMenuCmp from './components/contextMenu/contextMenu.cmp';
+import SearchBarCmp from './components/searchBar/searchBar.cmp';
 import {UiState} from './common/uiState';
 import Navigator from './common/navigator';
 import DataService from './common/dataService';
@@ -22,9 +23,10 @@ require('styles/main.less');
 
 @Component({
     selector: 'app',
-    directives: [ROUTER_DIRECTIVES, ContextMenuCmp],
+    directives: [ROUTER_DIRECTIVES, ContextMenuCmp, SearchBarCmp],
     template: `
     <div class="app-container">
+        <search-bar></search-bar>
         <context-menu></context-menu>
         <router-outlet></router-outlet>
     </div>`,
