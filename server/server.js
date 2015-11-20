@@ -125,10 +125,43 @@ function reOrderFollowingItems(item, oldOrder, cb) {
 }
 
 /**
+ * Given an array of items which all have a numeric "order" property, this function
+ * returns true if those items are arranged in consecutive order with a difference
+ * of 1 between each item.
+ * @param items
+ * @returns {boolean}
+ */
+function itemOrdersAreConsecutive(items) {
+    let orders = items.map(item => item.order);
+    let consecutive = true;
+    for (let i = 0; i < orders.length; i++) {
+        let prev = orders[i - 1] || 0;
+        let curr = orders[i];
+        if (curr - prev !== 1) {
+            consecutive = false;
+        }
+    }
+    return consecutive;
+}
+
+function setOrderByIndex(item, index) {
+    item.order = index + 1;
+    return item;
+}
+
+/**
  * List Pads
  */
 app.get('/api/pads', function(req, res) {
-    db.find({type: types.PAD}).sort({ order: 1}).exec((err, docs) => res.send(docs));
+    db.find({type: types.PAD}).sort({ order: 1}).exec((err, pads) => {
+        let orderValuesAreConsecutive = itemOrdersAreConsecutive(pads);
+        if (!orderValuesAreConsecutive) {
+            console.log('Order values for pads are not consecutive. Reordering...');
+            pads.forEach((pad, index) => db.update({_id: pad._id}, pad));
+            pads = pads.map(setOrderByIndex);
+        }
+        res.send(pads);
+    });
 });
 
 
