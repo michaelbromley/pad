@@ -161,7 +161,9 @@ class Navigator {
                 map.push([item._id]);
             }
         }
-        map.push(lastPage);
+        if (0 < lastPage.length) {
+            map.push(lastPage);
+        }
         return map;
     }
 }

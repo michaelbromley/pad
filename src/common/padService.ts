@@ -54,7 +54,6 @@ export class PadService {
                         item.order = newOrder;
                         return this.dataService.updateItem(item).subscribe(() => {
                             this.reloadContents();
-
                             if (0 < val.increment) {
                                 this.uiState.selectNext();
                             } else {
@@ -106,9 +105,9 @@ export class PadService {
      */
     public reloadContents() {
         if (this.uiState.getUiContext() === UiContext.PadList) {
-            return this.loadPadList();
+            return this.loadPadList(true);
         } else {
-            return this.loadPadCollection(this.uiState.currentPadId);
+            return this.loadPadCollection(this.uiState.currentPadId, true);
         }
     }
 
@@ -123,23 +122,35 @@ export class PadService {
         }
     }*/
 
-    public loadPadList() {
+    public loadPadList(isUpdate: boolean = false) {
         this.init();
         return this.dataService.fetchPadList()
             .subscribe(pads => {
                 this.pads = pads;
-                this.uiState.initUiView(this.pads);
+                if (isUpdate) {
+                    this.uiState.updateUiView(this.pads);
+                } else {
+                    this.uiState.initUiView(this.pads);
+                }
                 this._change.next(pads);
             });
     }
 
-    public loadPadCollection(id: string) {
+    /**
+     * Fetch and load the pad collection from the server. If isUpdate = true,
+     * then do no reset the address of the currently-selected item.
+     */
+    public loadPadCollection(id: string, isUpdate: boolean = false) {
         this.init();
         return this.dataService.fetchPad(id).subscribe(pad => {
             this.padCollection = pad;
             this.pad = this.padCollection[0] || <Pad>{};
             this.pages = this.createPagesArray(this.padCollection);
-            this.uiState.initUiView(pad);
+            if (isUpdate) {
+                this.uiState.updateUiView(pad);
+            } else {
+                this.uiState.initUiView(pad);
+            }
             this._change.next(pad);
         });
     }

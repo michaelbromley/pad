@@ -45,6 +45,11 @@ export class UiState {
             this.currentPadId = viewContents[0] && viewContents[0]._id;
         }
         this.navigator.init(viewContents);
+        this.navigator.deselectAll();
+    }
+
+    public updateUiView(viewContents) {
+        this.navigator.init(viewContents);
     }
 
     public getUiContext(): UiContext {
