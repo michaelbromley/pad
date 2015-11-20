@@ -25,7 +25,6 @@ require('styles/main.less');
     directives: [ROUTER_DIRECTIVES, ContextMenuCmp],
     template: `
     <div class="app-container">
-        <div className="header">Pad.</div>
         <context-menu></context-menu>
         <router-outlet></router-outlet>
     </div>`,

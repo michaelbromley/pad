@@ -1,22 +1,53 @@
+@context-menu-width: 180px;
 .context-menu-container {
 
   position: absolute;
-  left: -160px;
+  left: -(@context-menu-width + 10);
 
   .context-menu {
-    border: 1px solid green;
-    width: 150px;
+    width: @context-menu-width;
     min-height: 400px;
     position: fixed;
-    top: 50px;
+    top: 10px;
+
+    .pad-logo {
+      font-size: 2.4em;
+      display: inline-block;
+      color: darken(@color-parchment, 50%);
+      padding-left: 6px;
+      transition: color 0.3s;
+      &:hover {
+        color: darken(@color-parchment, 30%);
+      }
+    }
 
     ul.actions {
+      padding: 0;
+      margin: 0;
       li {
-        display: none;
+        visibility: hidden;
+        display: block;
+        opacity: 0;
+        color: @color-gray-dark;
+        font-size: @font-size-small;
+        text-transform: uppercase;
 
+        transition: opacity 0.3s, visibility 0s 0.3s;
         &.visible {
-          display: block;
+          transition: opacity 0.5s, visibility 0s;
+          visibility: visible;
+          opacity: 1;
         }
+      }
+    }
+
+    .shortcut-label {
+      font-size: @font-size-tiny;
+      color: @color-gray-mid;
+      code {
+        border: 1px solid @color-gray-light;
+        border-radius: 2px;
+        padding: 0 3px;
       }
     }
   }

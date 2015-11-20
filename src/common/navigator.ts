@@ -23,6 +23,9 @@ class Navigator {
         return this.selectedItemAddress;
     }
 
+    /**
+     * Returns the ID of the selected item, or an empty string if nothing is currently selected.
+     */
     public getSelectedItemId(): string {
        return this.getItemIdAtAddress(this.selectedItemAddress);
     }
@@ -97,7 +100,6 @@ class Navigator {
                 this.up();
             }
         }
-        console.log('address:', this.selectedItemAddress);
     };
     
     public next = () => {
@@ -108,7 +110,6 @@ class Navigator {
         } else {
             this.up();
         }
-        console.log('address:', this.selectedItemAddress);
     };
 
     private getLastItemAddress() {

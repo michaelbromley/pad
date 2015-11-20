@@ -16,6 +16,14 @@ export enum UiContext {
     Note
 }
 
+/**
+ * Defines the operations which may be performed on a selected item.
+ */
+export interface IAllowedOperations {
+    remove: boolean;
+    move: boolean;
+}
+
 @Injectable()
 export class UiState {
 
@@ -96,7 +104,7 @@ export class UiState {
                 event.preventDefault();
 
                 if (this.getUiContext() === UiContext.PadList) {
-                    this.router.navigate(['Pad', { id: this.navigator.getSelectedItemId()}]);
+                    this.router.navigate(['Pad', {id: this.navigator.getSelectedItemId()}]);
                 } else {
                     let canGoDeeper = this.navigator.down();
                     if (!canGoDeeper) {
@@ -104,7 +112,10 @@ export class UiState {
                         this.fireFocusEvent();
                     }
                 }
-            } else if (isPressed('left') || isPressed('esc')) {
+            } else if (isPressed('left')) {
+                event.preventDefault();
+                this.navigator.up();
+            } else if (isPressed('esc')) {
                 event.preventDefault();
                 if (this.navigator.getSelectedItemAddress()[0] === -1) {
                     this.router.navigate(['PadList']);
@@ -114,11 +125,17 @@ export class UiState {
             } else if (isPressed('alt', 'ctrl', 'n')) {
                 this.setCreate();
             } else if (isPressed('alt', 'ctrl', 'd')) {
-                this.setDeleteSelected();
+                if (this.getAllowedOperations().remove) {
+                    this.setDeleteSelected();
+                }
             } else if (isPressed('alt', 'ctrl', 'up')) {
-                this.setReOrder(-1);
+                if (this.getAllowedOperations().move) {
+                    this.setReOrder(-1);
+                }
             } else if (isPressed('alt', 'ctrl', 'down')) {
-                this.setReOrder(1);
+                if (this.getAllowedOperations().move) {
+                    this.setReOrder(1);
+                }
             }
         } else {
             if (isPressed('esc')) {
@@ -132,6 +149,42 @@ export class UiState {
     public keyup(event: KeyboardEvent) {
         this.keyboard.keyup(event);
         this.lastPressedKeys = this.keyboard.getPressedKeys();
+    }
+
+    public getSelectedItemId() {
+        return this.navigator.getSelectedItemId();
+    }
+
+    public getAllowedOperations(): IAllowedOperations {
+        let allowed: IAllowedOperations = {
+            remove: false,
+            move: false
+        };
+        let context = this.getUiContext();
+        let somethingIsSelected = this.navigator.getSelectedItemId() !== '';
+
+        if (!somethingIsSelected) {
+            return allowed;
+        }
+
+        if (context === UiContext.PadList) {
+            if (somethingIsSelected) {
+                allowed.remove = true;
+                allowed.move = true;
+            }
+        } else if (context === UiContext.Pad) {
+            if (this.navigator.getSelectedItemAddress()[0] !== 0) {
+                allowed.remove = true;
+                allowed.move = true;
+            }
+        } else if (context === UiContext.Page) {
+            if (this.navigator.getSelectedItemAddress()[1] !== 0) {
+                allowed.remove = true;
+                allowed.move = true;
+            }
+        }
+
+        return allowed;
     }
 
     public selectNext() {

@@ -1,4 +1,6 @@
 @import 'normalize';
+@import 'vars';
+@import 'common';
 @import '../components/padList/padList.cmp.less';
 @import '../components/pad/pad.cmp.less';
 @import '../components/titleInput/titleInput.cmp.less';
@@ -6,11 +8,24 @@
 @import '../components/contextMenu/contextMenu.cmp.less';
 
 
+html {
+  font-size: 62.5%; /* Now 10px = 1rem! */
+}
+
+body {
+  font-size: @font-size-regular;
+  line-height: 1.5;
+}
+
 body {
   font-family: 'Open Sans', sans-serif;
-  background-color: #f9f8f0;
 }
 
 .app-container {
   position: relative;
+}
+
+a:link, a:visited {
+  text-decoration: none;
+  color: inherit;
 }

@@ -1,19 +1,42 @@
 <div class="context-menu-container">
     <div class="context-menu">
+
+        <div class="pad-logo">
+            <a [router-link]="['PadList']">Pad.</a>
+        </div>
+
         <ul class="actions">
             <li class="visible">
-                <button (click)="createItem()">
+                <div class="pad-btn" (click)="createItem()">
                     {{ newItemLabel() }}
-                </button>
+                    <div class="shortcut-label">
+                        <code>alt</code> + <code>ctrl</code> + <code>n</code>
+                    </div>
+                </div>
             </li>
-            <li class="visible">
-                <button (click)="deleteSelected()">Delete Selected</button>
+            <li [class.visible]="canDelete()">
+                <div class="pad-btn" (click)="deleteSelected()">
+                    Delete Selected
+                    <div class="shortcut-label">
+                        <code>alt</code> + <code>ctrl</code> + <code>d</code>
+                    </div>
+                </div>
             </li>
-            <li class="visible">
-                <button (click)="moveUp()">Move Up</button>
+            <li [class.visible]="canMove()">
+                <div class="pad-btn" (click)="moveUp()">
+                    Move Up
+                    <div class="shortcut-label">
+                        <code>alt</code> + <code>ctrl</code> + <code>↑</code>
+                    </div>
+                </div>
             </li>
-            <li class="visible">
-                <button (click)="moveDown()">move Down</button>
+            <li [class.visible]="canMove()">
+                <div class="pad-btn" (click)="moveDown()">
+                    move Down
+                    <div class="shortcut-label">
+                        <code>alt</code> + <code>ctrl</code> + <code>↓</code>
+                    </div>
+                </div>
             </li>
         </ul>
     </div>
