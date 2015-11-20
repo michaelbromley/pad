@@ -4,9 +4,12 @@
     li {
       display: block;
 
-      &.selected {
-        background-color: pink;
-      }
+      padding: 10px 10px 20px 10px;
+      box-shadow: @box-shadow-light;
+
+      font-size: @font-size-large;
+
+      .selectable();
     }
   }
 }

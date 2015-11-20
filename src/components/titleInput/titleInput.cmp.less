@@ -1,25 +1,25 @@
 .title-input {
   position: relative;
   outline: none;
+  font-weight: bold;
 
   .label {
     margin: 0;
     cursor: pointer;
-    display: inline-block;
+    display: block;
+    border-bottom: 1px solid @color-gray-light;
   }
-  h1, .input.h1 { font-size: 32px; }
-  h2, .input.h2 { font-size: 24px; }
-  h3, .input.h3 { font-size: 18px; }
-  h4, .input.h4 { font-size: 16px; }
-  h5, .input.h5 { font-size: 14px; }
+  .h1, .input.h1 { font-size: 32px; }
+  .h2, .input.h2 { font-size: 24px; }
+  .h3, .input.h3 { font-size: 18px; }
+  .h4, .input.h4 { font-size: 16px; }
+  .h5, .input.h5 { font-size: 14px; }
 
   .input {
-    font-weight: bold;
     display: none;
-    position: absolute;
+    //position: absolute;
     width: 100%;
-    top: -2px;
-    left: -1px;
+    left: -2px;
     border: none;
     input {
       display: block;
@@ -29,12 +29,13 @@
       &:focus, &:active {
         outline: none;
       }
-      border-bottom-color: #999;
+      border-bottom: 1px dashed @color-gray-mid;
     }
   }
   &.focus {
     .label {
       opacity: 0;
+      height: 0;
     }
     .input {
       display: block;

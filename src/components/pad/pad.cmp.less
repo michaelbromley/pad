@@ -2,25 +2,23 @@
 ul.pad-collection-list, ul.notes-list {
   padding: 0;
 
-  li {
+  & > li {
     display: block;
-
-    &.selected {
-      background-color: pink;
-    }
+    padding: 5px;
+    .selectable();
   }
 }
 
 .page-container {
 
   padding: 10px;
-  box-shadow: 0 2px 3px 0 rgba(0,0,0,0.1);
+  box-shadow: @box-shadow-light;
   min-height: 100px;
 
   ul.notes-list {
     list-style-type: none;
 
-    li {
+    & > li {
       display: block;
       min-height: 26px;
     }
