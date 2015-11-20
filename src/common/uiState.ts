@@ -122,7 +122,6 @@ export class UiState {
             }
         }
         this.scroller.scrollIntoView(this.navigator.getSelectedItemId());
-        console.log('pressed keys', pressedKeys);
     }
 
     public keyup(event: KeyboardEvent) {
@@ -148,7 +147,6 @@ export class UiState {
     }
 
     public setCreate() {
-        console.log('calling setCreate()');
         let newItem;
         let currentOrder;
         let context = this.getUiContext();

@@ -71,6 +71,7 @@ function createCodeMap() {
 export class Keyboard {
 
     private pressed: boolean[] = [];
+    private timeout: number;
     private codesMap;
 
     constructor() {
@@ -79,10 +80,27 @@ export class Keyboard {
 
     public keydown(event: KeyboardEvent) {
         this.pressed[event.keyCode] = true;
+        this.clearKeyUpTimeout();
+        this.setKeyUpTimeout();
+
     }
 
     public keyup(event: KeyboardEvent) {
         this.pressed[event.keyCode] = false;
+        this.clearKeyUpTimeout();
+    }
+
+    private setKeyUpTimeout() {
+        this.timeout = <any>setTimeout(() => {
+            this.pressed = this.pressed.map(() => false);
+        }, 500);
+    }
+
+    private clearKeyUpTimeout() {
+        if (this.timeout) {
+            clearTimeout(this.timeout);
+            this.timeout = undefined;
+        }
     }
 
     /**
