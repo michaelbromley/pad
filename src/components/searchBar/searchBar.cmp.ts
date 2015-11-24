@@ -1,6 +1,6 @@
 import {Component, CORE_DIRECTIVES, FORM_DIRECTIVES, Input, Output, EventEmitter, ElementRef} from 'angular2/angular2';
 //import {UiState, UiContext} from '../../common/uiState';
-import {types} from "../../common/model";
+import {Type} from "../../common/model";
 import {PadService} from "../../common/padService";
 import {UiState} from "../../common/uiState";
 
@@ -34,7 +34,7 @@ class SearchBarCmp {
 
     public textChanged(event: Event) {
         let input = <HTMLInputElement>event.target;
-        this.padService.setFilterQuery(input.value);
+        //this.padService.setFilterQuery(input.value);
     }
 
     private focus(keyCode?: number) {

@@ -3,8 +3,9 @@ import {Router, Location} from 'angular2/router';
 //import {} from 'angular2/router';
 import Navigator from './navigator';
 import {Scroller} from './scroller';
-import {IPadItem, types, Pad, Page, Note} from "./model";
+import {Type, Pad, Page, Note} from "./model";
 import {Keyboard} from "./keyboard";
+import {PadService} from "./padService";
 
 /**
  * These are the possible states the app can be in (i.e. at what level of the hierarchy is the user at)
@@ -42,6 +43,7 @@ export class UiState {
 
     constructor(private router: Router,
                 private location: Location,
+                private padService: PadService,
                 private navigator: Navigator,
                 private keyboard: Keyboard) {
         // TODO: why does ng2 DI break when I try to inject this?
@@ -49,17 +51,18 @@ export class UiState {
     }
 
     public initUiView(viewContents) {
-        if (this.getUiContext() === UiContext.PadList) {
+        if (viewContents instanceof Array) {
             this.currentPadId = undefined;
+            this.navigator.initPadList(viewContents);
         } else {
-            this.currentPadId = viewContents[0] && viewContents[0]._id;
+            this.currentPadId = viewContents.uuid;
+            this.navigator.initPad(viewContents);
         }
-        this.navigator.init(viewContents);
         this.deselectAll();
     }
 
     public updateUiView(viewContents) {
-        this.navigator.init(viewContents);
+        this.navigator.initPad(viewContents);
     }
 
     public deselectAll() {
@@ -69,7 +72,7 @@ export class UiState {
     public getUiContext(): UiContext {
         if (this.location.path() === '') {
             return UiContext.PadList;
-        } else if (this.navigator.getSelectedItemAddress().length === 1) {
+        }  else if (this.navigator.getSelectedItemAddress().length === 1) {
             return UiContext.Pad;
         } else {
             return UiContext.Page;
@@ -81,7 +84,7 @@ export class UiState {
     }
 
     public itemIsSelected(item: any): boolean {
-        return this.navigator.getSelectedItemId() === item._id;
+        return this.navigator.getSelectedItemId() === item.uuid;
     }
 
     public keydown(event: KeyboardEvent) {
@@ -233,26 +236,16 @@ export class UiState {
     }
 
     public setCreate() {
-        let newItem;
-        let currentOrder;
         let context = this.getUiContext();
 
         if (context === UiContext.Pad) {
-            newItem = new Page(this.navigator.getCurrentPadId());
-            newItem.title = 'Untitled Page';
-            currentOrder = this.navigator.getSelectedItemAddress()[0];
+            this.padService.createPage(this.currentPadId, this.navigator.getSelectedItemAddress()[0]);
         } else if (context === UiContext.Page) {
-            newItem = new Note(this.navigator.getCurrentPageId());
-            newItem.content = 'Untitled Note';
-            currentOrder = this.navigator.getSelectedItemAddress()[1];
+            this.padService.createNote(this.currentPadId, this.navigator.getCurrentPageId(), this.navigator.getSelectedItemAddress()[0])
         } else {
-            newItem = new Pad();
-            newItem.name = 'Untitled Pad';
-            currentOrder = this.navigator.getSelectedItemAddress()[0];
+            this.padService.createPad();
         }
 
-        newItem.order = -1 < currentOrder ? currentOrder + 1 : 1;
-        this._create.next(newItem);
     }
 
     public setDeleteSelected() {
@@ -270,9 +263,9 @@ export class UiState {
         let type;
 
         if (this.getUiContext() === UiContext.PadList) {
-            type = types.PAD;
+            type = Type.PAD;
         } else {
-            type = this.navigator.getSelectedItemAddress().length === 1 ? types.PAGE : types.NOTE;
+            type = this.navigator.getSelectedItemAddress().length === 1 ? Type.PAGE : Type.NOTE;
         }
 
         this._reOrder.next({

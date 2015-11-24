@@ -1,7 +1,7 @@
 import {Component, CORE_DIRECTIVES, FORM_DIRECTIVES, Input, Output, EventEmitter, ElementRef} from 'angular2/angular2';
 import {RouterLink} from 'angular2/router';
 import {UiState, UiContext} from '../../common/uiState';
-import {types} from "../../common/model";
+import {Type} from "../../common/model";
 
 @Component({
     selector: 'context-menu',

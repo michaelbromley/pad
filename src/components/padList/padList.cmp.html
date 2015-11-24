@@ -2,8 +2,8 @@
     <ul class="pad-list">
         <li *ng-for="#pad of pads; #index0 = index"
             [class.selected]="checkSelected([index0])"
-            [id]="'_' + pad._id">
-            <a [router-link]="[ '/Pad', {id: pad._id } ]">{{ pad.name }}</a>
+            [id]="'_' + pad.uuid">
+            <a [router-link]="[ '/Pad', {id: pad.uuid } ]">{{ pad.title }}</a>
         </li>
     </ul>
 </div>

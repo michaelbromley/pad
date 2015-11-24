@@ -4,13 +4,13 @@
         <li [class.selected]="checkSelected([0])"
             [id]="'_' + pad._id">
             <title-input [item]="pad"
-                         title-prop="name"
+                         title-prop="title"
                          (blur)="updateItem($event)"
                          element="h1"
                          [address]="[0]" ></title-input>
         </li>
 
-        <li *ng-for="#page of pages; #index0 = index"
+        <li *ng-for="#page of pad.pages; #index0 = index"
             [class.selected]="checkSelected([index0 + 1])"
             [id]="'_' + page._id"
             class="page-container">
@@ -24,7 +24,7 @@
                                  [address]="[index0 + 1, 0]" ></title-input>
                 </li>
 
-                <li *ng-for="#note of getNotesInPage(page._id); #index1 = index"
+                <li *ng-for="#note of page.notes; #index1 = index"
                     [class.selected]="checkSelected([index0 + 1, index1 + 1])"
                     [id]="'_' + note._id">
 

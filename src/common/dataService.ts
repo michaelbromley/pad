@@ -5,8 +5,6 @@ import {Injectable} from 'angular2/angular2';
 @Injectable()
 class DataService {
 
-    private busy: boolean = false;
-
     constructor(private http: Http) {}
 
     public fetchPadList() {
@@ -14,35 +12,22 @@ class DataService {
             .map((res: Response) => res.json());
     }
 
-    public fetchPad(id) {
-        return this.http.get(`${config.API_URL}/pads/${id}`)
+    public fetchPad(uuid) {
+        return this.http.get(`${config.API_URL}/pads/${uuid}`)
             .map((res: Response) => res.json());
     }
 
-    public createItem(item) {
-        this.beginRequest();
-        delete item._id;
-        return this.http.post(`${config.API_URL}/items`, JSON.stringify(item))
-            .map((res:Response) => res.json())
-            .do(() => this.endRequest());
+    public createPad(pad) {
+        return this.http.post(`${config.API_URL}/pads`, JSON.stringify(pad))
+            .map((res:Response) => res.json());
     }
 
-    public updateItem(item) {
-        return this.http.put(`${config.API_URL}/items/${item._id}`, JSON.stringify(item));
+    public updatePad(pad) {
+        return this.http.put(`${config.API_URL}/pads/${pad.uuid}`, JSON.stringify(pad));
     }
 
-    public deleteItem(item) {
-        return this.http.delete(`${config.API_URL}/items/${item._id}`);
-    }
-
-    private beginRequest() {
-        this.busy = true;
-        console.log('starting request');
-    }
-
-    private endRequest() {
-        this.busy = false;
-        console.log('request ended');
+    public deletePad(pad) {
+        return this.http.delete(`${config.API_URL}/pads/${pad.uuid}`);
     }
 }
 

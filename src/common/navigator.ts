@@ -1,5 +1,8 @@
 import {Injectable} from 'angular2/angular2';
-import {types} from './model';
+import {Type} from './model';
+import {Pad} from "./model";
+import {Page} from "./model";
+import {Note} from "./model";
 
 const NONE = -1; // value to show that nothing is selected
 
@@ -11,12 +14,16 @@ const NONE = -1; // value to show that nothing is selected
 @Injectable()
 class Navigator {
     private selectedItemAddress: number[] = [NONE];
-    private collectionMap: number[];
+    private collectionMap: string[][];
 
     constructor() {}
     
-    public init(padCollection: any[]) {
-        this.collectionMap = this.buildMap(padCollection);
+    public initPad(viewContents: Pad) {
+        this.collectionMap = this.buildPadMap(viewContents);
+    }
+
+    public initPadList(viewContents: Pad[]) {
+        this.collectionMap = this.buildPadListMap(viewContents);
     }
     
     public getSelectedItemAddress() {
@@ -133,7 +140,7 @@ class Navigator {
         );
     }
     
-    private getValue(array: number[], address: number[]): any {
+    private getValue(array: string[][], address: number[]): any {
         let val: any = array;
         address.forEach(index => {
             if (val instanceof Array) {
@@ -145,33 +152,21 @@ class Navigator {
         return val;
     }
     
-    private buildMap(collection: any[]): number[] {
-        let map = [],
-            lastPage = [];
-
-        for (let i = 0; i < collection.length; i ++) {
-            let item = collection[i];
-            if (item.type === types.PAGE) {
-                if (0 < lastPage.length) {
-                    map.push(lastPage);
-                }
-                lastPage = [[item._id]];
-            } else if (item.type === types.NOTE) {
-                lastPage.push([item._id]);
-            } else if (item.type === types.PAD) {
-                map.push([item._id]);
-            }
-        }
-        if (0 < lastPage.length) {
-            map.push(lastPage);
-        }
+    private buildPadMap(pad: Pad): any[][] {
+        let map = [];
+        let pages = pad.pages.map((page: Page) => {
+            return [[page.uuid]].concat(page.notes.map((note: Note) => [note.uuid]));
+        });
+        map[0] = [pad.uuid];
+        map = map.concat(pages);
         return map;
+    }
+
+    private buildPadListMap(padList: Pad[]): string[][] {
+        return padList.map(pad => {
+            return [pad.uuid];
+        });
     }
 }
 
 export default Navigator;
-    
-    
-
-
-    

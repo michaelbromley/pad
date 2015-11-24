@@ -1,7 +1,7 @@
 import {Component, NgFor} from 'angular2/angular2';
 import {RouterLink} from 'angular2/router';
 import {UiState} from "../../common/uiState";
-import {PadService} from "../../common/padService";
+import DataService from "../../common/dataService";
 
 @Component({
     selector: 'pad-list',
@@ -11,21 +11,15 @@ import {PadService} from "../../common/padService";
 class PadListCmp {
 
     public pads: any[] = [];
-    private subscriptions = [];
 
-    constructor(private padService: PadService, private uiState: UiState) {
-        padService.loadPadList();
-
-        let sub = padService.change().subscribe(() => {
-            console.log('[padlist] change event');
-            this.pads = padService.getPads();
-        });
-
-        this.subscriptions.push(sub);
+    constructor(private dataService: DataService, private uiState: UiState) {
     }
 
-    onDestroy() {
-        this.subscriptions.map(sub => sub.unsubscribe());
+    onInit() {
+        this.dataService.fetchPadList().subscribe(pads => {
+            this.pads = pads;
+            this.uiState.initUiView(pads);
+        });
     }
 
     public checkSelected(address) {

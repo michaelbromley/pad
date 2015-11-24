@@ -1,50 +1,44 @@
-export const types = {
+let uuid = require('uuid');
+
+export const Type = {
     PAD: 'pad',
     PAGE: 'page',
     NOTE: 'note'
 };
 
-export interface IPadItem {
-    _id: string;
-    type: string;
-    name?: string;
-    title?: string;
-    content?: string;
-    padId?: string;
-    pageId?: string
-}
-
-export class Pad implements IPadItem {
-    public _id: string = '';
-    public name: string = '';
-    public type: string = types.PAD;
-    public order: number;
-}
-
-export class Page implements IPadItem {
-
-    public padId: string;
-    public _id: string = '';
+export class Pad {
+    public uuid: string = '';
     public title: string = '';
-    public type: string = types.PAGE;
+    public created: number;
+    public modified: number;
+    public type: string = Type.PAD;
     public order: number;
+    public pages: Page[] = [];
 
-    constructor(padId) {
-        this.padId = padId;
+    constructor() {
+        this.uuid = uuid.v4();
+        this.created = Date.now();
     }
-
-
 }
 
-export class Note implements IPadItem {
+export class Page {
+    public uuid: string = '';
+    public title: string = '';
+    public type: string = Type.PAGE;
+    public notes: Note[] = [];
 
-    public pageId: string;
-    public _id: string = '';
+    constructor() {
+        this.uuid = uuid.v4();
+    }
+}
+
+export class Note {
+    public uuid: string = '';
     public content: string = '';
-    public type: string = types.NOTE;
+    public type: string = Type.NOTE;
     public order: number;
 
-    constructor(pageId) {
-        this.pageId = pageId;
+    constructor() {
+        this.uuid = uuid.v4();
     }
 }

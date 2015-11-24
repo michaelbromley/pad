@@ -16,68 +16,6 @@ app.listen(3000);
 
 var db = new Datastore({ filename: __dirname + '/datastore', autoload: true });
 
-const types = {
-    PAD: 'pad',
-    PAGE: 'page',
-    NOTE: 'note'
-};
-
-function identity(arg) {
-    return arg;
-}
-
-/**
- * Returns the value of the "type" property of item, with added guard logic.
- * @param item
- * @returns {*}
- */
-function getType(item) {
-    if (!item.hasOwnProperty('type')) {
-        console.log('bad item:', item);
-        throw new Error('Type not specified');
-    }
-    let validType = Object.keys(types).map(key => types[key]).indexOf(item.type) > -1;
-    if (!validType) {
-        throw new Error(`'${item.type}' is not a  valid item type.`);
-    }
-    return item.type;
-}
-
-/**
- * Splice an array arr into the target array at the given index. Returns a new array.
- * @param target
- * @param arr
- * @param index
- * @returns {*}
- */
-function spliceArray(target, arr, index) {
-    let targetClone = target.slice();
-    Array.prototype.splice.apply(targetClone, [index, 0].concat(arr));
-    return targetClone;
-}
-
-/**
- * Given an array of objects of the same type, group them by the specified property
- * into an object, where the key of each group is the property value.
- *
- * @param objArray
- * @param prop
- * @returns {Object}
- */
-function groupBy(objArray, prop) {
-    let groups = {};
-    objArray.forEach(obj => {
-        let propVal = obj[prop];
-        if (!groups[propVal]) {
-            groups[propVal] = [obj];
-        } else {
-            groups[propVal].push(obj);
-        }
-    });
-
-    return groups;
-}
-
 /**
  * Given an item with an "order" property, find all items following it in sequence and update their orders
  * to come after it. -1 is a special value of oldOrder to signify a newly-created item.
@@ -90,15 +28,8 @@ function reOrderFollowingItems(item, oldOrder, cb) {
 
     let inc;
     let query = {
-        type: item.type,
-        _id: { $ne: item._id }
+        _id: { $ne: item.uuid }
     };
-
-    if (item.type === types.PAGE) {
-        query.padId = item.padId;
-    } else if (item.type === types.NOTE) {
-        query.pageId = item.pageId;
-    }
 
     if (oldOrder === -1) {
         // item is being newly-inserted
@@ -153,11 +84,11 @@ function setOrderByIndex(item, index) {
  * List Pads
  */
 app.get('/api/pads', function(req, res) {
-    db.find({type: types.PAD}).sort({ order: 1}).exec((err, pads) => {
+    db.find({}).sort({ order: 1}).exec((err, pads) => {
         let orderValuesAreConsecutive = itemOrdersAreConsecutive(pads);
         if (!orderValuesAreConsecutive) {
             console.log('Order values for pads are not consecutive. Reordering...');
-            pads.forEach((pad, index) => db.update({_id: pad._id}, pad));
+            pads.forEach((pad, index) => db.update({_id: pad.uuid}, pad));
             pads = pads.map(setOrderByIndex);
         }
         res.send(pads);
@@ -166,49 +97,10 @@ app.get('/api/pads', function(req, res) {
 
 
 /**
- * Get Pad & contents as a flat array in the correct order
+ * Create Pad
  */
-app.get('/api/pads/:id', function(req, res) {
-    let padId = req.params.id,
-        padCollection = [];
-
-    db.findOne({type: types.PAD, _id: padId}, (err, pad) => {
-
-        padCollection.push(pad);
-
-        db.find({type: types.PAGE, padId: padId}).sort({ order: 1 }).exec((err, pages) => {
-
-            padCollection = padCollection.concat(pages);
-
-            let query = {$and: [
-                { type: types.NOTE },
-                { $or : pages.map(page => ({ pageId: page._id })) }
-            ] };
-
-            db.find(query).sort({ order: 1 }).exec((err, notes) => {
-
-                let groupedNotes = groupBy(notes, 'pageId');
-                for(let pageId in groupedNotes) {
-                    let index = padCollection.map(item => item._id).indexOf(pageId),
-                        group = groupedNotes[pageId];
-
-                    padCollection = spliceArray(padCollection, group, index + 1);
-                }
-
-
-                res.send(padCollection);
-            });
-        });
-
-    });
-});
-
-/**
- * Create Item
- */
-app.post('/api/items', function(req, res) {
+app.post('/api/pads', function(req, res) {
     let item = req.body;
-    getType(item);
     db.insert(item, () => {
         reOrderFollowingItems(item, -1, () => res.send(item));
     });
@@ -216,24 +108,23 @@ app.post('/api/items', function(req, res) {
 
 
 /**
- * Read Item
+ * Read Pad
  */
-app.get('/api/items/:id', function(req, res) {
-    db.find({_id: req.params.id}, (item) => res.send(item));
+app.get('/api/pads/:id', function(req, res) {
+    db.findOne({uuid: req.params.id}, (err, item) => res.send(item));
 });
 
 /**
- * Update Item
+ * Update Pad
  */
-app.put('/api/items/:id', function(req, res) {
-    let item = req.body;
-    getType(item);
-    db.findOne({ _id: item._id}, (err, oldItem) => {
-        db.update({_id: req.params.id}, item, () => {
-            if (oldItem.order !== item.order) {
-                reOrderFollowingItems(item, oldItem.order, () => res.send(item));
+app.put('/api/pads/:id', function(req, res) {
+    let pad = req.body;
+    db.findOne({ uuid: pad.uuid}, (err, oldItem) => {
+        db.update({uuid: req.params.id}, pad, () => {
+            if (oldItem.order !== pad.order) {
+                reOrderFollowingItems(pad, oldItem.order, () => res.send(pad));
             } else {
-                res.send(item);
+                res.send(pad);
             }
         });
     });
@@ -241,9 +132,9 @@ app.put('/api/items/:id', function(req, res) {
 });
 
 /**
- * Delete Item
+ * Delete Pad
  */
-app.delete('/api/items/:id', function(req, res) {
+app.delete('/api/pads/:id', function(req, res) {
     let id = req.params.id;
-    db.remove({_id: id}, () => res.send(id));
+    db.remove({uuid: id}, () => res.send(id));
 });

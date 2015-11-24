@@ -3,7 +3,7 @@ import {RouteParams} from 'angular2/router';
 import TitleInputCmp from '../titleInput/titleInput.cmp';
 import NoteEditorCmp from '../noteEditor/noteEditor.cmp';
 import {UiState} from '../../common/uiState';
-import {types, IPadItem, Note, Pad, Page} from "../../common/model";
+import {Type, Note, Pad, Page} from "../../common/model";
 import {PadService} from "../../common/padService";
 
 @Component({
@@ -13,24 +13,26 @@ import {PadService} from "../../common/padService";
 })
 class PadCmp {
 
-    public newPageTitle: string =  '';
-    public padCollection: any[] = [];
-    public selectedItemAddress: any = '';
     public pad: Pad = <Pad>{};
-    public pages: Page[] = [];
 
     private subscriptions = [];
 
     constructor(private padService: PadService,
                 private params: RouteParams,
                 private uiState: UiState) {
-        padService.loadPadCollection(params.get('id'));
+    }
 
-        let sub = padService.change().subscribe(() => {
+    onActivate() {
+        this.padService.getPad(this.params.get('id'))
+            .subscribe(pad => {
+                this.pad = pad;
+                this.uiState.initUiView(this.pad);
+            });
+
+        let sub = this.padService.change().subscribe(pad=> {
             console.log('[pad] change event');
-            this.padCollection = padService.getPadCollection();
-            this.pad = padService.pad;
-            this.pages = padService.getPages();
+            this.pad = pad;
+            this.uiState.initUiView(this.pad);
         });
         this.subscriptions.push(sub);
     }
@@ -39,13 +41,8 @@ class PadCmp {
         this.subscriptions.map(sub => sub.unsubscribe());
     }
 
-
-    public getNotesInPage(pageId: string): Note[] {
-        return this.padCollection.filter(item => item.pageId === pageId);
-    }
-
     public updateItem(item) {
-        this.padService.updateItem(item);
+        //this.padService.updateItem(item);
     }
 
     public checkSelected(address) {
