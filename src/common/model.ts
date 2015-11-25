@@ -6,6 +6,13 @@ export const Type = {
     NOTE: 'note'
 };
 
+export interface IPadItem {
+    uuid: string;
+    type: string;
+    title?: string;
+    content?: string;
+}
+
 export class Pad {
     public uuid: string = '';
     public title: string = '';

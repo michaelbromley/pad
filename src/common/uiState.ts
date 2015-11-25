@@ -6,6 +6,7 @@ import {Scroller} from './scroller';
 import {Type, Pad, Page, Note} from "./model";
 import {Keyboard} from "./keyboard";
 import {PadService} from "./padService";
+import {IPadItem} from "./model";
 
 /**
  * These are the possible states the app can be in (i.e. at what level of the hierarchy is the user at)
@@ -58,11 +59,7 @@ export class UiState {
             this.currentPadId = viewContents.uuid;
             this.navigator.initPad(viewContents);
         }
-        this.deselectAll();
-    }
-
-    public updateUiView(viewContents) {
-        this.navigator.initPad(viewContents);
+        console.log('this.currentPadId', this.currentPadId);
     }
 
     public deselectAll() {
@@ -83,7 +80,7 @@ export class UiState {
         return this.navigator.getSelectedItemAddress().toString() === address.toString();
     }
 
-    public itemIsSelected(item: any): boolean {
+    public itemIsSelected(item: IPadItem): boolean {
         return this.navigator.getSelectedItemId() === item.uuid;
     }
 
@@ -135,7 +132,7 @@ export class UiState {
                 this.createItem();
             } else if (isPressed('alt', 'ctrl', 'd')) {
                 if (this.getAllowedOperations().remove) {
-                    this.setDeleteSelected();
+                    this.deleteSelectedItem();
                 }
             } else if (isPressed('alt', 'ctrl', 'up')) {
                 if (this.getAllowedOperations().move) {
@@ -248,13 +245,14 @@ export class UiState {
 
     }
 
-    public setDeleteSelected() {
-        let id = this.navigator.getSelectedItemId();
-        if (id) {
-            let selectedItem = {
-                _id: this.navigator.getSelectedItemId()
-            };
-            this.deleteSelectedEvent.next(selectedItem);
+    public deleteSelectedItem() {
+        if (this.getUiContext() === UiContext.PadList) {
+            this.padService.deleteItem(this.getSelectedItemId());
+        } else {
+            let itemUuid = this.navigator.getSelectedItemId();
+            if (itemUuid) {
+                this.padService.deleteItem(this.currentPadId, itemUuid);
+            }
         }
     }
 

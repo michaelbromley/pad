@@ -2,14 +2,16 @@ import {Injectable, EventEmitter} from 'angular2/angular2';
 let Rx = require('rx');
 import DataService from './dataService';
 import {UiState, UiContext} from "./uiState";
-import {Page, Pad, Note, Type} from "./model";
+import {IPadItem, Page, Pad, Note, Type} from "./model";
 
 enum ActionType {
     CREATE_PAGE,
     CREATE_NOTE,
     UPDATE_PAD,
     UPDATE_PAGE,
-    UPDATE_NOTE
+    UPDATE_NOTE,
+    DELETE_PAGE,
+    DELETE_NOTE
 }
 
 class Action {
@@ -34,7 +36,7 @@ class Action {
 @Injectable()
 export class PadService {
 
-    public changeEvent: EventEmitter<Pad> = new EventEmitter();
+    public changeEvent: EventEmitter<any> = new EventEmitter();
 
     private pads: { [padUuid: string]: Pad } = {};
     private workingPads: { [padUuid: string]: Pad } = {};
@@ -49,7 +51,8 @@ export class PadService {
         pad.title = 'Untitled Pad ' + pad.uuid;
         return this.dataService.createPad(pad)
             .subscribe(pad => {
-                this.pads[pad.uuid] = pad;
+                this.loadPadIntoMemory(pad);
+                this.changeEvent.next(pad);
             });
     }
 
@@ -59,13 +62,33 @@ export class PadService {
         }
         if (!this.workingPads[uuid]) {
             return this.dataService.fetchPad(uuid)
-                .do(pad => {
-                    this.pads[uuid] = pad;
-                    this.workingPads[uuid] = pad;
-                    this.historyPointer[uuid] = -1;
+                .do((pad: Pad) => {
+                    this.loadPadIntoMemory(pad);
                 });
         } else {
             return Rx.Observable.of(this.workingPads[uuid]);
+        }
+    }
+
+    private loadPadIntoMemory(pad: Pad) {
+        this.pads[pad.uuid] = pad;
+        this.workingPads[pad.uuid] = pad;
+        this.historyPointer[pad.uuid] = -1;
+    }
+
+    public getItemByUuid(padUuid: string, itemUuid: string): IPadItem {
+        let pad = this.workingPads[padUuid];
+        if (pad) {
+            let matchingPage = pad.pages.filter(page => page.uuid === itemUuid);
+            if (matchingPage.length === 1) {
+                return matchingPage[0];
+            }
+            let matchingNote = pad.pages
+                .reduce((prev, curr)=> prev.concat(curr.notes), [])
+                .filter(note => note.uuid === itemUuid);
+            if (matchingNote.length === 1) {
+                return matchingNote[0];
+            }
         }
     }
 
@@ -82,7 +105,7 @@ export class PadService {
         this.prepareAndApply(padUuid, action);
     }
 
-    public updateItem(padUuid: string, item: any) {
+    public updateItem(padUuid: string, item: IPadItem) {
         let action;
         switch (item.type) {
             case Type.PAD:
@@ -99,6 +122,26 @@ export class PadService {
         }
         action.uuid = item.uuid;
         this.prepareAndApply(padUuid, action);
+    }
+
+    public deleteItem(padUuid: string, itemUuid?: string) {
+        if (typeof itemUuid === 'undefined') {
+            this.dataService.deletePad(padUuid)
+                .subscribe(() => this.changeEvent.next({}));
+        } else {
+            let action;
+            let item = this.getItemByUuid(padUuid, itemUuid);
+
+            switch (item.type) {
+                case Type.PAGE:
+                    action = new Action(ActionType.DELETE_PAGE);
+                    break;
+                case Type.NOTE:
+                    action = new Action(ActionType.DELETE_NOTE);
+            }
+            action.uuid = item.uuid;
+            this.prepareAndApply(padUuid, action);
+        }
     }
 
     /**
@@ -121,6 +164,7 @@ export class PadService {
     private applyAction(pad: Pad, action: Action): Pad {
         let padClone: Pad = JSON.parse(JSON.stringify(pad));
         let getPageIndex = uuid => padClone.pages.map(page => page.uuid).indexOf(uuid);
+        let pageIndex = -1, noteIndex = -1;
 
         switch (action.type) {
             case ActionType.CREATE_PAGE:
@@ -140,8 +184,16 @@ export class PadService {
                 padClone.pages[getPageIndex(action.uuid)].title = action.data;
                 break;
             case ActionType.UPDATE_NOTE:
-                let [pageIndex, noteIndex] = this.getIndices(padClone, action.uuid);
+                [pageIndex, noteIndex] = this.getIndices(padClone, action.uuid);
                 padClone.pages[pageIndex].notes[noteIndex].content = action.data;
+                break;
+            case ActionType.DELETE_PAGE:
+                pageIndex = getPageIndex(action.uuid);
+                padClone.pages.splice(pageIndex, 1);
+                break;
+            case ActionType.DELETE_NOTE:
+                [pageIndex, noteIndex] = this.getIndices(padClone, action.uuid);
+                padClone.pages[pageIndex].notes.splice(noteIndex, 1);
                 break;
         }
 

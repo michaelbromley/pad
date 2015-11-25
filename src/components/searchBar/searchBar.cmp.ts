@@ -12,12 +12,13 @@ import {UiState} from "../../common/uiState";
 class SearchBarCmp {
 
     private focussed: boolean = false;
+    private subscriptions = [];
 
     constructor(private padService: PadService,
                 private uiState: UiState,
                 private elRef: ElementRef) {
 
-        uiState.searchBarFocusChangeEvent.subscribe(val => {
+        let focusSub = uiState.searchBarFocusChangeEvent.subscribe(val => {
             if (val) {
                 this.focus(val);
             } else {
@@ -25,11 +26,17 @@ class SearchBarCmp {
             }
         });
 
-        padService.changeEvent.subscribe(() => {
+        let changeSub = padService.changeEvent.subscribe(() => {
             if (!this.focussed) {
                 this.clear();
             }
         });
+
+        this.subscriptions.concat(focusSub, changeSub);
+    }
+
+    onDestroy() {
+        this.subscriptions.map(sub => sub.unsubscribe());
     }
 
     public textChanged(event: Event) {

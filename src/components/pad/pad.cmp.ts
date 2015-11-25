@@ -27,6 +27,7 @@ class PadCmp {
             .subscribe(pad => {
                 this.pad = pad;
                 this.uiState.initUiView(this.pad);
+                this.uiState.deselectAll();
             });
 
         let sub = this.padService.changeEvent.subscribe(pad=> {

@@ -54,7 +54,7 @@ class ContextMenuCmp {
     }
 
     public deleteSelected() {
-        this.uiState.setDeleteSelected();
+        this.uiState.deleteSelectedItem();
     }
 
     public moveUp() {

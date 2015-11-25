@@ -13,22 +13,22 @@ class DataService {
             .map((res: Response) => res.json());
     }
 
-    public fetchPad(uuid): Observable<Pad> {
+    public fetchPad(uuid: string): Observable<Pad> {
         return this.http.get(`${config.API_URL}/pads/${uuid}`)
             .map((res: Response) => res.json());
     }
 
-    public createPad(pad): Observable<Pad> {
+    public createPad(pad: Pad): Observable<Pad> {
         return this.http.post(`${config.API_URL}/pads`, JSON.stringify(pad))
             .map((res:Response) => res.json());
     }
 
-    public updatePad(pad): Observable<any> {
+    public updatePad(pad: Pad): Observable<any> {
         return this.http.put(`${config.API_URL}/pads/${pad.uuid}`, JSON.stringify(pad));
     }
 
-    public deletePad(pad): Observable<any> {
-        return this.http.delete(`${config.API_URL}/pads/${pad.uuid}`);
+    public deletePad(padUuid: string): Observable<any> {
+        return this.http.delete(`${config.API_URL}/pads/${padUuid}`);
     }
 }
 

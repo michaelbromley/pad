@@ -10,6 +10,7 @@ class TitleInputCmp {
 
     public focussed: boolean = false;
     private title: string;
+    private subscriptions = [];
     @Input() public item: any;
     @Input() public titleProp: string;
     @Input() public element: string;
@@ -18,19 +19,26 @@ class TitleInputCmp {
     @Output() private blur = new EventEmitter();
 
     constructor(private uiState: UiState, private elRef: ElementRef) {
-        uiState.focusEvent.subscribe(val => {
+        let focusSub = uiState.focusEvent.subscribe(val => {
             if (val === this.address.toString()) {
                 this.focus();
             } else {
                 this.blurHandler();
             }
         });
-        uiState.blurEvent.subscribe(val => {
+        let blurSub = uiState.blurEvent.subscribe(val => {
             if (val === this.address.toString()) {
                 this.blurHandler();
             }
         });
+
+        this.subscriptions.concat(focusSub, blurSub);
     }
+
+    onDestroy() {
+        this.subscriptions.map(sub => sub.unsubscribe());
+    }
+
 
     private onChanges() {
         this.title = this.item[this.titleProp];

@@ -16,20 +16,23 @@ class NoteEditorCmp {
     @Output() public blur = new EventEmitter();
     private focussed: boolean = false;
     private originalContent: string;
+    private subscriptions = [];
 
     constructor(private uiState: UiState, private elRef: ElementRef) {
-        uiState.focusEvent.subscribe(val => {
+        let focusSub = uiState.focusEvent.subscribe(val => {
             if (val === this.address.toString()) {
                 this.focus();
             } else {
                 this.blurHandler();
             }
         });
-        uiState.blurEvent.subscribe(val => {
+        let blurSub = uiState.blurEvent.subscribe(val => {
             if (val === this.address.toString()) {
                 this.blurHandler();
             }
         });
+
+        this.subscriptions.concat(focusSub, blurSub);
     }
  
     private onChanges() {
