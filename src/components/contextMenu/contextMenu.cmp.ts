@@ -50,7 +50,7 @@ class ContextMenuCmp {
     }
 
     public createItem() {
-        this.uiState.setCreate();
+        this.uiState.createItem();
     }
 
     public deleteSelected() {

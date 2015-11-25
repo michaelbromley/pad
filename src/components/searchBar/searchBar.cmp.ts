@@ -17,7 +17,7 @@ class SearchBarCmp {
                 private uiState: UiState,
                 private elRef: ElementRef) {
 
-        uiState.searchBarFocusChange().subscribe(val => {
+        uiState.searchBarFocusChangeEvent.subscribe(val => {
             if (val) {
                 this.focus(val);
             } else {
@@ -25,7 +25,7 @@ class SearchBarCmp {
             }
         });
 
-        padService.change().subscribe(() => {
+        padService.changeEvent.subscribe(() => {
             if (!this.focussed) {
                 this.clear();
             }

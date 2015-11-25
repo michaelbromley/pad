@@ -29,7 +29,7 @@ class PadCmp {
                 this.uiState.initUiView(this.pad);
             });
 
-        let sub = this.padService.change().subscribe(pad=> {
+        let sub = this.padService.changeEvent.subscribe(pad=> {
             console.log('[pad] change event');
             this.pad = pad;
             this.uiState.initUiView(this.pad);

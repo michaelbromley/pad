@@ -28,15 +28,15 @@ export interface IAllowedOperations {
 @Injectable()
 export class UiState {
 
-    private _focus: EventEmitter = new EventEmitter();
-    private _searchBarFocusChange: EventEmitter = new EventEmitter();
-    private _blur: EventEmitter = new EventEmitter();
-    private _create: EventEmitter = new EventEmitter();
-    private _deleteSelected: EventEmitter = new EventEmitter();
-    private _reOrder: EventEmitter = new EventEmitter();
+    public focusEvent: EventEmitter<string> = new EventEmitter();
+    public searchBarFocusChangeEvent: EventEmitter<number> = new EventEmitter();
+    public blurEvent: EventEmitter<string> = new EventEmitter();
+    public createEvent: EventEmitter<any> = new EventEmitter();
+    public deleteSelectedEvent: EventEmitter<any> = new EventEmitter();
+    public reOrderEvent: EventEmitter<any> = new EventEmitter();
 
-    private currentAddressIsFocussed: boolean = false;
-    private searchBarIsFocussed: boolean = false;
+    private currentAddressIsFocused: boolean = false;
+    private searchBarIsFocused: boolean = false;
     private lastPressedKeys: number[] = [];
     public currentPadId: string;
     private scroller;
@@ -100,7 +100,7 @@ export class UiState {
         }
         this.lastPressedKeys = pressedKeys;
 
-        if (!this.currentAddressIsFocussed && !this.searchBarIsFocussed) {
+        if (!this.currentAddressIsFocused && !this.searchBarIsFocused) {
             if (isPressed('up')) {
                 event.preventDefault();
                 this.navigator.prev();
@@ -117,7 +117,7 @@ export class UiState {
                 } else {
                     let canGoDeeper = this.navigator.down();
                     if (!canGoDeeper) {
-                        this.currentAddressIsFocussed = true;
+                        this.currentAddressIsFocused = true;
                         this.fireFocusEvent();
                     }
                 }
@@ -132,7 +132,7 @@ export class UiState {
                     this.navigator.up();
                 }
             } else if (isPressed('alt', 'ctrl', 'n')) {
-                this.setCreate();
+                this.createItem();
             } else if (isPressed('alt', 'ctrl', 'd')) {
                 if (this.getAllowedOperations().remove) {
                     this.setDeleteSelected();
@@ -166,14 +166,14 @@ export class UiState {
     private focusSearchBar(keyCode: number) {
         this.blurSelectedItem();
         this.navigator.deselectAll();
-        this.searchBarIsFocussed = true;
-        this._searchBarFocusChange.next(keyCode);
+        this.searchBarIsFocused = true;
+        this.searchBarFocusChangeEvent.next(keyCode);
     }
 
     private blurSearchBar() {
-        if (this.searchBarIsFocussed) {
-            this.searchBarIsFocussed = false;
-            this._searchBarFocusChange.next(undefined);
+        if (this.searchBarIsFocused) {
+            this.searchBarIsFocused = false;
+            this.searchBarFocusChangeEvent.next(undefined);
         }
     }
 
@@ -229,13 +229,13 @@ export class UiState {
     }
 
     public blurSelectedItem() {
-        if (this.currentAddressIsFocussed) {
-            this.currentAddressIsFocussed = false;
+        if (this.currentAddressIsFocused) {
+            this.currentAddressIsFocused = false;
             this.fireBlurEvent();
         }
     }
 
-    public setCreate() {
+    public createItem() {
         let context = this.getUiContext();
 
         if (context === UiContext.Pad) {
@@ -254,7 +254,7 @@ export class UiState {
             let selectedItem = {
                 _id: this.navigator.getSelectedItemId()
             };
-            this._deleteSelected.next(selectedItem);
+            this.deleteSelectedEvent.next(selectedItem);
         }
     }
 
@@ -268,7 +268,7 @@ export class UiState {
             type = this.navigator.getSelectedItemAddress().length === 1 ? Type.PAGE : Type.NOTE;
         }
 
-        this._reOrder.next({
+        this.reOrderEvent.next({
             type: type,
             id: selectedItemId,
             increment: increment
@@ -277,49 +277,25 @@ export class UiState {
 
     public setFocus(address: number[]) {
         this.navigator.setSelectedItemAddress(address);
-        this.currentAddressIsFocussed = true;
+        this.currentAddressIsFocused = true;
         this.fireFocusEvent();
     }
 
     public isCurrentAddressFocussed() {
-        return this.currentAddressIsFocussed;
+        return this.currentAddressIsFocused;
     }
 
     public unsetFocus() {
-        this.currentAddressIsFocussed = false;
+        this.currentAddressIsFocused = false;
         this.fireBlurEvent();
     }
 
-    public focus() {
-        return this._focus.toRx();
-    }
-
-    public blur() {
-        return this._blur.toRx();
-    }
-
-    public searchBarFocusChange() {
-        return this._searchBarFocusChange.toRx();
-    }
-
-    public create() {
-        return this._create.toRx();
-    }
-
-    public deleteSelected() {
-        return this._deleteSelected.toRx();
-    }
-
-    public reOrder() {
-        return this._reOrder.toRx();
-    }
-
     private fireFocusEvent() {
-        this._focus.next(this.navigator.getSelectedItemAddress().toString());
+        this.focusEvent.next(this.navigator.getSelectedItemAddress().toString());
     }
 
     private fireBlurEvent() {
-        this._blur.next(this.navigator.getSelectedItemAddress().toString());
+        this.blurEvent.next(this.navigator.getSelectedItemAddress().toString());
     }
 
 }

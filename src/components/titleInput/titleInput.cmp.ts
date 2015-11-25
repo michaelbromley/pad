@@ -18,14 +18,14 @@ class TitleInputCmp {
     @Output() private blur = new EventEmitter();
 
     constructor(private uiState: UiState, private elRef: ElementRef) {
-        uiState.focus().subscribe(val => {
+        uiState.focusEvent.subscribe(val => {
             if (val === this.address.toString()) {
                 this.focus();
             } else {
                 this.blurHandler();
             }
         });
-        uiState.blur().subscribe(val => {
+        uiState.blurEvent.subscribe(val => {
             if (val === this.address.toString()) {
                 this.blurHandler();
             }

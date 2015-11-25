@@ -34,7 +34,7 @@ class Action {
 @Injectable()
 export class PadService {
 
-    public _change: EventEmitter = new EventEmitter();
+    public changeEvent: EventEmitter<Pad> = new EventEmitter();
 
     private pads: { [padUuid: string]: Pad } = {};
     private workingPads: { [padUuid: string]: Pad } = {};
@@ -112,7 +112,7 @@ export class PadService {
         this.dataService.updatePad(this.workingPads[padUuid]).subscribe(() => {
             console.log('saved changes');
         });
-        this._change.next(this.workingPads[padUuid]);
+        this.changeEvent.next(this.workingPads[padUuid]);
     }
 
     /**
@@ -131,21 +131,18 @@ export class PadService {
             case ActionType.CREATE_NOTE:
                 let note = new Note();
                 note.content = action.data;
-                let pageIndex = getPageIndex(action.uuid);
-                padClone.pages[pageIndex].notes.splice(action.index, 0, note);
+                padClone.pages[getPageIndex(action.uuid)].notes.splice(action.index, 0, note);
                 break;
             case ActionType.UPDATE_PAD:
                 padClone.title = action.data;
                 break;
             case ActionType.UPDATE_PAGE:
-                let pageIndex = getPageIndex(action.uuid);
-                padClone.pages[pageIndex].title = action.data;
+                padClone.pages[getPageIndex(action.uuid)].title = action.data;
                 break;
             case ActionType.UPDATE_NOTE:
                 let [pageIndex, noteIndex] = this.getIndices(padClone, action.uuid);
                 padClone.pages[pageIndex].notes[noteIndex].content = action.data;
                 break;
-
         }
 
         return padClone;
@@ -156,7 +153,8 @@ export class PadService {
      * note, and the index of the note in that page.
      */
     private getIndices(pad: Pad, noteUuid: string): [number, number] {
-        let pageIndex = noteIndex = -1;
+        let pageIndex = -1;
+        let noteIndex = -1;
 
         pad.pages.map((page: Page, index: number) => {
             let tempIndex = page.notes
@@ -168,9 +166,4 @@ export class PadService {
         });
         return [pageIndex, noteIndex];
     }
-
-    public change() {
-        return this._change.toRx();
-    }
-
 }
