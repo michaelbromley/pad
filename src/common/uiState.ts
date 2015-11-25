@@ -30,7 +30,7 @@ export interface IAllowedOperations {
 export class UiState {
 
     public focusEvent: EventEmitter<string> = new EventEmitter();
-    public searchBarFocusChangeEvent: EventEmitter<number> = new EventEmitter();
+    public searchBarFocusChangeEvent: EventEmitter<boolean> = new EventEmitter();
     public blurEvent: EventEmitter<string> = new EventEmitter();
     public createEvent: EventEmitter<any> = new EventEmitter();
     public deleteSelectedEvent: EventEmitter<any> = new EventEmitter();
@@ -122,11 +122,13 @@ export class UiState {
                 this.navigator.up();
             } else if (isPressed('esc')) {
                 event.preventDefault();
-                if (this.navigator.getSelectedItemAddress()[0] === -1) {
+                if (this.navigator.nothingSelected()) {
                     this.router.navigate(['PadList']);
                 } else {
                     this.navigator.up();
                 }
+            } else if (isPressed('alt', 'ctrl', 's')) {
+                this.focusSearchBar();
             } else if (isPressed('alt', 'ctrl', 'n')) {
                 this.createItem();
             } else if (isPressed('alt', 'ctrl', 'd')) {
@@ -141,10 +143,10 @@ export class UiState {
                 if (this.getAllowedOperations().move) {
                     this.moveItem(1);
                 }
-            } else {
-                if (this.keyboard.isPrintableChar(event.keyCode)) {
-                    this.focusSearchBar(event.keyCode);
-                }
+            }
+
+            if (this.navigator.nothingSelected()) {
+                this.focusSearchBar();
             }
         } else {
             if (isPressed('esc')) {
@@ -154,22 +156,21 @@ export class UiState {
             }
             if (isPressed('down')) {
                 this.blurSearchBar();
+                this.navigator.next();
             }
         }
         this.scroller.scrollIntoView(this.navigator.getSelectedItemId());
     }
 
-    private focusSearchBar(keyCode: number) {
-        this.blurSelectedItem();
-        this.navigator.deselectAll();
+    public focusSearchBar() {
         this.searchBarIsFocused = true;
-        this.searchBarFocusChangeEvent.next(keyCode);
+        this.searchBarFocusChangeEvent.next(true);
     }
 
     private blurSearchBar() {
         if (this.searchBarIsFocused) {
             this.searchBarIsFocused = false;
-            this.searchBarFocusChangeEvent.next(undefined);
+            this.searchBarFocusChangeEvent.next(false);
         }
     }
 

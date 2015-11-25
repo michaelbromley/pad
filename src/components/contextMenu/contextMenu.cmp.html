@@ -6,9 +6,12 @@
         </div>
 
         <ul class="actions">
-            <li [class.visible]="!isAnythingFocussed()">
-                <div class="pad-btn">
-                    Type to search
+            <li [class.visible]="!isAnythingFocused()">
+                <div class="pad-btn" (click)="focusSearchBar()">
+                    Search
+                    <div class="shortcut-label">
+                        <code>alt</code> + <code>ctrl</code> + <code>s</code>
+                    </div>
                 </div>
             </li>
             <li class="visible">

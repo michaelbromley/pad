@@ -67,6 +67,10 @@ class Navigator {
         }
     }
 
+    public nothingSelected(): boolean {
+        return this.selectedItemAddress[0] === NONE;
+    }
+
     public deselectAll() {
         this.selectedItemAddress = [NONE];
     }

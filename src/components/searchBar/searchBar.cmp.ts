@@ -26,7 +26,7 @@ class SearchBarCmp {
 
         let focusSub = uiState.searchBarFocusChangeEvent.subscribe(val => {
             if (val) {
-                this.focus(val);
+                this.focus();
             } else {
                 this.blur();
             }
@@ -52,14 +52,9 @@ class SearchBarCmp {
         this.filterService.setFilterTerm(input.value);
     }
 
-    private focus(keyCode?: number) {
+    private focus() {
         this.focussed = true;
-        setTimeout(() => {
-            if (typeof keyCode !== 'undefined') {
-                this.input.value += String.fromCharCode(keyCode).toLowerCase();
-            }
-            this.input.focus();
-        });
+        setTimeout(() => this.input.focus());
     }
 
     private blur() {

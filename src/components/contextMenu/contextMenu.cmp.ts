@@ -33,7 +33,7 @@ class ContextMenuCmp {
         return this.getContext() === UiContext.Page;
     }
 
-    public isAnythingFocussed() {
+    public isAnythingFocused() {
         return this.uiState.isCurrentAddressFocussed();
     }
 
@@ -47,6 +47,10 @@ class ContextMenuCmp {
 
     private getContext() {
         return this.uiState.getUiContext();
+    }
+
+    public focusSearchBar() {
+        this.uiState.focusSearchBar();
     }
 
     public createItem() {
