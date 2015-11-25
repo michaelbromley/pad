@@ -37,12 +37,10 @@ export class FilterService {
      * current filterTerm, OR those pages which contain notes whose contents match.
      */
     public filterPad(pad: Pad): Pad {
-        if (!pad || !pad.pages || this.filterTerm === '') {
-            return pad;
-        }
-
         let padClone: Pad = clone(pad);
-
+        if (!pad || !pad.pages || this.filterTerm === '') {
+            return padClone;
+        }
         padClone.pages = padClone.pages
             .map((page: Page) => {
                 page.notes = page.notes.filter((note: Note) => this.matches(note.content));

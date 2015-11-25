@@ -48,7 +48,7 @@ class PadCmp {
 
     private loadPad(pad: Pad) {
         this.pad = pad;
-        this.filteredPad = this.filterService.filterPad(pad);
+        this.filteredPad = this.filterService.filterPad(this.pad);
         this.uiState.initUiView(this.filteredPad);
     }
 

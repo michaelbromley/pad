@@ -2,6 +2,7 @@ import {Component, CORE_DIRECTIVES, FORM_DIRECTIVES, Input, Output, EventEmitter
 import {RouterLink} from 'angular2/router';
 import {UiState, UiContext} from '../../common/uiState';
 import {Type} from "../../common/model";
+import {Action, ActionType} from "../../common/padService";
 
 @Component({
     selector: 'context-menu',
@@ -67,6 +68,22 @@ class ContextMenuCmp {
 
     public moveDown() {
         this.uiState.moveItem(1);
+    }
+
+    public getHistory() {
+        return this.uiState.getCurrentPadHistory().reverse();
+    }
+
+    public isCurrentState(index: number) {
+        if (index === -1) {
+            return this.uiState.getCurrentPadHistoryPointer() === -1;
+        }
+        let originalIndex = this.uiState.getCurrentPadHistory().length - 1 - index;
+        return this.uiState.getCurrentPadHistoryPointer() === originalIndex;
+    }
+
+    public getActionDescription(action: Action): string {
+        return ActionType[action.type].toLowerCase().replace('_', ' ');
     }
 }
 

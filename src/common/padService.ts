@@ -5,7 +5,7 @@ import {UiState, UiContext} from './uiState';
 import {IPadItem, Page, Pad, Note, Type} from './model';
 import {clone} from './utils';
 
-enum ActionType {
+export enum ActionType {
     CREATE_PAGE,
     CREATE_NOTE,
     UPDATE_PAD,
@@ -17,7 +17,7 @@ enum ActionType {
     MOVE_NOTE
 }
 
-class Action {
+export class Action {
     uuid: string;
     type: ActionType;
     index: number;
@@ -73,9 +73,22 @@ export class PadService {
         }
     }
 
+    public getHistory(padUuid: string): Action[] {
+        let history =  this.history[padUuid];
+        if (history) {
+            return history.slice(0);
+        } else {
+            return [];
+        }
+    }
+
+    public getHistoryPointer(padUuid: string): number {
+        return this.historyPointer[padUuid];
+    }
+
     private loadPadIntoMemory(pad: Pad) {
-        this.pads[pad.uuid] = pad;
-        this.workingPads[pad.uuid] = pad;
+        this.pads[pad.uuid] = clone(pad);
+        this.workingPads[pad.uuid] = clone(pad);
         this.historyPointer[pad.uuid] = -1;
     }
 
@@ -175,6 +188,29 @@ export class PadService {
             console.log('saved changes');
         });
         this.changeEvent.next(this.workingPads[padUuid]);
+    }
+
+    public undo(padUuid: string) {
+        if (0 <= this.historyPointer[padUuid]) {
+            this.historyPointer[padUuid]--;
+            let actions = this.history[padUuid].slice(0, this.historyPointer[padUuid] + 1);
+            this.workingPads[padUuid] = clone(this.pads[padUuid]);
+            for (let i = 0; i < actions.length; i++) {
+                this.workingPads[padUuid] = this.applyAction(this.workingPads[padUuid], actions[i]);
+            }
+            this.changeEvent.next(this.workingPads[padUuid]);
+            console.log('(undo) workingPad', this.workingPads[padUuid]);
+        }
+    }
+
+    public redo(padUuid: string) {
+        if (this.historyPointer[padUuid] < this.history[padUuid].length - 1) {
+            this.historyPointer[padUuid]++;
+            let action = this.history[padUuid].slice(this.historyPointer[padUuid], this.historyPointer[padUuid] + 1)[0];
+            this.workingPads[padUuid] = this.applyAction(this.workingPads[padUuid], action);
+            this.changeEvent.next(this.workingPads[padUuid]);
+            console.log('(redo) workingPad', this.workingPads[padUuid]);
+        }
     }
 
     /**

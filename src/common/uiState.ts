@@ -5,7 +5,7 @@ import Navigator from './navigator';
 import {Scroller} from './scroller';
 import {Type, Pad, Page, Note} from "./model";
 import {Keyboard} from "./keyboard";
-import {PadService} from "./padService";
+import {PadService, Action} from "./padService";
 import {IPadItem} from "./model";
 
 /**
@@ -64,8 +64,18 @@ export class UiState {
     }
 
     public registerKeyboardShortcuts() {
-        this.keyboard.registerShortcut(['up'], event => this.navigator.prev(), true);
-        this.keyboard.registerShortcut(['down'], event => this.navigator.next(), true);
+        this.keyboard.registerShortcut(['up'], event => {
+            this.navigator.prev();
+            if (this.navigator.nothingSelected()) {
+                this.deselectAll();
+            }
+        }, true);
+        this.keyboard.registerShortcut(['down'], event => {
+            this.navigator.next();
+            if (this.navigator.nothingSelected()) {
+                this.deselectAll();
+            }
+        }, true);
         this.keyboard.registerShortcut(['right'], event => this.navigator.down());
         this.keyboard.registerShortcut(['left'], event => this.navigator.up(), true);
         this.keyboard.registerShortcut(['enter'], event => {
@@ -103,6 +113,14 @@ export class UiState {
                 this.moveItem(1);
             }
         });
+        this.keyboard.registerShortcut(['alt', 'ctrl', 'z'], event => {
+            this.navigator.deselectAll();
+            this.padService.undo(this.currentPadId);
+        }, true);
+        this.keyboard.registerShortcut(['alt', 'ctrl', 'shift', 'z'], event => {
+            this.navigator.deselectAll();
+            this.padService.redo(this.currentPadId);
+        }, true);
     }
 
     public deselectAll() {
@@ -141,9 +159,6 @@ export class UiState {
 
         if (!this.currentAddressIsFocused && !this.searchBarIsFocused) {
             this.keyboard.checkShortcuts(event);
-            if (this.navigator.nothingSelected()) {
-                this.focusSearchBar();
-            }
         } else {
             if (isPressed('esc')) {
                 event.preventDefault();
@@ -272,6 +287,14 @@ export class UiState {
 
     public isCurrentAddressFocussed() {
         return this.currentAddressIsFocused;
+    }
+
+    public getCurrentPadHistory(): Action[] {
+        return this.padService.getHistory(this.currentPadId);
+    }
+
+    public getCurrentPadHistoryPointer(): number {
+        return this.padService.getHistoryPointer(this.currentPadId);
     }
 
     public unsetFocus() {

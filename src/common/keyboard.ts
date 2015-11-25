@@ -127,7 +127,7 @@ export class Keyboard {
     private setKeyUpTimeout() {
         this.timeout = <any>setTimeout(() => {
             this.pressed = this.pressed.map(() => false);
-        }, 500);
+        }, 400);
     }
 
     private clearKeyUpTimeout() {
