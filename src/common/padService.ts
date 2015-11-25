@@ -1,8 +1,9 @@
 import {Injectable, EventEmitter} from 'angular2/angular2';
 let Rx = require('rx');
 import DataService from './dataService';
-import {UiState, UiContext} from "./uiState";
-import {IPadItem, Page, Pad, Note, Type} from "./model";
+import {UiState, UiContext} from './uiState';
+import {IPadItem, Page, Pad, Note, Type} from './model';
+import {clone} from './utils';
 
 enum ActionType {
     CREATE_PAGE,
@@ -180,7 +181,7 @@ export class PadService {
      * Given a pad and an action, applies the action and returns a new pad with that action applied.
      */
     private applyAction(pad: Pad, action: Action): Pad {
-        let padClone: Pad = JSON.parse(JSON.stringify(pad));
+        let padClone: Pad = clone(pad);
         let getPageIndex = uuid => padClone.pages.map(page => page.uuid).indexOf(uuid);
         let pageIndex = -1, noteIndex = -1;
         let page, note, newIndex;

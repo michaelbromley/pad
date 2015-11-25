@@ -5,6 +5,7 @@ import NoteEditorCmp from '../noteEditor/noteEditor.cmp';
 import {UiState} from '../../common/uiState';
 import {Type, Note, Pad, Page} from "../../common/model";
 import {PadService} from "../../common/padService";
+import {FilterService} from "../../common/filterService";
 
 @Component({
     selector: 'pad',
@@ -14,28 +15,41 @@ import {PadService} from "../../common/padService";
 class PadCmp {
 
     public pad: Pad = <Pad>{};
+    public filteredPad: Pad = <Pad>{};
 
     private subscriptions = [];
 
     constructor(private padService: PadService,
+                private filterService: FilterService,
                 private params: RouteParams,
                 private uiState: UiState) {
+
+        this.filterService.clearFilter();
     }
 
     onActivate() {
         this.padService.getPad(this.params.get('id'))
             .subscribe(pad => {
-                this.pad = pad;
-                this.uiState.initUiView(this.pad);
+                this.loadPad(pad);
                 this.uiState.deselectAll();
             });
 
-        let sub = this.padService.changeEvent.subscribe(pad=> {
-            console.log('[pad] change event');
-            this.pad = pad;
-            this.uiState.initUiView(this.pad);
+        let changeSub = this.padService.changeEvent.subscribe(pad=> {
+            this.loadPad(pad);
         });
-        this.subscriptions.push(sub);
+
+        let filterSub = this.filterService.filterChangeEvent.subscribe(() => {
+            this.filteredPad = this.filterService.filterPad(this.pad);
+            this.uiState.initUiView(this.filteredPad);
+        });
+
+        this.subscriptions = [changeSub, filterSub];
+    }
+
+    private loadPad(pad: Pad) {
+        this.pad = pad;
+        this.filteredPad = this.filterService.filterPad(pad);
+        this.uiState.initUiView(this.filteredPad);
     }
 
     onDestroy() {

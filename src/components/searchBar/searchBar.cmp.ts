@@ -1,8 +1,10 @@
 import {Component, CORE_DIRECTIVES, FORM_DIRECTIVES, Input, Output, EventEmitter, ElementRef} from 'angular2/angular2';
 //import {UiState, UiContext} from '../../common/uiState';
+let Rx: Rx = require('rx');
 import {Type} from "../../common/model";
 import {PadService} from "../../common/padService";
 import {UiState} from "../../common/uiState";
+import {FilterService} from "../../common/filterService";
 
 @Component({
     selector: 'search-bar',
@@ -12,11 +14,15 @@ import {UiState} from "../../common/uiState";
 class SearchBarCmp {
 
     private focussed: boolean = false;
+    private input: HTMLInputElement;
     private subscriptions = [];
 
     constructor(private padService: PadService,
+                private filterService: FilterService,
                 private uiState: UiState,
                 private elRef: ElementRef) {
+
+        this.input = this.elRef.nativeElement.querySelector('input');
 
         let focusSub = uiState.searchBarFocusChangeEvent.subscribe(val => {
             if (val) {
@@ -26,13 +32,15 @@ class SearchBarCmp {
             }
         });
 
-        let changeSub = padService.changeEvent.subscribe(() => {
-            if (!this.focussed) {
-                this.clear();
-            }
-        });
+        let clearSub = Rx.Observable
+            .merge(padService.changeEvent, filterService.clearFilterEvent)
+            .subscribe(() => {
+                if (!this.focussed) {
+                    this.clear();
+                }
+            });
 
-        this.subscriptions.concat(focusSub, changeSub);
+        this.subscriptions = [focusSub, clearSub];
     }
 
     onDestroy() {
@@ -41,29 +49,28 @@ class SearchBarCmp {
 
     public textChanged(event: Event) {
         let input = <HTMLInputElement>event.target;
-        //this.padService.setFilterQuery(input.value);
+        this.filterService.setFilterTerm(input.value);
     }
 
     private focus(keyCode?: number) {
         this.focussed = true;
         setTimeout(() => {
-            let input = this.elRef.nativeElement.querySelector('input');
             if (typeof keyCode !== 'undefined') {
-                input.value += String.fromCharCode(keyCode).toLowerCase();
+                this.input.value += String.fromCharCode(keyCode).toLowerCase();
             }
-            input.focus();
+            this.input.focus();
         });
     }
 
     private blur() {
         this.focussed = false;
         setTimeout(() => {
-            this.elRef.nativeElement.querySelector('input').blur();
+            this.input.blur();
         });
     }
 
     private clear() {
-        this.elRef.nativeElement.querySelector('input').value = '';
+        this.input.value = '';
     }
 }
 

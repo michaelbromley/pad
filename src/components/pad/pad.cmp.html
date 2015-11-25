@@ -10,7 +10,7 @@
                          [address]="[0]" ></title-input>
         </li>
 
-        <li *ng-for="#page of pad.pages; #index0 = index"
+        <li *ng-for="#page of filteredPad.pages; #index0 = index"
             [class.selected]="checkSelected([index0 + 1])"
             [id]="'_' + page._id"
             class="page-container">

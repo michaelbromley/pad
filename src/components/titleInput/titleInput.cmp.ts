@@ -32,7 +32,7 @@ class TitleInputCmp {
             }
         });
 
-        this.subscriptions.concat(focusSub, blurSub);
+        this.subscriptions = [focusSub, blurSub];
     }
 
     onDestroy() {

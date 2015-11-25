@@ -3,6 +3,8 @@ import {RouterLink} from 'angular2/router';
 import {UiState} from "../../common/uiState";
 import DataService from "../../common/dataService";
 import {PadService} from "../../common/padService";
+import {FilterService} from "../../common/filterService";
+import {Pad} from "../../common/model";
 
 @Component({
     selector: 'pad-list',
@@ -11,20 +13,26 @@ import {PadService} from "../../common/padService";
 })
 class PadListCmp {
 
-    public pads: any[] = [];
+    public pads: Pad[] = [];
+    public filteredPads: Pad[] = [];
     private subscriptions: any[] = [];
 
     constructor(private dataService: DataService,
+                private filterService: FilterService,
                 private padService: PadService,
                 private uiState: UiState) {
+
+        this.filterService.clearFilter();
     }
 
     onInit() {
-        let sub = this.padService.changeEvent.subscribe(pad => {
+        let changeSub = this.padService.changeEvent.subscribe(pad => {
             this.loadPads();
         });
-        this.subscriptions.push(sub);
-
+        let filterSub = this.filterService.filterChangeEvent.subscribe(() => {
+            this.loadPads();
+        });
+        this.subscriptions = [changeSub, filterSub];
         this.loadPads();
     }
 
@@ -35,7 +43,8 @@ class PadListCmp {
     private loadPads() {
         this.dataService.fetchPadList().subscribe(pads => {
             this.pads = pads;
-            this.uiState.initUiView(pads);
+            this.filteredPads = this.filterService.filterPadList(pads);
+            this.uiState.initUiView(this.filteredPads);
             this.uiState.deselectAll();
         });
     }

@@ -32,7 +32,7 @@ class NoteEditorCmp {
             }
         });
 
-        this.subscriptions.concat(focusSub, blurSub);
+        this.subscriptions = [focusSub, blurSub];
     }
  
     private onChanges() {
