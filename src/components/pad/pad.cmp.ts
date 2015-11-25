@@ -42,7 +42,7 @@ class PadCmp {
     }
 
     public updateItem(item) {
-        //this.padService.updateItem(item);
+        this.padService.updateItem(this.uiState.currentPadId, item);
     }
 
     public checkSelected(address) {

@@ -6,11 +6,14 @@ import {Page, Pad, Note, Type} from "./model";
 
 enum ActionType {
     CREATE_PAGE,
-    CREATE_NOTE
+    CREATE_NOTE,
+    UPDATE_PAD,
+    UPDATE_PAGE,
+    UPDATE_NOTE
 }
 
 class Action {
-    parentUuid: string;
+    uuid: string;
     type: ActionType;
     index: number;
     data: any;
@@ -75,7 +78,26 @@ export class PadService {
     public createNote(padUuid: string, pageUuid: string, index: number) {
         let action = new Action(ActionType.CREATE_NOTE, index);
         action.data = 'Untitled Note';
-        action.parentUuid = pageUuid;
+        action.uuid = pageUuid;
+        this.prepareAndApply(padUuid, action);
+    }
+
+    public updateItem(padUuid: string, item: any) {
+        let action;
+        switch (item.type) {
+            case Type.PAD:
+                action = new Action(ActionType.UPDATE_PAD);
+                action.data = item.title;
+                break;
+            case Type.PAGE:
+                action = new Action(ActionType.UPDATE_PAGE);
+                action.data = item.title;
+                break;
+            case Type.NOTE:
+                action = new Action(ActionType.UPDATE_NOTE);
+                action.data = item.content;
+        }
+        action.uuid = item.uuid;
         this.prepareAndApply(padUuid, action);
     }
 
@@ -97,7 +119,8 @@ export class PadService {
      * Given a pad and an action, applies the action and returns a new pad with that action applied.
      */
     private applyAction(pad: Pad, action: Action): Pad {
-        let padClone = JSON.parse(JSON.stringify(pad));
+        let padClone: Pad = JSON.parse(JSON.stringify(pad));
+        let getPageIndex = uuid => padClone.pages.map(page => page.uuid).indexOf(uuid);
 
         switch (action.type) {
             case ActionType.CREATE_PAGE:
@@ -108,12 +131,42 @@ export class PadService {
             case ActionType.CREATE_NOTE:
                 let note = new Note();
                 note.content = action.data;
-                let pageIndex = padClone.pages.map(page => page.uuid).indexOf(action.parentUuid);
+                let pageIndex = getPageIndex(action.uuid);
                 padClone.pages[pageIndex].notes.splice(action.index, 0, note);
                 break;
+            case ActionType.UPDATE_PAD:
+                padClone.title = action.data;
+                break;
+            case ActionType.UPDATE_PAGE:
+                let pageIndex = getPageIndex(action.uuid);
+                padClone.pages[pageIndex].title = action.data;
+                break;
+            case ActionType.UPDATE_NOTE:
+                let [pageIndex, noteIndex] = this.getIndices(padClone, action.uuid);
+                padClone.pages[pageIndex].notes[noteIndex].content = action.data;
+                break;
+
         }
 
         return padClone;
+    }
+
+    /**
+     * Given a pad and a noteUuid, this returns an array containing the index of the page which contains the
+     * note, and the index of the note in that page.
+     */
+    private getIndices(pad: Pad, noteUuid: string): [number, number] {
+        let pageIndex = noteIndex = -1;
+
+        pad.pages.map((page: Page, index: number) => {
+            let tempIndex = page.notes
+                .map((note: Note, index: number) => note.uuid).indexOf(noteUuid);
+            if (-1 < tempIndex) {
+                pageIndex = index;
+                noteIndex = tempIndex;
+            }
+        });
+        return [pageIndex, noteIndex];
     }
 
     public change() {
