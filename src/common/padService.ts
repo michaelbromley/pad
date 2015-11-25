@@ -11,7 +11,9 @@ enum ActionType {
     UPDATE_PAGE,
     UPDATE_NOTE,
     DELETE_PAGE,
-    DELETE_NOTE
+    DELETE_NOTE,
+    MOVE_PAGE,
+    MOVE_NOTE
 }
 
 class Action {
@@ -144,6 +146,22 @@ export class PadService {
         }
     }
 
+    public moveItem(padUuid: string, increment: number, itemUuid: string) {
+        let action;
+        let item = this.getItemByUuid(padUuid, itemUuid);
+
+        switch (item.type) {
+            case Type.PAGE:
+                action = new Action(ActionType.MOVE_PAGE);
+                break;
+            case Type.NOTE:
+                action = new Action(ActionType.MOVE_NOTE);
+        }
+        action.uuid = item.uuid;
+        action.data = increment;
+        this.prepareAndApply(padUuid, action);
+    }
+
     /**
      * Push the action onto the history stack update the pointer and
      * apply the action to the workingPad.
@@ -165,6 +183,7 @@ export class PadService {
         let padClone: Pad = JSON.parse(JSON.stringify(pad));
         let getPageIndex = uuid => padClone.pages.map(page => page.uuid).indexOf(uuid);
         let pageIndex = -1, noteIndex = -1;
+        let page, note, newIndex;
 
         switch (action.type) {
             case ActionType.CREATE_PAGE:
@@ -194,6 +213,22 @@ export class PadService {
             case ActionType.DELETE_NOTE:
                 [pageIndex, noteIndex] = this.getIndices(padClone, action.uuid);
                 padClone.pages[pageIndex].notes.splice(noteIndex, 1);
+                break;
+            case ActionType.MOVE_PAGE:
+                pageIndex = getPageIndex(action.uuid);
+                newIndex = pageIndex + action.data;
+                if (0 <= newIndex && newIndex < padClone.pages.length) {
+                    page = padClone.pages.splice(pageIndex, 1)[0];
+                    padClone.pages.splice(newIndex, 0, page);
+                }
+                break;
+            case ActionType.MOVE_NOTE:
+                [pageIndex, noteIndex] = this.getIndices(padClone, action.uuid);
+                newIndex = noteIndex + action.data;
+                if (0 <= newIndex && newIndex < padClone.pages[pageIndex].notes.length) {
+                    note = padClone.pages[pageIndex].notes.splice(noteIndex, 1)[0];
+                    padClone.pages[pageIndex].notes.splice(noteIndex + action.data, 0, note);
+                }
                 break;
         }
 

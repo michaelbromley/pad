@@ -58,11 +58,11 @@ class ContextMenuCmp {
     }
 
     public moveUp() {
-        this.uiState.setReOrder(-1);
+        this.uiState.moveItem(-1);
     }
 
     public moveDown() {
-        this.uiState.setReOrder(1);
+        this.uiState.moveItem(1);
     }
 }
 

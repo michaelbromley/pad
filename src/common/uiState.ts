@@ -59,7 +59,6 @@ export class UiState {
             this.currentPadId = viewContents.uuid;
             this.navigator.initPad(viewContents);
         }
-        console.log('this.currentPadId', this.currentPadId);
     }
 
     public deselectAll() {
@@ -136,11 +135,11 @@ export class UiState {
                 }
             } else if (isPressed('alt', 'ctrl', 'up')) {
                 if (this.getAllowedOperations().move) {
-                    this.setReOrder(-1);
+                    this.moveItem(-1);
                 }
             } else if (isPressed('alt', 'ctrl', 'down')) {
                 if (this.getAllowedOperations().move) {
-                    this.setReOrder(1);
+                    this.moveItem(1);
                 }
             } else {
                 if (this.keyboard.isPrintableChar(event.keyCode)) {
@@ -198,7 +197,7 @@ export class UiState {
         if (context === UiContext.PadList) {
             if (somethingIsSelected) {
                 allowed.remove = true;
-                allowed.move = true;
+                allowed.move = false;
             }
         } else if (context === UiContext.Pad) {
             if (this.navigator.getSelectedItemAddress()[0] !== 0) {
@@ -256,21 +255,16 @@ export class UiState {
         }
     }
 
-    public setReOrder(increment: number) {
-        let selectedItemId = this.navigator.getSelectedItemId();
-        let type;
-
-        if (this.getUiContext() === UiContext.PadList) {
-            type = Type.PAD;
-        } else {
-            type = this.navigator.getSelectedItemAddress().length === 1 ? Type.PAGE : Type.NOTE;
+    public moveItem(increment: number) {
+        if (this.getUiContext() !== UiContext.PadList) {
+            let selectedItemId = this.navigator.getSelectedItemId();
+            this.padService.moveItem(this.currentPadId, increment, selectedItemId);
+            if (0 < increment) {
+                this.navigator.next();
+            } else {
+                this.navigator.prev();
+            }
         }
-
-        this.reOrderEvent.next({
-            type: type,
-            id: selectedItemId,
-            increment: increment
-        });
     }
 
     public setFocus(address: number[]) {
