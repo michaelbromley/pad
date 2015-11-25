@@ -1,4 +1,3 @@
-
 /**
  * Create a map object { name: keyCode }
  * Code borrowed from https://github.com/timoxley/keycode
@@ -65,6 +64,12 @@ function createCodeMap() {
 }
 
 
+interface IShortcutDefinition {
+    keys: string[];
+    action: (event: KeyboardEvent) => any;
+    preventDefault: boolean;
+}
+
 /**
  * Service for handling keyboard shortcuts.
  */
@@ -73,9 +78,38 @@ export class Keyboard {
     private pressed: boolean[] = [];
     private timeout: number;
     private codesMap;
+    private shortcutMap: IShortcutDefinition[] = [];
 
     constructor() {
         this.codesMap = createCodeMap();
+    }
+
+    /**
+     * Register a keyboard shortcut - an array of key names and a resulting function to invoke.
+     */
+    public registerShortcut(keys: string[], action: (event: KeyboardEvent) => any, preventDefault: boolean = false) {
+        this.shortcutMap.push({
+            keys: keys,
+            action: action,
+            preventDefault: preventDefault
+        });
+    }
+
+    /**
+     * Check any shortcuts registered with registerShortcut() and invoke the actions of those that apply.
+     */
+    public checkShortcuts(event: KeyboardEvent) {
+        const isPressed = (keys: string[]) => {
+            return this.isPressedOnly(...keys);
+        };
+        this.shortcutMap.forEach((shortcut: IShortcutDefinition) => {
+            if (isPressed(shortcut.keys)) {
+                if (shortcut.preventDefault) {
+                    event.preventDefault();
+                }
+                shortcut.action(event);
+            }
+        });
     }
 
     public keydown(event: KeyboardEvent) {

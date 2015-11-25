@@ -49,6 +49,8 @@ export class UiState {
                 private keyboard: Keyboard) {
         // TODO: why does ng2 DI break when I try to inject this?
         this.scroller = new Scroller();
+
+        this.registerKeyboardShortcuts();
     }
 
     public initUiView(viewContents) {
@@ -59,6 +61,48 @@ export class UiState {
             this.currentPadId = viewContents.uuid;
             this.navigator.initPad(viewContents);
         }
+    }
+
+    public registerKeyboardShortcuts() {
+        this.keyboard.registerShortcut(['up'], event => this.navigator.prev(), true);
+        this.keyboard.registerShortcut(['down'], event => this.navigator.next(), true);
+        this.keyboard.registerShortcut(['right'], event => this.navigator.down());
+        this.keyboard.registerShortcut(['left'], event => this.navigator.up(), true);
+        this.keyboard.registerShortcut(['enter'], event => {
+            if (this.getUiContext() === UiContext.PadList) {
+                this.router.navigate(['Pad', {id: this.navigator.getSelectedItemId()}]);
+            } else {
+                let canGoDeeper = this.navigator.down();
+                if (!canGoDeeper) {
+                    this.currentAddressIsFocused = true;
+                    this.fireFocusEvent();
+                }
+            }
+        }, true);
+        this.keyboard.registerShortcut(['esc'], event => {
+            if (this.navigator.nothingSelected()) {
+                this.router.navigate(['PadList']);
+            } else {
+                this.navigator.up();
+            }
+        }, true);
+        this.keyboard.registerShortcut(['alt', 'ctrl', 's'], event => this.focusSearchBar());
+        this.keyboard.registerShortcut(['alt', 'ctrl', 'n'], event => this.createItem());
+        this.keyboard.registerShortcut(['alt', 'ctrl', 'd'], event => {
+            if (this.getAllowedOperations().remove) {
+                this.deleteSelectedItem();
+            }
+        });
+        this.keyboard.registerShortcut(['alt', 'ctrl', 'up'], event => {
+            if (this.getAllowedOperations().move) {
+                this.moveItem(-1);
+            }
+        });
+        this.keyboard.registerShortcut(['alt', 'ctrl', 'down'], event => {
+            if (this.getAllowedOperations().move) {
+                this.moveItem(1);
+            }
+        });
     }
 
     public deselectAll() {
@@ -89,7 +133,6 @@ export class UiState {
         };
 
         this.keyboard.keydown(event);
-
         let pressedKeys = this.keyboard.getPressedKeys();
         if (this.lastPressedKeys.toString() === pressedKeys.toString()) {
             return;
@@ -97,54 +140,7 @@ export class UiState {
         this.lastPressedKeys = pressedKeys;
 
         if (!this.currentAddressIsFocused && !this.searchBarIsFocused) {
-            if (isPressed('up')) {
-                event.preventDefault();
-                this.navigator.prev();
-            } else if (isPressed('down')) {
-                event.preventDefault();
-                this.navigator.next();
-            } else if (isPressed('right')) {
-                this.navigator.down();
-            } else if (isPressed('enter')) {
-                event.preventDefault();
-
-                if (this.getUiContext() === UiContext.PadList) {
-                    this.router.navigate(['Pad', {id: this.navigator.getSelectedItemId()}]);
-                } else {
-                    let canGoDeeper = this.navigator.down();
-                    if (!canGoDeeper) {
-                        this.currentAddressIsFocused = true;
-                        this.fireFocusEvent();
-                    }
-                }
-            } else if (isPressed('left')) {
-                event.preventDefault();
-                this.navigator.up();
-            } else if (isPressed('esc')) {
-                event.preventDefault();
-                if (this.navigator.nothingSelected()) {
-                    this.router.navigate(['PadList']);
-                } else {
-                    this.navigator.up();
-                }
-            } else if (isPressed('alt', 'ctrl', 's')) {
-                this.focusSearchBar();
-            } else if (isPressed('alt', 'ctrl', 'n')) {
-                this.createItem();
-            } else if (isPressed('alt', 'ctrl', 'd')) {
-                if (this.getAllowedOperations().remove) {
-                    this.deleteSelectedItem();
-                }
-            } else if (isPressed('alt', 'ctrl', 'up')) {
-                if (this.getAllowedOperations().move) {
-                    this.moveItem(-1);
-                }
-            } else if (isPressed('alt', 'ctrl', 'down')) {
-                if (this.getAllowedOperations().move) {
-                    this.moveItem(1);
-                }
-            }
-
+            this.keyboard.checkShortcuts(event);
             if (this.navigator.nothingSelected()) {
                 this.focusSearchBar();
             }
