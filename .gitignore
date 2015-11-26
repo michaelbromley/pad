@@ -1,6 +1,6 @@
 node_modules
 .idea
-server/datastore
-tmp
+/server
+/tmp
 src/**/*.css
 src/**/*.js
