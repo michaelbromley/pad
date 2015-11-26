@@ -47,12 +47,23 @@
                 </div>
             </li>
         </ul>
-        <ul class="history">
-            <li *ng-for="#action of getHistory(); #i = index"
-                (click)="jumpToHistory(i)"
-                [ng-class]="{ 'current' : isCurrentState(i) }">{{ getActionDescription(action) }}</li>
-            <li (click)="jumpToHistory(-1)"
-                [ng-class]="{ 'current' : isCurrentState(-1) }">Origin</li>
-        </ul>
+
+        <div class="history-container" [class.visible]="isPadContext()">
+            <div class="title">Pad Edits History</div>
+
+            <ul class="history">
+                <li *ng-for="#action of getHistory(); #i = index"
+                    (click)="jumpToHistory(i)"
+                    [ng-class]="{ 'current' : isCurrentState(i) }">
+                    <div class="action-label">{{ getActionDescription(action) }}</div>
+                    <div class="action-time">{{ actionTime(action.created) }}</div>
+                </li>
+                <li (click)="jumpToHistory(-1)"
+                    [ng-class]="{ 'current' : isCurrentState(-1) }">
+                    <div class="action-label">Origin</div>
+                </li>
+            </ul>
+
+        </div>
     </div>
 </div>

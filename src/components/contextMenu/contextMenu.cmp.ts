@@ -4,6 +4,7 @@ import {UiState, UiContext} from '../../common/uiState';
 import {Type} from "../../common/model";
 import {Action, ActionType} from "../../common/padService";
 import {PadService} from "../../common/padService";
+import {timeAgo} from '../../common/utils';
 
 @Component({
     selector: 'context-menu',
@@ -81,6 +82,10 @@ class ContextMenuCmp {
         }
         let originalIndex = this.uiState.getCurrentPadHistory().length - 1 - index;
         return this.uiState.getCurrentPadHistoryPointer() === originalIndex;
+    }
+
+    public actionTime(timestamp: number) {
+        return timeAgo(timestamp);
     }
 
     public jumpToHistory(index: number) {

@@ -22,9 +22,11 @@ export class Action {
     type: ActionType;
     index: number;
     data: any;
+    created: number;
 
     constructor(type: ActionType, index?: number) {
         this.type = type;
+        this.created = Date.now();
         if (typeof index !== 'undefined') {
             this.index = 0 < index ? index : 0;
         }
