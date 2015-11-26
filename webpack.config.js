@@ -21,7 +21,7 @@ module.exports = {
         modulesDirectories: ['node_modules', 'src']
     },
     output: {
-        path: path.join(__dirname, 'tmp'),
+        path: path.join(__dirname, 'build'),
         publicPath: '',
         filename: '[name].js',
         pathInfo: true
@@ -32,7 +32,8 @@ module.exports = {
             {test: /\.ts$/, loader: 'ts-loader?transpileOnly=true'},
             {test: /\.css$/, loader: "style!css" },
             {test: /\.less$/, loader: "style!css!less"},
-            {test: /\.html/, loader: "html-loader"}
+            {test: /\.html/, loader: "html-loader"},
+            {test: /\.(jpe?g|png|gif|svg)$/i, loader: "file"}
         ]
     },
     plugins: [

@@ -5,11 +5,12 @@ import {Type} from "../../common/model";
 import {Action, ActionType} from "../../common/padService";
 import {PadService} from "../../common/padService";
 import {timeAgo} from '../../common/utils';
+import SettingsPanelCmp from "../settingsPanel/settingsPanel";
 
 @Component({
     selector: 'context-menu',
     template: require('./contextMenu.cmp.html'),
-    directives: [CORE_DIRECTIVES, RouterLink]
+    directives: [CORE_DIRECTIVES, RouterLink, SettingsPanelCmp]
 })
 class ContextMenuCmp {
 
