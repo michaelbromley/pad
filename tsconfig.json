@@ -9,6 +9,6 @@
   },
   "files": [
     "typings/tsd.d.ts",
-    "src/app.ts"
+    "src/app/app.ts"
   ]
 }

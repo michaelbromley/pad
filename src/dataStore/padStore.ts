@@ -1,4 +1,5 @@
 import {Pad} from "../app/common/model";
+import {Observable} from 'angular2/angular2';
 let Rx: Rx = require('rx');
 
 /**
@@ -12,7 +13,7 @@ export class PadStore {
     /**
      * List Pads
      */
-    public getPads(): Rx.Observable<Pad[]> {
+    public getPads(): Observable<Pad[]> {
         return Rx.Observable.create(observer => {
             this.db.find({}).sort({ order: 1}).exec((err, pads) => {
                 observer.onNext(pads);
@@ -25,7 +26,7 @@ export class PadStore {
     /**
      * Create Pad
      */
-    public createPad(item: Pad): Rx.Observable<Pad> {
+    public createPad(item: Pad): Observable<Pad> {
         return Rx.Observable.create(observer => {
             this.db.insert(item, () => {
                 observer.onNext(item);
@@ -37,7 +38,7 @@ export class PadStore {
     /**
      * Read Pad
      */
-    public getPad(uuid: string): Rx.Observable<Pad> {
+    public getPad(uuid: string): Observable<Pad> {
         return Rx.Observable.create(observer => {
             this.db.findOne({uuid: uuid}, (err, item) => {
                 observer.onNext(item);
@@ -49,7 +50,7 @@ export class PadStore {
     /**
      * Update Pad
      */
-    public updatePad(pad: Pad): Rx.Observable<Pad> {
+    public updatePad(pad: Pad): Observable<Pad> {
         return Rx.Observable.create(observer => {
             this.db.update({uuid: pad.uuid}, pad, () => {
                 observer.onNext(pad);
@@ -61,7 +62,7 @@ export class PadStore {
     /**
      * Delete Pad
      */
-    public deletePad(uuid: string): Rx.Observable<string> {
+    public deletePad(uuid: string): Observable<string> {
         return Rx.Observable.create(observer => {
             this.db.remove({uuid: uuid}, () => {
                 observer.onNext(uuid);
