@@ -1,0 +1,44 @@
+.title-input {
+  position: relative;
+  outline: none;
+  font-weight: bold;
+  border-bottom: 1px solid @color-gray-light;
+
+  .label {
+    margin: 0;
+    cursor: pointer;
+    display: block;
+  }
+  .h1, .input.h1 { font-size: 32px; min-height: 48px;}
+  .h2, .input.h2 { font-size: 24px; min-height: 36px;}
+  .h3, .input.h3 { font-size: 18px; min-height: 24px;}
+  .h4, .input.h4 { font-size: 16px; min-height: 20px;}
+  .h5, .input.h5 { font-size: 14px; min-height: 18px;}
+
+  .input {
+    display: none;
+    position: absolute;
+    width: 100%;
+    left: -2px;
+    top: -1px;
+    border: none;
+    input {
+      display: block;
+      width: 100%;
+      background: none;
+      border-color: transparent;
+      &:focus, &:active {
+        outline: none;
+      }
+    }
+  }
+  &.focus {
+    border-bottom: 1px dashed @color-gray-mid;
+    .label {
+      opacity: 0;
+    }
+    .input {
+      display: block;
+    }
+  }
+}

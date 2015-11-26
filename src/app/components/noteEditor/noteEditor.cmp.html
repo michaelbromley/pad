@@ -1,0 +1,11 @@
+<div class="note-editor"
+     [ng-class]="{ focus: focussed }"
+     (click)="clickHandler($event)">
+
+               <textarea class="input"
+                         [(ng-model)]="note.content"
+                         (keydown)="keyHandler($event)">
+               </textarea>
+
+    <div class="preview" [inner-html]="note.content | markdown"></div>
+</div>

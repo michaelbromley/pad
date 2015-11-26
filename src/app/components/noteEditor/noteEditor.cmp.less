@@ -1,0 +1,33 @@
+.note-editor {
+
+  position: relative;
+  cursor: pointer;
+
+  .input {
+    width: 100%;
+    display: none;
+  }
+
+  .preview {
+    width: 100%;
+    opacity: 1;
+
+    & > ul {
+      list-style-type: disc;
+    }
+    li {
+      display: list-item;
+    }
+  }
+
+  &.focus {
+    .preview {
+      opacity: 0;
+      height: 0;
+      overflow: hidden;
+    }
+    .input {
+      display: block;
+    }
+  }
+}
