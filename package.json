@@ -2,6 +2,7 @@
   "name": "pad",
   "scripts": {
     "build": "webpack --progress --profile --colors",
+    "build-server": "gulp build-server",
     "watch": "webpack-dev-server --hot --inline --progress --colors",
     "test": "echo \"No unit tests and e2e tests yet\" && exit 1"
   },
@@ -13,7 +14,6 @@
     "cors": "^2.7.1",
     "express": "^4.12.4",
     "flexboxgrid": "^6.2.0",
-    "keyboardjs": "^2.1.1",
     "marked": "^0.3.5",
     "nedb": "^1.1.2",
     "rx": "^4.0.7",
@@ -22,6 +22,8 @@
   },
   "devDependencies": {
     "css-loader": "^0.16.0",
+    "gulp": "^3.9.0",
+    "gulp-typescript": "^2.9.2",
     "html-loader": "^0.3.0",
     "html-webpack-plugin": "1.6.0",
     "less": "^2.5.1",

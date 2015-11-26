@@ -19,7 +19,6 @@ export class Pad {
     public created: number;
     public modified: number;
     public type: string = Type.PAD;
-    public order: number;
     public pages: Page[] = [];
 
     constructor() {

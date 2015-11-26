@@ -3,7 +3,7 @@
 var webpack = require('webpack'),
     HtmlWebpackPlugin = require('html-webpack-plugin'),
     path = require('path'),
-    srcPath = path.join(__dirname, 'src');
+    srcPath = path.join(__dirname, 'src', 'app');
 
 module.exports = {
     target: 'web',
@@ -39,7 +39,7 @@ module.exports = {
         new webpack.optimize.CommonsChunkPlugin('common', 'common.js'),
         new HtmlWebpackPlugin({
             inject: true,
-            template: 'src/index.html'
+            template: 'src/app/index.html'
         }),
         new webpack.NoErrorsPlugin()
     ],
