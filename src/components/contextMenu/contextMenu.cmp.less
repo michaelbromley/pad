@@ -26,6 +26,7 @@
       margin: 0;
       li {
         max-height: 0;
+        overflow: hidden;
         display: block;
         opacity: 0;
         color: @color-gray-dark;
@@ -51,7 +52,9 @@
     }
 
     ul.history {
+      list-style-type: none;
       li {
+        cursor: pointer;
         &.current {
           font-weight: bold;
         }

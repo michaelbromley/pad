@@ -49,8 +49,10 @@
         </ul>
         <ul class="history">
             <li *ng-for="#action of getHistory(); #i = index"
+                (click)="jumpToHistory(i)"
                 [ng-class]="{ 'current' : isCurrentState(i) }">{{ getActionDescription(action) }}</li>
-            <li [ng-class]="{ 'current' : isCurrentState(-1) }">Origin</li>
+            <li (click)="jumpToHistory(-1)"
+                [ng-class]="{ 'current' : isCurrentState(-1) }">Origin</li>
         </ul>
     </div>
 </div>

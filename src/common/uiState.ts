@@ -279,6 +279,10 @@ export class UiState {
         }
     }
 
+    public jumpToHistory(index) {
+        this.padService.jumpToHistoryIndex(this.currentPadId, index);
+    }
+
     public setFocus(address: number[]) {
         this.navigator.setSelectedItemAddress(address);
         this.currentAddressIsFocused = true;

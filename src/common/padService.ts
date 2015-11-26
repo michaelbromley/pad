@@ -110,13 +110,17 @@ export class PadService {
 
     public createPage(padUuid: string, index: number) {
         let action = new Action(ActionType.CREATE_PAGE, index);
-        action.data = 'Untitled Page';
+        let newPage = new Page();
+        newPage.title = 'Untitled Page';
+        action.data = newPage;
         this.prepareAndApply(padUuid, action);
     }
 
     public createNote(padUuid: string, pageUuid: string, index: number) {
         let action = new Action(ActionType.CREATE_NOTE, index);
-        action.data = 'Untitled Note';
+        let newNote = new Note();
+        newNote.content = 'New Note';
+        action.data = newNote;
         action.uuid = pageUuid;
         this.prepareAndApply(padUuid, action);
     }
@@ -181,6 +185,10 @@ export class PadService {
      * apply the action to the workingPad.
      */
     private prepareAndApply(padUuid: string, action: Action) {
+        // remove any history actions that are after the current pointer position -
+        // otherwise things get extremely messy. Essentially, whenever a new action is
+        // created, it becomes the "head" of the history stack.
+        this.history[padUuid] = this.history[padUuid].slice(0, this.historyPointer[padUuid] + 1);
         this.history[padUuid].push(action);
         this.workingPads[padUuid] = this.applyAction(this.workingPads[padUuid], action);
         this.historyPointer[padUuid] ++;
@@ -191,25 +199,30 @@ export class PadService {
     }
 
     public undo(padUuid: string) {
-        if (0 <= this.historyPointer[padUuid]) {
-            this.historyPointer[padUuid]--;
-            let actions = this.history[padUuid].slice(0, this.historyPointer[padUuid] + 1);
-            this.workingPads[padUuid] = clone(this.pads[padUuid]);
-            for (let i = 0; i < actions.length; i++) {
-                this.workingPads[padUuid] = this.applyAction(this.workingPads[padUuid], actions[i]);
-            }
-            this.changeEvent.next(this.workingPads[padUuid]);
-            console.log('(undo) workingPad', this.workingPads[padUuid]);
-        }
+        this.jumpToHistoryIndex(padUuid, this.historyPointer[padUuid] - 1);
     }
 
     public redo(padUuid: string) {
-        if (this.historyPointer[padUuid] < this.history[padUuid].length - 1) {
-            this.historyPointer[padUuid]++;
-            let action = this.history[padUuid].slice(this.historyPointer[padUuid], this.historyPointer[padUuid] + 1)[0];
-            this.workingPads[padUuid] = this.applyAction(this.workingPads[padUuid], action);
+        this.jumpToHistoryIndex(padUuid, this.historyPointer[padUuid] + 1);
+    }
+
+    public jumpToHistoryIndex(padUuid: string, index: number) {
+        if (-1 <= index && index < this.history[padUuid].length) {
+            let delta = index - this.historyPointer[padUuid];
+            let actions;
+            if (delta < 0) {
+                // undoing actions
+                actions = this.history[padUuid].slice(0, index + 1);
+                this.workingPads[padUuid] = clone(this.pads[padUuid]);
+            } else {
+                // redoing actions
+                actions = this.history[padUuid].slice(this.historyPointer[padUuid] + 1, index + 1);
+            }
+            for (let i = 0; i < actions.length; i++) {
+                this.workingPads[padUuid] = this.applyAction(this.workingPads[padUuid], actions[i]);
+            }
+            this.historyPointer[padUuid] += delta;
             this.changeEvent.next(this.workingPads[padUuid]);
-            console.log('(redo) workingPad', this.workingPads[padUuid]);
         }
     }
 
@@ -224,14 +237,10 @@ export class PadService {
 
         switch (action.type) {
             case ActionType.CREATE_PAGE:
-                let page = new Page();
-                page.title = action.data;
-                padClone.pages.splice(action.index, 0, page);
+                padClone.pages.splice(action.index, 0, action.data);
                 break;
             case ActionType.CREATE_NOTE:
-                let note = new Note();
-                note.content = action.data;
-                padClone.pages[getPageIndex(action.uuid)].notes.splice(action.index, 0, note);
+                padClone.pages[getPageIndex(action.uuid)].notes.splice(action.index, 0, action.data);
                 break;
             case ActionType.UPDATE_PAD:
                 padClone.title = action.data;

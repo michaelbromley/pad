@@ -22,6 +22,7 @@
                                  (blur)="updateItem($event)"
                                  element="h2"
                                  [address]="[index0 + 1, 0]" ></title-input>
+                    <small>{{ page.uuid }}</small>
                 </li>
 
                 <li *ng-for="#note of page.notes; #index1 = index"

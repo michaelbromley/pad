@@ -3,6 +3,7 @@ import {RouterLink} from 'angular2/router';
 import {UiState, UiContext} from '../../common/uiState';
 import {Type} from "../../common/model";
 import {Action, ActionType} from "../../common/padService";
+import {PadService} from "../../common/padService";
 
 @Component({
     selector: 'context-menu',
@@ -80,6 +81,15 @@ class ContextMenuCmp {
         }
         let originalIndex = this.uiState.getCurrentPadHistory().length - 1 - index;
         return this.uiState.getCurrentPadHistoryPointer() === originalIndex;
+    }
+
+    public jumpToHistory(index: number) {
+        if (index === -1) {
+            return this.uiState.jumpToHistory(-1);
+        } else {
+            let originalIndex = this.uiState.getCurrentPadHistory().length - 1 - index;
+            return this.uiState.jumpToHistory(originalIndex);
+        }
     }
 
     public getActionDescription(action: Action): string {
