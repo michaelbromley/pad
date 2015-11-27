@@ -1,79 +1,61 @@
 import {Injectable, EventEmitter} from 'angular2/angular2';
-let Rx = require('rx');
 import DataService from './dataService';
 import {UiState, UiContext} from './uiState';
 import {IPadItem, Page, Pad, Note, Type, Action, ActionType} from './model';
 import {clone} from './utils';
 import {CollabService} from "./collabService";
+import {PadHistory} from "./padHistory";
 
 /**
- * Service which keeps the state of the current pad and lists of pads. Should be the only component
- * to directly consume the dataService.
- *
+ * Service which keeps the state of the current pad and is responsible for creating new actions on the pad.
  */
 @Injectable()
 export class PadService {
 
     public changeEvent: EventEmitter<any> = new EventEmitter();
-
-    private pads: { [padUuid: string]: Pad } = {};
-    private workingPads: { [padUuid: string]: Pad } = {};
-    private history: { [padUuid: string]: Action[] } = {};
-    private historyPointer: { [padUuid: string]: number; } = {};
+    private pad: Pad = <Pad>{};
+    private workingPad: Pad = <Pad>{};
 
     constructor(private dataService: DataService,
+                private padHistory: PadHistory,
                 private collabService: CollabService) {
 
-        let actionSub = collabService.action.subscribe((action: Action) => {
-            this.prepareAndApply(action.padUuid, action);
+        collabService.action.subscribe((action: Action) => {
+            this.prepareAndApply(action);
         })
     }
 
     public createPad() {
         let pad = new Pad();
-        pad.title = 'Untitled Pad ' + pad.uuid;
+        pad.title = 'Untitled Pad ' + pad.uuid.substr(0, 5);
         return this.dataService.createPad(pad)
             .subscribe(pad => {
-                this.loadPadIntoMemory(pad);
+                this.pad = pad;
+                this.workingPad = clone(pad);
                 this.changeEvent.next(pad);
             });
     }
 
-    public getPad(uuid: string) {
-        if (!this.history[uuid]) {
-            this.history[uuid] = [];
-        }
-        if (!this.workingPads[uuid]) {
-            return this.dataService.fetchPad(uuid)
-                .do((pad: Pad) => {
-                    this.loadPadIntoMemory(pad);
-                });
-        } else {
-            return Rx.Observable.of(this.workingPads[uuid]);
-        }
+    public fetchPad(uuid: string) {
+        return this.dataService.fetchPad(uuid)
+            .map((pad: Pad) => {
+                this.pad = pad;
+                this.workingPad = this.padHistory.applyActions(pad, pad.history);
+                return this.workingPad;
+            });
+
     }
 
-    public getHistory(padUuid: string): Action[] {
-        let history =  this.history[padUuid];
-        if (history) {
-            return history.slice(0);
-        } else {
-            return [];
-        }
+    public getCurrentHistory(): Action[] {
+        return this.pad.history ? this.pad.history.slice(0) : [];
     }
 
-    public getHistoryPointer(padUuid: string): number {
-        return this.historyPointer[padUuid];
+    public getCurrentHistoryPointer(): number {
+        return this.pad.historyPointer;
     }
 
-    private loadPadIntoMemory(pad: Pad) {
-        this.pads[pad.uuid] = clone(pad);
-        this.workingPads[pad.uuid] = clone(pad);
-        this.historyPointer[pad.uuid] = -1;
-    }
-
-    public getItemByUuid(padUuid: string, itemUuid: string): IPadItem {
-        let pad = this.workingPads[padUuid];
+    public getItemByUuid(itemUuid: string): IPadItem {
+        let pad = this.workingPad;
         if (pad) {
             let matchingPage = pad.pages.filter(page => page.uuid === itemUuid);
             if (matchingPage.length === 1) {
@@ -88,88 +70,89 @@ export class PadService {
         }
     }
 
-    public createPage(padUuid: string, index: number) {
-        let action = new Action(ActionType.CREATE_PAGE, padUuid);
+    public createPage(index: number) {
+        let action = new Action(ActionType.CREATE_PAGE, this.pad.uuid);
         let newPage = new Page();
         newPage.title = 'Untitled Page';
         action.data = {
             page: newPage,
-            index: index
+            index: index + 1
         };
-        this.prepareAndApply(padUuid, action);
+        this.prepareAndApply(action);
         this.collabService.emitAction(action);
     }
 
-    public createNote(padUuid: string, pageUuid: string, index: number) {
-        let action = new Action(ActionType.CREATE_NOTE, padUuid);
+    public createNote(pageUuid: string, index: number) {
+        let action = new Action(ActionType.CREATE_NOTE, this.pad.uuid);
         let newNote = new Note();
         newNote.content = 'New Note';
         action.data = {
             note: newNote,
             pageUuid: pageUuid,
-            index: index
+            index: index + 1
         };
-        this.prepareAndApply(padUuid, action);
+        this.prepareAndApply(action);
         this.collabService.emitAction(action);
     }
 
-    public updateItem(padUuid: string, item: IPadItem) {
+    public updateItem(item: IPadItem) {
         let action;
         switch (item.type) {
             case Type.PAD:
-                action = new Action(ActionType.UPDATE_PAD, padUuid);
+                action = new Action(ActionType.UPDATE_PAD, this.pad.uuid);
                 action.data = { title: item.title };
                 break;
             case Type.PAGE:
-                action = new Action(ActionType.UPDATE_PAGE, padUuid);
+                action = new Action(ActionType.UPDATE_PAGE, this.pad.uuid);
                 action.data = { title: item.title };
                 break;
             case Type.NOTE:
-                action = new Action(ActionType.UPDATE_NOTE, padUuid);
+                action = new Action(ActionType.UPDATE_NOTE, this.pad.uuid);
                 action.data = { content: item.content };
         }
         action.data.uuid = item.uuid;
-        this.prepareAndApply(padUuid, action);
+        this.prepareAndApply(action);
         this.collabService.emitAction(action);
     }
 
-    public deleteItem(padUuid: string, itemUuid?: string) {
-        if (typeof itemUuid === 'undefined') {
-            this.dataService.deletePad(padUuid)
-                .subscribe(() => this.changeEvent.next({}));
-        } else {
-            let action;
-            let item = this.getItemByUuid(padUuid, itemUuid);
-
-            switch (item.type) {
-                case Type.PAGE:
-                    action = new Action(ActionType.DELETE_PAGE, padUuid);
-                    break;
-                case Type.NOTE:
-                    action = new Action(ActionType.DELETE_NOTE, padUuid);
-            }
-            action.data = { uuid: item.uuid };
-            this.prepareAndApply(padUuid, action);
-            this.collabService.emitAction(action);
-        }
+    // TODO: refactor out all "pad list" type operations.
+    public deletePad(padUuid: string) {
+        this.dataService.deletePad(padUuid)
+            .subscribe(() => this.changeEvent.next({}));
     }
 
-    public moveItem(padUuid: string, increment: number, itemUuid: string) {
+    public deleteItem(itemUuid: string) {
         let action;
-        let item = this.getItemByUuid(padUuid, itemUuid);
+        let item = this.getItemByUuid(itemUuid);
 
         switch (item.type) {
             case Type.PAGE:
-                action = new Action(ActionType.MOVE_PAGE, padUuid);
+                action = new Action(ActionType.DELETE_PAGE, this.pad.uuid);
                 break;
             case Type.NOTE:
-                action = new Action(ActionType.MOVE_NOTE, padUuid);
+                action = new Action(ActionType.DELETE_NOTE, this.pad.uuid);
+        }
+        action.data = { uuid: item.uuid };
+        this.prepareAndApply(action);
+        this.collabService.emitAction(action);
+    }
+
+    public moveItem(increment: number, itemUuid: string) {
+        let action;
+        let item = this.getItemByUuid(itemUuid);
+
+        switch (item.type) {
+            case Type.PAGE:
+                action = new Action(ActionType.MOVE_PAGE, this.pad.uuid);
+                break;
+            case Type.NOTE:
+                action = new Action(ActionType.MOVE_NOTE, this.pad.uuid);
         }
         action.data = {
             uuid: item.uuid,
             increment: increment
         };
-        this.prepareAndApply(padUuid, action);
+        this.prepareAndApply(action);
         this.collabService.emitAction(action);
     }
 
@@ -177,120 +160,43 @@ export class PadService {
      * Push the action onto the history stack update the pointer and
      * apply the action to the workingPad.
      */
-    private prepareAndApply(padUuid: string, action: Action) {
+    private prepareAndApply(action: Action) {
         // remove any history actions that are after the current pointer position -
         // otherwise things get extremely messy. Essentially, whenever a new action is
         // created, it becomes the "head" of the history stack.
-        this.history[padUuid] = this.history[padUuid].slice(0, this.historyPointer[padUuid] + 1);
-        this.history[padUuid].push(action);
-        this.workingPads[padUuid] = this.applyAction(this.workingPads[padUuid], action);
-        this.historyPointer[padUuid] ++;
-        this.dataService.updatePad(this.workingPads[padUuid]).subscribe(() => {
-            console.log('saved changes');
-        });
-        this.changeEvent.next(this.workingPads[padUuid]);
+        // TODO: Disabled for now, since it has many complex implication when working
+        // in a collaborative setting. For now, just push all new action onto the end
+        // of the history stack for everyone.
+        //this.pad.history = this.pad.history.slice(0, this.pad.historyPointer + 1);
+        this.pad.history.push(action);
+        this.workingPad = this.padHistory.applyAction(this.workingPad, action);
+        this.pad.historyPointer = this.pad.history.length - 1;
+        this.changeEvent.next(this.workingPad);
     }
 
-    public undo(padUuid: string) {
-        this.jumpToHistoryIndex(padUuid, this.historyPointer[padUuid] - 1);
+    public undo() {
+        this.jumpToHistoryIndex(this.pad.historyPointer - 1);
     }
 
-    public redo(padUuid: string) {
-        this.jumpToHistoryIndex(padUuid, this.historyPointer[padUuid] + 1);
+    public redo() {
+        this.jumpToHistoryIndex(this.pad.historyPointer + 1);
     }
 
-    public jumpToHistoryIndex(padUuid: string, index: number) {
-        if (-1 <= index && index < this.history[padUuid].length) {
-            let delta = index - this.historyPointer[padUuid];
+    public jumpToHistoryIndex(index: number) {
+        if (-1 <= index && index < this.pad.history.length) {
+            let delta = index - this.pad.historyPointer;
             let actions;
             if (delta < 0) {
                 // undoing actions
-                actions = this.history[padUuid].slice(0, index + 1);
-                this.workingPads[padUuid] = clone(this.pads[padUuid]);
+                actions = this.pad.history.slice(0, index + 1);
+                this.workingPad = clone(this.pad);
             } else {
                 // redoing actions
-                actions = this.history[padUuid].slice(this.historyPointer[padUuid] + 1, index + 1);
+                actions = this.pad.history.slice(this.pad.historyPointer + 1, index + 1);
             }
-            for (let i = 0; i < actions.length; i++) {
-                this.workingPads[padUuid] = this.applyAction(this.workingPads[padUuid], actions[i]);
-            }
-            this.historyPointer[padUuid] += delta;
-            this.changeEvent.next(this.workingPads[padUuid]);
+            this.workingPad = this.padHistory.applyActions(this.workingPad, actions);
+            this.pad.historyPointer += delta;
+            this.changeEvent.next(this.workingPad);
         }
-    }
-
-    /**
-     * Given a pad and an action, applies the action and returns a new pad with that action applied.
-     */
-    private applyAction(pad: Pad, action: Action): Pad {
-        let padClone: Pad = clone(pad);
-        let getPageIndex = uuid => padClone.pages.map(page => page.uuid).indexOf(uuid);
-        let pageIndex = -1, noteIndex = -1;
-        let page, note, newIndex;
-
-        switch (action.type) {
-            case ActionType.CREATE_PAGE:
-                padClone.pages.splice(action.data.index, 0, action.data.page);
-                break;
-            case ActionType.CREATE_NOTE:
-                padClone.pages[getPageIndex(action.data.pageUuid)].notes.splice(action.data.index, 0, action.data.note);
-                break;
-            case ActionType.UPDATE_PAD:
-                padClone.title = action.data.title;
-                break;
-            case ActionType.UPDATE_PAGE:
-                padClone.pages[getPageIndex(action.data.uuid)].title = action.data.title;
-                break;
-            case ActionType.UPDATE_NOTE:
-                [pageIndex, noteIndex] = this.getIndices(padClone, action.data.uuid);
-                padClone.pages[pageIndex].notes[noteIndex].content = action.data.content;
-                break;
-            case ActionType.DELETE_PAGE:
-                pageIndex = getPageIndex(action.data.uuid);
-                padClone.pages.splice(pageIndex, 1);
-                break;
-            case ActionType.DELETE_NOTE:
-                [pageIndex, noteIndex] = this.getIndices(padClone, action.data.uuid);
-                padClone.pages[pageIndex].notes.splice(noteIndex, 1);
-                break;
-            case ActionType.MOVE_PAGE:
-                pageIndex = getPageIndex(action.data.uuid);
-                newIndex = pageIndex + action.data.increment;
-                if (0 <= newIndex && newIndex < padClone.pages.length) {
-                    page = padClone.pages.splice(pageIndex, 1)[0];
-                    padClone.pages.splice(newIndex, 0, page);
-                }
-                break;
-            case ActionType.MOVE_NOTE:
-                [pageIndex, noteIndex] = this.getIndices(padClone, action.data.uuid);
-                newIndex = noteIndex + action.data.increment;
-                newIndex = noteIndex + action.data.increment;
-                if (0 <= newIndex && newIndex < padClone.pages[pageIndex].notes.length) {
-                    note = padClone.pages[pageIndex].notes.splice(noteIndex, 1)[0];
-                    padClone.pages[pageIndex].notes.splice(noteIndex + action.data.increment, 0, note);
-                }
-                break;
-        }
-
-        return padClone;
-    }
-
-    /**
-     * Given a pad and a noteUuid, this returns an array containing the index of the page which contains the
-     * note, and the index of the note in that page.
-     */
-    private getIndices(pad: Pad, noteUuid: string): [number, number] {
-        let pageIndex = -1;
-        let noteIndex = -1;
-
-        pad.pages.map((page: Page, index: number) => {
-            let tempIndex = page.notes
-                .map((note: Note, index: number) => note.uuid).indexOf(noteUuid);
-            if (-1 < tempIndex) {
-                pageIndex = index;
-                noteIndex = tempIndex;
-            }
-        });
-        return [pageIndex, noteIndex];
     }
 }

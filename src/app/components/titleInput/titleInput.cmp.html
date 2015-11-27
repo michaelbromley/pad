@@ -1,6 +1,6 @@
-<div class="title-input" [ng-class]="{ focus: focussed }" (click)="clickHandler($event)">
+<div class="title-input" [ng-class]="{ focus: focussed, locked: locked }" (click)="clickHandler($event)">
     <div class="label" [ng-class]="element">{{ title }}</div>
     <div class="input {{ element }}">
-        <input [(ng-model)]="title" />
+        <input [(ng-model)]="title" [disabled]="locked"/>
     </div>
 </div>

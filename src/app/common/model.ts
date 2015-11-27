@@ -20,6 +20,8 @@ export class Pad {
     public modified: number;
     public type: string = Type.PAD;
     public pages: Page[] = [];
+    public history: Action[] = [];
+    public historyPointer: number = -1;
 
     constructor() {
         this.uuid = uuid.v4();
@@ -85,5 +87,7 @@ export interface IMessage<T> {
 }
 
 export enum MessageType {
-    Action
+    Action,
+    Lock,
+    Unlock
 }

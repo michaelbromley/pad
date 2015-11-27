@@ -14,12 +14,17 @@ const NONE = -1; // value to show that nothing is selected
 @Injectable()
 class Navigator {
     private selectedItemAddress: number[] = [NONE];
+    // a nested array containing item uuids, reflecting
+    // the UI layout.
     private collectionMap: string[][];
+    // A mapping of item uuid to address - the inverse of the collectionMap.
+    private inverseMap: { [uuid: string]: number[] };
 
     constructor() {}
     
     public initPad(viewContents: Pad) {
         this.collectionMap = this.buildPadMap(viewContents);
+        this.inverseMap = this.buildInversePadMap(viewContents);
     }
 
     public initPadList(viewContents: Pad[]) {
@@ -59,12 +64,8 @@ class Navigator {
         return unwrap(val);
     }
 
-    public setSelectedItemAddress(newAddress: number[]) {
-        if (this.getValue(this.collectionMap, newAddress)) {
-            this.selectedItemAddress = newAddress;
-        } else {
-            throw new Error(`Navigator#setSelectedItemAddress: address ${newAddress} does not exist.`);
-        }
+    public setSelectedItem(uuid: string) {
+        this.selectedItemAddress = this.inverseMap[uuid];
     }
 
     public nothingSelected(): boolean {
@@ -163,6 +164,19 @@ class Navigator {
         });
         map[0] = [pad.uuid];
         map = map.concat(pages);
+        return map;
+    }
+
+    private buildInversePadMap(pad: Pad): { [uuid: string]: number[] } {
+        let map = {};
+        map[pad.uuid] = [0];
+        pad.pages.forEach((page, index) => {
+            let pageIndex = index + 1;
+            map[page.uuid] = [pageIndex, 0];
+            page.notes.forEach((note, noteIndex) => {
+                map[note.uuid] = [pageIndex, noteIndex + 1];
+            });
+        });
         return map;
     }
 

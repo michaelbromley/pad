@@ -1,4 +1,4 @@
-import {Injectable, EventEmitter} from 'angular2/angular2';
+import {Injectable, EventEmitter, NgZone} from 'angular2/angular2';
 import SockJSClass = __SockJSClient.SockJSClass;
 import {Action, IMessage, MessageType} from "./model";
 let uuid = require('uuid');
@@ -18,8 +18,9 @@ export class CollabService {
      */
     private instanceUuid: string;
     public action: EventEmitter<Action> = new EventEmitter();
+    private locked: { [uuid: string] : boolean } = {};
 
-    constructor() {
+    constructor(private ngZone: NgZone) {
 
         this.instanceUuid = uuid();
 
@@ -27,14 +28,38 @@ export class CollabService {
             console.log('socket open');
         };
         sock.onmessage = (e) => {
-            let message: IMessage<any> = JSON.parse(e.data);
-            if (message.type === MessageType.Action) {
-                this.receiveAction(message);
-            }
+            ngZone.run(() => {
+                let message: IMessage<any> = JSON.parse(e.data);
+                if (message.type === MessageType.Action) {
+                    this.receiveAction(message);
+                }
+                if (message.type === MessageType.Lock || message.type === MessageType.Unlock) {
+                    this.receiveLock(message);
+                }
+            });
+
         };
         sock.onclose = function() {
             console.log('closed socket');
         };
+    }
+
+    public lockItem(uuid: string) {
+        let message: IMessage<string> = {
+            originUuid: this.instanceUuid,
+            type: MessageType.Lock,
+            data: uuid
+        };
+        sock.send(JSON.stringify(message));
+    }
+
+    public unlockItem(uuid: string) {
+        let message: IMessage<string> = {
+            originUuid: this.instanceUuid,
+            type: MessageType.Unlock,
+            data: uuid
+        };
+        sock.send(JSON.stringify(message));
     }
 
     public emitAction(action: Action) {
@@ -46,9 +71,19 @@ export class CollabService {
         sock.send(JSON.stringify(message));
     }
 
+    public isItemLocked(uuid: string) {
+        return !!this.locked[uuid];
+    }
+
     private receiveAction(message: IMessage<Action>) {
         if (message.originUuid !== this.instanceUuid) {
-            this.action.next(message.data)
+            this.action.next(message.data);
+        }
+    }
+
+    private receiveLock(message: IMessage<string>) {
+        if (message.originUuid !== this.instanceUuid) {
+            this.locked[message.data] = (message.type === MessageType.Lock);
         }
     }
 }

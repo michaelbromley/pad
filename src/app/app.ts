@@ -16,6 +16,7 @@ import DataService from './common/dataService';
 import {Scroller} from './common/scroller';
 import {Keyboard} from './common/keyboard';
 import {PadService} from './common/padService';
+import {PadHistory} from './common/padHistory';
 import {FilterService} from './common/filterService';
 import {CollabService} from './common/collabService';
 
@@ -54,7 +55,7 @@ class AppComponent {
 
     @HostListener('window:click', ['$event'])
     public clickHandler(event: MouseEvent) {
-        this.uiState.blurSelectedItem();
+        this.uiState.blurSelected();
     }
 }
 
@@ -76,6 +77,7 @@ bootstrap(AppComponent, [
     DataService,
     CollabService,
     PadService,
+    PadHistory,
     FilterService,
     Navigator,
     Keyboard]);

@@ -1,9 +1,10 @@
 <div class="note-editor"
-     [ng-class]="{ focus: focussed }"
+     [ng-class]="{ focus: focussed, locked: locked }"
      (click)="clickHandler($event)">
 
                <textarea class="input"
                          [(ng-model)]="note.content"
+                         [disabled]="locked"
                          (keydown)="keyHandler($event)">
                </textarea>
 

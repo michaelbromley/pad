@@ -55,8 +55,16 @@ echo.on('connection', function (conn) {
     clients[conn.id] = conn;
     conn.on('data', function (msg) {
         var message = JSON.parse(msg);
-        console.log('got message from', message.originUuid);
         if (message.type === MessageType.Action) {
+            dataStore.addActionToPad(message.data.padUuid, message.data)
+                .subscribe(function () {
+                broadcast(message);
+            });
+        }
+        if (message.type === MessageType.Lock) {
+            broadcast(message);
+        }
+        if (message.type === MessageType.Unlock) {
             broadcast(message);
         }
     });

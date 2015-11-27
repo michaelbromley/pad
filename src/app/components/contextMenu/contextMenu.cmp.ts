@@ -29,11 +29,7 @@ class ContextMenuCmp {
     }
 
     public isPadContext(): boolean {
-        return this.getContext() === UiContext.Pad;
-    }
-
-    public isPageContext(): boolean {
-        return this.getContext() === UiContext.Page;
+        return this.getContext() !== UiContext.PadList;
     }
 
     public isAnythingFocused() {

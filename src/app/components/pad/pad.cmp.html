@@ -1,36 +1,37 @@
 <div class="pad-collection-container" (keydown)="awd">
     <ul class="pad-collection-list">
 
-        <li [class.selected]="checkSelected([0])"
+        <li [class.selected]="isSelected(pad.uuid)"
             [id]="'_' + pad._id">
             <title-input [item]="pad"
                          title-prop="title"
                          (blur)="updateItem($event)"
                          element="h1"
-                         [address]="[0]" ></title-input>
+                         [locked]="isLocked(pad.uuid)"></title-input>
         </li>
 
-        <li *ng-for="#page of filteredPad.pages; #index0 = index"
-            [class.selected]="checkSelected([index0 + 1])"
+        <li *ng-for="#page of filteredPad.pages"
+            [class.selected]="isSelected(page.uuid)"
             [id]="'_' + page._id"
             class="page-container">
 
             <ul class="notes-list">
-                <li [class.selected]="checkSelected([index0 + 1, 0])">
+                <li [class.selected]="isSelected(page.uuid)">
                     <title-input [item]="page"
                                  title-prop="title"
                                  (blur)="updateItem($event)"
                                  element="h2"
-                                 [address]="[index0 + 1, 0]" ></title-input>
+                                 [locked]="isLocked(page.uuid)"></title-input>
                     <small>{{ page.uuid }}</small>
                 </li>
 
-                <li *ng-for="#note of page.notes; #index1 = index"
-                    [class.selected]="checkSelected([index0 + 1, index1 + 1])"
+                <li *ng-for="#note of page.notes"
+                    [class.selected]="isSelected(note.uuid)"
                     [id]="'_' + note._id">
 
                     <note-editor [note]="note"
                                  (blur)="updateItem($event)"
+                                 [locked]="isLocked(note.uuid)"
                                  [address]="[index0 + 1, index1 + 1]"></note-editor>
 
                 </li>

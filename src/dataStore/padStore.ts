@@ -1,5 +1,6 @@
 import {Pad} from "../app/common/model";
 import {Observable} from 'angular2/angular2';
+import {Action} from "../app/common/model";
 let Rx: Rx = require('rx');
 
 /**
@@ -68,6 +69,22 @@ export class PadStore {
                 observer.onNext(uuid);
                 observer.onCompleted();
             });
+        });
+    }
+
+    /**
+     * Push an action onto the pad's history array
+     */
+    public addActionToPad(padUuid: string, action: Action): Observable<string> {
+        return Rx.Observable.create(observer => {
+            this.db.update({uuid: padUuid},
+                {
+                    $push: { history: action },
+                    $inc: { historyPointer: 1 }
+                }, () => {
+                    observer.onNext(padUuid);
+                    observer.onCompleted();
+                });
         });
     }
 }

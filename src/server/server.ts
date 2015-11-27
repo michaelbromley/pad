@@ -71,8 +71,17 @@ echo.on('connection', (conn) => {
 
     conn.on('data', (msg) => {
         let message: IMessage<any> = JSON.parse(msg);
-        console.log('got message from', message.originUuid);
+
         if (message.type === MessageType.Action) {
+            dataStore.addActionToPad(message.data.padUuid, message.data)
+            .subscribe(() => {
+                broadcast(message);
+            });
+        }
+        if (message.type === MessageType.Lock) {
+            broadcast(message);
+        }
+        if (message.type === MessageType.Unlock) {
             broadcast(message);
         }
     });

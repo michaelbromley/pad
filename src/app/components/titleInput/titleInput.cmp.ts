@@ -12,22 +12,23 @@ class TitleInputCmp {
     private title: string;
     private subscriptions = [];
     @Input() public item: any;
+    @Input() public locked: boolean;
     @Input() public titleProp: string;
     @Input() public element: string;
-    @Input() public address: number[];
 
     @Output() private blur = new EventEmitter();
 
-    constructor(private uiState: UiState, private elRef: ElementRef) {
+    constructor(private uiState: UiState,
+                private elRef: ElementRef) {
         let focusSub = uiState.focusEvent.subscribe(val => {
-            if (val === this.address.toString()) {
+            if (val === this.item.uuid) {
                 this.focus();
             } else {
                 this.blurHandler();
             }
         });
         let blurSub = uiState.blurEvent.subscribe(val => {
-            if (val === this.address.toString()) {
+            if (val === this.item.uuid) {
                 this.blurHandler();
             }
         });
@@ -46,10 +47,15 @@ class TitleInputCmp {
 
     public clickHandler(event: MouseEvent){
         event.stopPropagation();
-        this.uiState.setFocus(this.address);
+        if (!this.locked) {
+            this.uiState.focusItem(this.item.uuid);
+        }
     }
 
     private focus() {
+        if (this.locked) {
+            return;
+        }
         this.focussed = true;
         setTimeout(() => {
             this.elRef.nativeElement.querySelector('input').focus();
@@ -57,10 +63,13 @@ class TitleInputCmp {
     }
 
     private blurHandler() {
-        this.focussed = false;
-        if (this.title !== this.item[this.titleProp]) {
-            this.item[this.titleProp] = this.title;
-            this.blur.next(this.item); // TODO: delete?
+        if (this.focussed) {
+            this.focussed = false;
+            if (this.title !== this.item[this.titleProp]) {
+                this.item[this.titleProp] = this.title;
+                this.blur.next(this.item); // TODO: delete?
+            }
+            this.uiState.blurItem(this.item.uuid);
         }
     };
 }

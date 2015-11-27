@@ -12,7 +12,7 @@ import {UiState} from "../../common/uiState";
 class NoteEditorCmp {
 
     @Input() public note: Note;
-    @Input() public address: number[];
+    @Input() public locked: boolean;
     @Output() public blur = new EventEmitter();
     private focussed: boolean = false;
     private originalContent: string;
@@ -20,14 +20,14 @@ class NoteEditorCmp {
 
     constructor(private uiState: UiState, private elRef: ElementRef) {
         let focusSub = uiState.focusEvent.subscribe(val => {
-            if (val === this.address.toString()) {
+            if (val === this.note.uuid) {
                 this.focus();
             } else {
                 this.blurHandler();
             }
         });
         let blurSub = uiState.blurEvent.subscribe(val => {
-            if (val === this.address.toString()) {
+            if (val === this.note.uuid) {
                 this.blurHandler();
             }
         });
@@ -47,16 +47,19 @@ class NoteEditorCmp {
     }
 
     public blurHandler() {
-        this.focussed = false;
-        if (this.originalContent !== this.note.content) {
-            this.blur.next(this.note);
-            this.originalContent = this.note.content;
+        if (this.focussed) {
+            this.focussed = false;
+            if (this.originalContent !== this.note.content) {
+                this.blur.next(this.note);
+                this.originalContent = this.note.content;
+            }
+            this.uiState.blurItem(this.note.uuid);
         }
     }
 
     public clickHandler(event: MouseEvent) {
         event.stopPropagation();
-        this.uiState.setFocus(this.address);
+        this.uiState.focusItem(this.note.uuid);
     }
 
     public keyHandler(event) {

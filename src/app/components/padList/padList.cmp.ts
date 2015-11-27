@@ -4,7 +4,8 @@ import {UiState} from "../../common/uiState";
 import DataService from "../../common/dataService";
 import {PadService} from "../../common/padService";
 import {FilterService} from "../../common/filterService";
-import {Pad} from "../../common/model";
+import {Pad, ActionType} from "../../common/model";
+import {PadHistory} from "../../common/padHistory";
 
 @Component({
     selector: 'pad-list',
@@ -20,6 +21,7 @@ class PadListCmp {
     constructor(private dataService: DataService,
                 private filterService: FilterService,
                 private padService: PadService,
+                private padHistory: PadHistory,
                 private uiState: UiState) {
 
         this.filterService.clearFilter();
@@ -42,15 +44,15 @@ class PadListCmp {
 
     private loadPads() {
         this.dataService.fetchPadList().subscribe(pads => {
-            this.pads = pads;
+            this.pads = pads.map(pad => this.padHistory.applyActions(pad, pad.history, ActionType.UPDATE_PAD));
             this.filteredPads = this.filterService.filterPadList(pads);
             this.uiState.initUiView(this.filteredPads);
             this.uiState.deselectAll();
         });
     }
 
-    public checkSelected(address) {
-        return this.uiState.addressIsSelected(address);
+    public checkSelected(uuid: string) {
+        return this.uiState.itemIsSelected(uuid);
     }
 }
 

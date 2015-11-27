@@ -6,6 +6,7 @@ import {UiState} from '../../common/uiState';
 import {Type, Note, Pad, Page} from "../../common/model";
 import {PadService} from "../../common/padService";
 import {FilterService} from "../../common/filterService";
+import {CollabService} from "../../common/collabService";
 
 @Component({
     selector: 'pad',
@@ -20,6 +21,7 @@ class PadCmp {
     private subscriptions = [];
 
     constructor(private padService: PadService,
+                private collabService: CollabService,
                 private filterService: FilterService,
                 private params: RouteParams,
                 private uiState: UiState) {
@@ -28,7 +30,7 @@ class PadCmp {
     }
 
     onInit() {
-        this.padService.getPad(this.params.get('id'))
+        this.padService.fetchPad(this.params.get('id'))
             .subscribe(pad => {
                 this.loadPad(pad);
                 this.uiState.deselectAll();
@@ -57,11 +59,15 @@ class PadCmp {
     }
 
     public updateItem(item) {
-        this.padService.updateItem(this.uiState.currentPadId, item);
+        this.padService.updateItem(item);
     }
 
-    public checkSelected(address) {
-        return this.uiState.addressIsSelected(address);
+    public isSelected(uuid: string) {
+        return this.uiState.itemIsSelected(uuid);
+    }
+
+    public isLocked(uuid: string) {
+        return this.collabService.isItemLocked(uuid);
     }
 }
 

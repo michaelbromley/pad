@@ -6,6 +6,7 @@ import {Scroller} from './scroller';
 import {Type, Pad, Page, Note, IPadItem, Action} from "./model";
 import {Keyboard} from "./keyboard";
 import {PadService} from "./padService";
+import {CollabService} from "./collabService";
 
 /**
  * These are the possible states the app can be in (i.e. at what level of the hierarchy is the user at)
@@ -44,6 +45,7 @@ export class UiState {
     constructor(private router: Router,
                 private location: Location,
                 private padService: PadService,
+                private collabService: CollabService,
                 private navigator: Navigator,
                 private keyboard: Keyboard) {
         // TODO: why does ng2 DI break when I try to inject this?
@@ -83,8 +85,7 @@ export class UiState {
             } else {
                 let canGoDeeper = this.navigator.down();
                 if (!canGoDeeper) {
-                    this.currentAddressIsFocused = true;
-                    this.fireFocusEvent();
+                    this.focusItem(this.navigator.getSelectedItemId());
                 }
             }
         }, true);
@@ -114,11 +115,11 @@ export class UiState {
         });
         this.keyboard.registerShortcut(['alt', 'ctrl', 'z'], event => {
             this.navigator.deselectAll();
-            this.padService.undo(this.currentPadId);
+            this.padService.undo();
         }, true);
         this.keyboard.registerShortcut(['alt', 'ctrl', 'shift', 'z'], event => {
             this.navigator.deselectAll();
-            this.padService.redo(this.currentPadId);
+            this.padService.redo();
         }, true);
     }
 
@@ -136,12 +137,8 @@ export class UiState {
         }
     }
 
-    public addressIsSelected(address: number[]): boolean {
-        return this.navigator.getSelectedItemAddress().toString() === address.toString();
-    }
-
-    public itemIsSelected(item: IPadItem): boolean {
-        return this.navigator.getSelectedItemId() === item.uuid;
+    public itemIsSelected(uuid: string): boolean {
+        return this.navigator.getSelectedItemId() === uuid;
     }
 
     public keydown(event: KeyboardEvent) {
@@ -161,8 +158,9 @@ export class UiState {
         } else {
             if (isPressed('esc')) {
                 event.preventDefault();
-                this.blurSelectedItem();
+                this.blurItem(this.navigator.getSelectedItemId());
                 this.blurSearchBar();
+
             }
             if (isPressed('down')) {
                 this.blurSearchBar();
@@ -170,18 +168,6 @@ export class UiState {
             }
         }
         this.scroller.scrollIntoView(this.navigator.getSelectedItemId());
-    }
-
-    public focusSearchBar() {
-        this.searchBarIsFocused = true;
-        this.searchBarFocusChangeEvent.next(true);
-    }
-
-    private blurSearchBar() {
-        if (this.searchBarIsFocused) {
-            this.searchBarIsFocused = false;
-            this.searchBarFocusChangeEvent.next(false);
-        }
     }
 
     public keyup(event: KeyboardEvent) {
@@ -235,20 +221,13 @@ export class UiState {
         this.scroller.scrollIntoView(this.navigator.getSelectedItemId());
     }
 
-    public blurSelectedItem() {
-        if (this.currentAddressIsFocused) {
-            this.currentAddressIsFocused = false;
-            this.fireBlurEvent();
-        }
-    }
-
     public createItem() {
         let context = this.getUiContext();
 
         if (context === UiContext.Pad) {
-            this.padService.createPage(this.currentPadId, this.navigator.getSelectedItemAddress()[0]);
+            this.padService.createPage(this.navigator.getSelectedItemAddress()[0]);
         } else if (context === UiContext.Page) {
-            this.padService.createNote(this.currentPadId, this.navigator.getCurrentPageId(), this.navigator.getSelectedItemAddress()[0])
+            this.padService.createNote(this.navigator.getCurrentPageId(), this.navigator.getSelectedItemAddress()[0])
         } else {
             this.padService.createPad();
         }
@@ -257,11 +236,11 @@ export class UiState {
 
     public deleteSelectedItem() {
         if (this.getUiContext() === UiContext.PadList) {
-            this.padService.deleteItem(this.getSelectedItemId());
+            this.padService.deletePad(this.getSelectedItemId());
         } else {
             let itemUuid = this.navigator.getSelectedItemId();
             if (itemUuid) {
-                this.padService.deleteItem(this.currentPadId, itemUuid);
+                this.padService.deleteItem(itemUuid);
             }
         }
     }
@@ -269,7 +248,7 @@ export class UiState {
     public moveItem(increment: number) {
         if (this.getUiContext() !== UiContext.PadList) {
             let selectedItemId = this.navigator.getSelectedItemId();
-            this.padService.moveItem(this.currentPadId, increment, selectedItemId);
+            this.padService.moveItem(increment, selectedItemId);
             if (0 < increment) {
                 this.navigator.next();
             } else {
@@ -279,13 +258,45 @@ export class UiState {
     }
 
     public jumpToHistory(index) {
-        this.padService.jumpToHistoryIndex(this.currentPadId, index);
+        this.padService.jumpToHistoryIndex(index);
     }
 
-    public setFocus(address: number[]) {
-        this.navigator.setSelectedItemAddress(address);
+    public focusItem(uuid: string) {
+        this.navigator.setSelectedItem(uuid);
         this.currentAddressIsFocused = true;
-        this.fireFocusEvent();
+        this.collabService.lockItem(this.navigator.getSelectedItemId());
+        console.log('focus and lock', uuid);
+        this.focusEvent.next(uuid);
+    }
+
+    public blurItem(uuid: string) {
+        if (this.currentAddressIsFocused) {
+            this.currentAddressIsFocused = false;
+            this.collabService.unlockItem(uuid);
+            console.log('blur and unlock', uuid);
+            this.blurEvent.next(uuid);
+        }
+    }
+
+    public blurSelected() {
+        if (this.currentAddressIsFocused) {
+            this.currentAddressIsFocused = false;
+            this.collabService.unlockItem(this.navigator.getSelectedItemId());
+            console.log('blur all');
+            this.blurEvent.next(this.navigator.getSelectedItemId());
+        }
+    }
+
+    public focusSearchBar() {
+        this.searchBarIsFocused = true;
+        this.searchBarFocusChangeEvent.next(true);
+    }
+
+    private blurSearchBar() {
+        if (this.searchBarIsFocused) {
+            this.searchBarIsFocused = false;
+            this.searchBarFocusChangeEvent.next(false);
+        }
     }
 
     public isCurrentAddressFocussed() {
@@ -293,24 +304,11 @@ export class UiState {
     }
 
     public getCurrentPadHistory(): Action[] {
-        return this.padService.getHistory(this.currentPadId);
+        return this.padService.getCurrentHistory();
     }
 
     public getCurrentPadHistoryPointer(): number {
-        return this.padService.getHistoryPointer(this.currentPadId);
-    }
-
-    public unsetFocus() {
-        this.currentAddressIsFocused = false;
-        this.fireBlurEvent();
-    }
-
-    private fireFocusEvent() {
-        this.focusEvent.next(this.navigator.getSelectedItemAddress().toString());
-    }
-
-    private fireBlurEvent() {
-        this.blurEvent.next(this.navigator.getSelectedItemAddress().toString());
+        return this.padService.getCurrentHistoryPointer();
     }
 
 }
