@@ -48,3 +48,32 @@ export class Note {
         this.uuid = uuid.v4();
     }
 }
+
+
+export enum ActionType {
+    CREATE_PAGE,
+    CREATE_NOTE,
+    UPDATE_PAD,
+    UPDATE_PAGE,
+    UPDATE_NOTE,
+    DELETE_PAGE,
+    DELETE_NOTE,
+    MOVE_PAGE,
+    MOVE_NOTE
+}
+
+export class Action {
+    uuid: string;
+    // the client instance that created this action
+    originUuid: string;
+    type: ActionType;
+    padUuid: string;
+    data: any;
+    created: number;
+
+    constructor(type: ActionType) {
+        this.type = type;
+        this.uuid = uuid();
+        this.created = Date.now();
+    }
+}

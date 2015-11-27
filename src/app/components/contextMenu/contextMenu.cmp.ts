@@ -1,8 +1,7 @@
 import {Component, CORE_DIRECTIVES, FORM_DIRECTIVES, Input, Output, EventEmitter, ElementRef} from 'angular2/angular2';
 import {RouterLink} from 'angular2/router';
 import {UiState, UiContext} from '../../common/uiState';
-import {Type} from "../../common/model";
-import {Action, ActionType} from "../../common/padService";
+import {Type, Action, ActionType} from "../../common/model";
 import {PadService} from "../../common/padService";
 import {timeAgo} from '../../common/utils';
 import SettingsPanelCmp from "../settingsPanel/settingsPanel";

@@ -3,10 +3,9 @@ import {Router, Location} from 'angular2/router';
 //import {} from 'angular2/router';
 import Navigator from './navigator';
 import {Scroller} from './scroller';
-import {Type, Pad, Page, Note} from "./model";
+import {Type, Pad, Page, Note, IPadItem, Action} from "./model";
 import {Keyboard} from "./keyboard";
-import {PadService, Action} from "./padService";
-import {IPadItem} from "./model";
+import {PadService} from "./padService";
 
 /**
  * These are the possible states the app can be in (i.e. at what level of the hierarchy is the user at)

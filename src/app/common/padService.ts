@@ -2,36 +2,8 @@ import {Injectable, EventEmitter} from 'angular2/angular2';
 let Rx = require('rx');
 import DataService from './dataService';
 import {UiState, UiContext} from './uiState';
-import {IPadItem, Page, Pad, Note, Type} from './model';
+import {IPadItem, Page, Pad, Note, Type, Action, ActionType} from './model';
 import {clone} from './utils';
-
-export enum ActionType {
-    CREATE_PAGE,
-    CREATE_NOTE,
-    UPDATE_PAD,
-    UPDATE_PAGE,
-    UPDATE_NOTE,
-    DELETE_PAGE,
-    DELETE_NOTE,
-    MOVE_PAGE,
-    MOVE_NOTE
-}
-
-export class Action {
-    uuid: string;
-    type: ActionType;
-    index: number;
-    data: any;
-    created: number;
-
-    constructor(type: ActionType, index?: number) {
-        this.type = type;
-        this.created = Date.now();
-        if (typeof index !== 'undefined') {
-            this.index = 0 < index ? index : 0;
-        }
-    }
-}
 
 /**
  * Service which keeps the state of the current pad and lists of pads. Should be the only component
@@ -114,16 +86,22 @@ export class PadService {
         let action = new Action(ActionType.CREATE_PAGE, index);
         let newPage = new Page();
         newPage.title = 'Untitled Page';
-        action.data = newPage;
+        action.data = {
+            page: newPage,
+            index: index
+        };
         this.prepareAndApply(padUuid, action);
     }
 
     public createNote(padUuid: string, pageUuid: string, index: number) {
-        let action = new Action(ActionType.CREATE_NOTE, index);
+        let action = new Action(ActionType.CREATE_NOTE);
         let newNote = new Note();
         newNote.content = 'New Note';
-        action.data = newNote;
-        action.uuid = pageUuid;
+        action.data = {
+            note: newNote,
+            pageUuid: pageUuid,
+            index: index
+        };
         this.prepareAndApply(padUuid, action);
     }
 
@@ -132,17 +110,17 @@ export class PadService {
         switch (item.type) {
             case Type.PAD:
                 action = new Action(ActionType.UPDATE_PAD);
-                action.data = item.title;
+                action.data = { title: item.title };
                 break;
             case Type.PAGE:
                 action = new Action(ActionType.UPDATE_PAGE);
-                action.data = item.title;
+                action.data = { title: item.title };
                 break;
             case Type.NOTE:
                 action = new Action(ActionType.UPDATE_NOTE);
-                action.data = item.content;
+                action.data = { content: item.content };
         }
-        action.uuid = item.uuid;
+        action.data.uuid = item.uuid;
         this.prepareAndApply(padUuid, action);
     }
 
@@ -161,7 +139,7 @@ export class PadService {
                 case Type.NOTE:
                     action = new Action(ActionType.DELETE_NOTE);
             }
-            action.uuid = item.uuid;
+            action.data = { uuid: item.uuid };
             this.prepareAndApply(padUuid, action);
         }
     }
@@ -177,8 +155,10 @@ export class PadService {
             case Type.NOTE:
                 action = new Action(ActionType.MOVE_NOTE);
         }
-        action.uuid = item.uuid;
-        action.data = increment;
+        action.data = {
+            uuid: item.uuid,
+            increment: increment
+        };
         this.prepareAndApply(padUuid, action);
     }
 
@@ -239,43 +219,44 @@ export class PadService {
 
         switch (action.type) {
             case ActionType.CREATE_PAGE:
-                padClone.pages.splice(action.index, 0, action.data);
+                padClone.pages.splice(action.data.index, 0, action.data.page);
                 break;
             case ActionType.CREATE_NOTE:
-                padClone.pages[getPageIndex(action.uuid)].notes.splice(action.index, 0, action.data);
+                padClone.pages[getPageIndex(action.data.pageUuid)].notes.splice(action.data.index, 0, action.data.note);
                 break;
             case ActionType.UPDATE_PAD:
-                padClone.title = action.data;
+                padClone.title = action.data.title;
                 break;
             case ActionType.UPDATE_PAGE:
-                padClone.pages[getPageIndex(action.uuid)].title = action.data;
+                padClone.pages[getPageIndex(action.data.uuid)].title = action.data.title;
                 break;
             case ActionType.UPDATE_NOTE:
-                [pageIndex, noteIndex] = this.getIndices(padClone, action.uuid);
-                padClone.pages[pageIndex].notes[noteIndex].content = action.data;
+                [pageIndex, noteIndex] = this.getIndices(padClone, action.data.uuid);
+                padClone.pages[pageIndex].notes[noteIndex].content = action.data.content;
                 break;
             case ActionType.DELETE_PAGE:
-                pageIndex = getPageIndex(action.uuid);
+                pageIndex = getPageIndex(action.data.uuid);
                 padClone.pages.splice(pageIndex, 1);
                 break;
             case ActionType.DELETE_NOTE:
-                [pageIndex, noteIndex] = this.getIndices(padClone, action.uuid);
+                [pageIndex, noteIndex] = this.getIndices(padClone, action.data.uuid);
                 padClone.pages[pageIndex].notes.splice(noteIndex, 1);
                 break;
             case ActionType.MOVE_PAGE:
-                pageIndex = getPageIndex(action.uuid);
-                newIndex = pageIndex + action.data;
+                pageIndex = getPageIndex(action.data.uuid);
+                newIndex = pageIndex + action.data.increment;
                 if (0 <= newIndex && newIndex < padClone.pages.length) {
                     page = padClone.pages.splice(pageIndex, 1)[0];
                     padClone.pages.splice(newIndex, 0, page);
                 }
                 break;
             case ActionType.MOVE_NOTE:
-                [pageIndex, noteIndex] = this.getIndices(padClone, action.uuid);
-                newIndex = noteIndex + action.data;
+                [pageIndex, noteIndex] = this.getIndices(padClone, action.data.uuid);
+                newIndex = noteIndex + action.data.increment;
+                newIndex = noteIndex + action.data.increment;
                 if (0 <= newIndex && newIndex < padClone.pages[pageIndex].notes.length) {
                     note = padClone.pages[pageIndex].notes.splice(noteIndex, 1)[0];
-                    padClone.pages[pageIndex].notes.splice(noteIndex + action.data, 0, note);
+                    padClone.pages[pageIndex].notes.splice(noteIndex + action.data.increment, 0, note);
                 }
                 break;
         }

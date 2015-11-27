@@ -27,7 +27,7 @@ class PadCmp {
         this.filterService.clearFilter();
     }
 
-    onActivate() {
+    onInit() {
         this.padService.getPad(this.params.get('id'))
             .subscribe(pad => {
                 this.loadPad(pad);
