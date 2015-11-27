@@ -4,6 +4,7 @@ import DataService from './dataService';
 import {UiState, UiContext} from './uiState';
 import {IPadItem, Page, Pad, Note, Type, Action, ActionType} from './model';
 import {clone} from './utils';
+import {CollabService} from "./collabService";
 
 /**
  * Service which keeps the state of the current pad and lists of pads. Should be the only component
@@ -20,7 +21,12 @@ export class PadService {
     private history: { [padUuid: string]: Action[] } = {};
     private historyPointer: { [padUuid: string]: number; } = {};
 
-    constructor(private dataService: DataService) {
+    constructor(private dataService: DataService,
+                private collabService: CollabService) {
+
+        let actionSub = collabService.action.subscribe((action: Action) => {
+            this.prepareAndApply(action.padUuid, action);
+        })
     }
 
     public createPad() {
@@ -83,7 +89,7 @@ export class PadService {
     }
 
     public createPage(padUuid: string, index: number) {
-        let action = new Action(ActionType.CREATE_PAGE, index);
+        let action = new Action(ActionType.CREATE_PAGE, padUuid);
         let newPage = new Page();
         newPage.title = 'Untitled Page';
         action.data = {
@@ -91,10 +97,11 @@ export class PadService {
             index: index
         };
         this.prepareAndApply(padUuid, action);
+        this.collabService.emitAction(action);
     }
 
     public createNote(padUuid: string, pageUuid: string, index: number) {
-        let action = new Action(ActionType.CREATE_NOTE);
+        let action = new Action(ActionType.CREATE_NOTE, padUuid);
         let newNote = new Note();
         newNote.content = 'New Note';
         action.data = {
@@ -103,25 +110,27 @@ export class PadService {
             index: index
         };
         this.prepareAndApply(padUuid, action);
+        this.collabService.emitAction(action);
     }
 
     public updateItem(padUuid: string, item: IPadItem) {
         let action;
         switch (item.type) {
             case Type.PAD:
-                action = new Action(ActionType.UPDATE_PAD);
+                action = new Action(ActionType.UPDATE_PAD, padUuid);
                 action.data = { title: item.title };
                 break;
             case Type.PAGE:
-                action = new Action(ActionType.UPDATE_PAGE);
+                action = new Action(ActionType.UPDATE_PAGE, padUuid);
                 action.data = { title: item.title };
                 break;
             case Type.NOTE:
-                action = new Action(ActionType.UPDATE_NOTE);
+                action = new Action(ActionType.UPDATE_NOTE, padUuid);
                 action.data = { content: item.content };
         }
         action.data.uuid = item.uuid;
         this.prepareAndApply(padUuid, action);
+        this.collabService.emitAction(action);
     }
 
     public deleteItem(padUuid: string, itemUuid?: string) {
@@ -134,13 +143,14 @@ export class PadService {
 
             switch (item.type) {
                 case Type.PAGE:
-                    action = new Action(ActionType.DELETE_PAGE);
+                    action = new Action(ActionType.DELETE_PAGE, padUuid);
                     break;
                 case Type.NOTE:
-                    action = new Action(ActionType.DELETE_NOTE);
+                    action = new Action(ActionType.DELETE_NOTE, padUuid);
             }
             action.data = { uuid: item.uuid };
             this.prepareAndApply(padUuid, action);
+            this.collabService.emitAction(action);
         }
     }
 
@@ -150,16 +160,17 @@ export class PadService {
 
         switch (item.type) {
             case Type.PAGE:
-                action = new Action(ActionType.MOVE_PAGE);
+                action = new Action(ActionType.MOVE_PAGE, padUuid);
                 break;
             case Type.NOTE:
-                action = new Action(ActionType.MOVE_NOTE);
+                action = new Action(ActionType.MOVE_NOTE, padUuid);
         }
         action.data = {
             uuid: item.uuid,
             increment: increment
         };
         this.prepareAndApply(padUuid, action);
+        this.collabService.emitAction(action);
     }
 
     /**

@@ -6,7 +6,7 @@
   "bundle": "typings/tsd.d.ts",
   "installed": {
     "node/node.d.ts": {
-      "commit": "62eedc3121a5e28c50473d2e4a9cefbcb9c3957f"
+      "commit": "fb2b3b1e068c9ff7d8f9b0851c08d37d96c95c38"
     },
     "angular2/angular2.d.ts": {
       "commit": "62eedc3121a5e28c50473d2e4a9cefbcb9c3957f"
@@ -19,6 +19,18 @@
     },
     "nedb/nedb.d.ts": {
       "commit": "e48f0c7a0a5f9e9d35e9cfd7506461bab435cb49"
+    },
+    "socket.io/socket.io.d.ts": {
+      "commit": "fb2b3b1e068c9ff7d8f9b0851c08d37d96c95c38"
+    },
+    "socket.io-client/socket.io-client.d.ts": {
+      "commit": "fb2b3b1e068c9ff7d8f9b0851c08d37d96c95c38"
+    },
+    "sockjs-client/sockjs-client.d.ts": {
+      "commit": "fb2b3b1e068c9ff7d8f9b0851c08d37d96c95c38"
+    },
+    "sockjs-node/sockjs-node.d.ts": {
+      "commit": "fb2b3b1e068c9ff7d8f9b0851c08d37d96c95c38"
     }
   }
 }

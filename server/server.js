@@ -1,13 +1,28 @@
+var MessageType = require('./model').MessageType;
 'use strict';
-var express = require('express'), cors = require('cors'), bodyParser = require('body-parser'), Datastore = require('nedb'), path = require('path'), PadStore = require('./padStore').PadStore;
+var express = require('express');
+var cors = require('cors');
+var bodyParser = require('body-parser');
+var Datastore = require('nedb');
+var path = require('path');
+var PadStore = require('./padStore').PadStore;
 var app = express();
+var server = require('http').Server(app);
+var sockjs = require('sockjs');
+var echo = sockjs.createServer({ sockjs_url: 'http://cdn.jsdelivr.net/sockjs/1.0.1/sockjs.min.js' });
+var db = new Datastore({ filename: __dirname + '/datastore', autoload: true });
+var dataStore = new PadStore(db);
 app.use(express.static(path.resolve(__dirname + '/../build')));
 app.use(express.static(path.resolve(__dirname + '/../node_modules')));
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:8080',
+    credentials: true
+}));
 app.listen(3000);
-var db = new Datastore({ filename: __dirname + '/datastore', autoload: true });
-var dataStore = new PadStore(db);
+/**
+ * REST endpoints
+ */
 app.get('/api/pads', function (req, res) {
     dataStore.getPads().subscribe(function (pads) { return res.send(pads); });
 });
@@ -23,3 +38,31 @@ app.put('/api/pads/:id', function (req, res) {
 app.delete('/api/pads/:id', function (req, res) {
     dataStore.deletePad(req.params.id).subscribe(function (uuid) { return res.send(uuid); });
 });
+/**
+ * Web socket handlers
+ */
+var clients = {};
+// Broadcast to all clients
+function broadcast(message) {
+    // iterate through each client in clients object
+    for (var client in clients) {
+        // send the message to that client
+        clients[client].write(JSON.stringify(message));
+    }
+}
+echo.on('connection', function (conn) {
+    // add this client to clients object
+    clients[conn.id] = conn;
+    conn.on('data', function (msg) {
+        var message = JSON.parse(msg);
+        console.log('got message from', message.originUuid);
+        if (message.type === MessageType.Action) {
+            broadcast(message);
+        }
+    });
+    conn.on('close', function () {
+        delete clients[conn.id];
+    });
+});
+echo.installHandlers(server, { prefix: '/echo' });
+server.listen(9999, '0.0.0.0');

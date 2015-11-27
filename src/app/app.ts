@@ -17,6 +17,7 @@ import {Scroller} from './common/scroller';
 import {Keyboard} from './common/keyboard';
 import {PadService} from './common/padService';
 import {FilterService} from './common/filterService';
+import {CollabService} from './common/collabService';
 
 // Common styles
 require('flexboxgrid/dist/flexboxgrid.css');
@@ -73,6 +74,7 @@ bootstrap(AppComponent, [
     UiState,
     Scroller,
     DataService,
+    CollabService,
     PadService,
     FilterService,
     Navigator,

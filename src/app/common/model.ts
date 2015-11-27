@@ -64,16 +64,26 @@ export enum ActionType {
 
 export class Action {
     uuid: string;
-    // the client instance that created this action
-    originUuid: string;
     type: ActionType;
     padUuid: string;
     data: any;
     created: number;
 
-    constructor(type: ActionType) {
+    constructor(type: ActionType, padUuid: string) {
         this.type = type;
+        this.padUuid = padUuid;
         this.uuid = uuid();
         this.created = Date.now();
     }
+}
+
+
+export interface IMessage<T> {
+    originUuid: string,
+    type: MessageType,
+    data: T
+}
+
+export enum MessageType {
+    Action
 }

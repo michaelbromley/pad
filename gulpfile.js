@@ -8,10 +8,10 @@ gulp.task('build-server', function() {
     return gulp.src([
             'typings/tsd.d.ts',
             'src/server/server.ts',
-            'src/dataStore/padStore.ts'
+            'src/dataStore/padStore.ts',
+            'src/app/common/model.ts'
         ])
         .pipe(ts({
-            module: 'commonjs'
         }))
         .pipe(gulp.dest('server'));
 });

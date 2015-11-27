@@ -2,8 +2,9 @@ import config from '../common/config';
 import {Http, HTTP_PROVIDERS, Headers, Response} from 'angular2/http';
 import {Injectable, Observable} from 'angular2/angular2';
 import {Pad} from "./model";
-let NeDBDataStore = require("nedb/browser-version/out/nedb");
 import {PadStore} from "../../dataStore/padStore";
+
+let NeDBDataStore = require("nedb/browser-version/out/nedb");
 
 export enum StorageStrategy {
     Local,
@@ -19,7 +20,7 @@ class DataService {
     constructor(private http: Http) {
         let db = new NeDBDataStore({ filename: 'pad', autoload: true });
         this.padStore = new PadStore(db);
-        this.localStorage = true;
+        this.localStorage = false;
     }
 
     public setStorageStrategy(strategy: StorageStrategy) {
