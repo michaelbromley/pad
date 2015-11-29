@@ -209,10 +209,8 @@ export class UiState {
                 allowed.move = true;
             }
         } else if (context === UiContext.Page) {
-            if (this.navigator.getSelectedItemAddress()[1] !== 0) {
-                allowed.remove = true;
-                allowed.move = true;
-            }
+            allowed.remove = true;
+            allowed.move = true;
         }
 
         return allowed;
@@ -256,11 +254,7 @@ export class UiState {
         if (this.getUiContext() !== UiContext.PadList) {
             let selectedItemId = this.navigator.getSelectedItemId();
             this.padService.moveItem(increment, selectedItemId);
-            if (0 < increment) {
-                this.navigator.next();
-            } else {
-                this.navigator.prev();
-            }
+            setTimeout(() => this.navigator.setSelectedItem(selectedItemId));
         }
     }
 
