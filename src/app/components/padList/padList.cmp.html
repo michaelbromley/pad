@@ -1,9 +1,15 @@
 <div class="pad-list-container">
     <ul class="pad-list">
         <li *ng-for="#pad of filteredPads; #index0 = index"
-            [class.selected]="checkSelected([index0])"
+            [class.selected]="checkSelected(pad.uuid)"
             [id]="'_' + pad.uuid">
-            <a [router-link]="[ '/Pad', {id: pad.uuid } ]">{{ pad.title }}</a>
+            <div>
+                <a [router-link]="[ '/Pad', {id: pad.uuid } ]">{{ pad.title }}</a>
+            </div>
+            <div class="pad-info">
+                <div class="pages">{{ pad.pages }} pages</div>
+                <div class="changes">{{ pad.history.length }} uncommitted changes</div>
+            </div>
         </li>
     </ul>
 </div>

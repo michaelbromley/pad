@@ -12,7 +12,7 @@
             </div>
             <div class="col-xs">
                 <div class="box">
-                    <settings-panel></settings-panel>
+                    <!--<settings-panel></settings-panel>-->
                 </div>
             </div>
         </div>
@@ -60,8 +60,8 @@
             </li>
         </ul>
 
-        <div class="history-container" [class.visible]="isPadContext()">
-            <div class="title">Pad Edits History</div>
+        <div class="history-container" [class.visible]="isPadContext() && 0 < getHistory().length">
+            <div class="title">Uncommitted Changes</div>
 
             <ul class="history">
                 <li *ng-for="#action of getHistory(); #i = index"

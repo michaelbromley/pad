@@ -21,7 +21,7 @@ class Navigator {
     private inverseMap: { [uuid: string]: number[] };
 
     constructor() {}
-    
+
     public initPad(viewContents: Pad) {
         this.collectionMap = this.buildPadMap(viewContents);
         this.inverseMap = this.buildInversePadMap(viewContents);
@@ -30,7 +30,7 @@ class Navigator {
     public initPadList(viewContents: Pad[]) {
         this.collectionMap = this.buildPadListMap(viewContents);
     }
-    
+
     public getSelectedItemAddress() {
         return this.selectedItemAddress;
     }
@@ -39,7 +39,7 @@ class Navigator {
      * Returns the ID of the selected item, or an empty string if nothing is currently selected.
      */
     public getSelectedItemId(): string {
-       return this.getItemIdAtAddress(this.selectedItemAddress);
+        return this.getItemIdAtAddress(this.selectedItemAddress);
     }
 
     public getCurrentPageId(): string {
@@ -93,19 +93,25 @@ class Navigator {
     }
 
     public up() {
-        if (1 === this.selectedItemAddress.length) {
+        if (1 === this.selectedItemAddress.length || this.selectedItemAddress[1] === 0) {
             this.selectedItemAddress[0] = NONE;
         } else {
             this.selectedItemAddress.pop();
         }
 
     }
-    
+
     public prev = () => {
+        let prevAddress;
         if (this.selectedItemAddress[0] === NONE) {
             this.selectedItemAddress = this.getLastItemAddress();
         } else {
-            let prevAddress = this.decrementLast(this.selectedItemAddress);
+            if (this.selectedItemAddress.length === 1 || (this.selectedItemAddress.length === 2 && this.selectedItemAddress[1] === 0)) {
+                let prevPageIndex = this.selectedItemAddress[0] - 1;
+                prevAddress = [prevPageIndex, this.collectionMap[prevPageIndex] && this.collectionMap[prevPageIndex].length - 1];
+            } else {
+                prevAddress = this.decrementLast(this.selectedItemAddress);
+            }
             if (this.getValue(this.collectionMap, prevAddress)) {
                 this.selectedItemAddress = prevAddress;
             } else {
@@ -113,9 +119,33 @@ class Navigator {
             }
         }
     };
-    
+
     public next = () => {
-        let nextAddress = this.incrementLast(this.selectedItemAddress);
+        if (this.down()) {
+            this.next();
+        } else {
+            let nextAddress = this.incrementLast(this.selectedItemAddress);
+            let objectAtAddress = this.getValue(this.collectionMap, nextAddress);
+            if (objectAtAddress instanceof Array && objectAtAddress[0]) {
+                this.selectedItemAddress = nextAddress;
+            } else {
+                this.nextPage();
+            }
+        }
+    };
+
+    public prevPage = () => {
+        let prevAddress = [this.selectedItemAddress[0] - 1];
+        let objectAtAddress = this.getValue(this.collectionMap, prevAddress);
+        if (objectAtAddress instanceof Array && objectAtAddress[0]) {
+            this.selectedItemAddress = prevAddress;
+        } else {
+            this.up();
+        }
+    };
+
+    public nextPage = () => {
+        let nextAddress = [this.selectedItemAddress[0] + 1 ];
         let objectAtAddress = this.getValue(this.collectionMap, nextAddress);
         if (objectAtAddress instanceof Array && objectAtAddress[0]) {
             this.selectedItemAddress = nextAddress;
@@ -127,7 +157,7 @@ class Navigator {
     private getLastItemAddress() {
         return [this.collectionMap.length - 1];
     }
-    
+
     /**
      * Increment the last element in an array of numbers, and return a new array.
      */
@@ -137,14 +167,14 @@ class Navigator {
             }
         );
     }
-    
+
     private decrementLast(array: number[]): number[] {
         return array.map((num, i, arr) => {
                 return num - +(i === arr.length - 1);
             }
         );
     }
-    
+
     private getValue(array: string[][], address: number[]): any {
         let val: any = array;
         address.forEach(index => {
@@ -156,7 +186,7 @@ class Navigator {
         });
         return val;
     }
-    
+
     private buildPadMap(pad: Pad): any[][] {
         let map = [];
         let pages = pad.pages.map((page: Page) => {

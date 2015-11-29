@@ -17,7 +17,12 @@ export class PadStore {
     public getPads(): Observable<Pad[]> {
         return Rx.Observable.create(observer => {
             this.db.find({}).sort({ order: 1}).exec((err, pads) => {
-                observer.onNext(pads);
+                let listPads = pads.map(pad => {
+                    let listPad = pad;
+                    listPad.pages = pad.pages.length;
+                    return listPad;
+                });
+                observer.onNext(listPads);
                 observer.onCompleted();
             });
         });

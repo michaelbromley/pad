@@ -65,17 +65,27 @@ export class UiState {
     }
 
     public registerKeyboardShortcuts() {
-        this.keyboard.registerShortcut(['up'], event => {
-            this.navigator.prev();
+        const deselect = () => {
             if (this.navigator.nothingSelected()) {
                 this.deselectAll();
             }
+        };
+
+        this.keyboard.registerShortcut(['up'], event => {
+            this.navigator.prev();
+            deselect();
         }, true);
         this.keyboard.registerShortcut(['down'], event => {
             this.navigator.next();
-            if (this.navigator.nothingSelected()) {
-                this.deselectAll();
-            }
+            deselect();
+        }, true);
+        this.keyboard.registerShortcut(['ctrl', 'down'], event => {
+            this.navigator.nextPage();
+            deselect();
+        }, true);
+        this.keyboard.registerShortcut(['ctrl', 'up'], event => {
+            this.navigator.prevPage();
+            deselect();
         }, true);
         this.keyboard.registerShortcut(['right'], event => this.navigator.down());
         this.keyboard.registerShortcut(['left'], event => this.navigator.up(), true);
@@ -83,10 +93,7 @@ export class UiState {
             if (this.getUiContext() === UiContext.PadList) {
                 this.router.navigate(['Pad', {id: this.navigator.getSelectedItemId()}]);
             } else {
-                let canGoDeeper = this.navigator.down();
-                if (!canGoDeeper) {
-                    this.focusItem(this.navigator.getSelectedItemId());
-                }
+                this.focusItem(this.navigator.getSelectedItemId());
             }
         }, true);
         this.keyboard.registerShortcut(['esc'], event => {
@@ -162,7 +169,7 @@ export class UiState {
                 this.blurSearchBar();
 
             }
-            if (isPressed('down')) {
+            if (this.searchBarIsFocused && isPressed('down')) {
                 this.blurSearchBar();
                 this.navigator.next();
             }

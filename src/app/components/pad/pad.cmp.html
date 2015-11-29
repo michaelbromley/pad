@@ -2,7 +2,7 @@
     <ul class="pad-collection-list">
 
         <li [class.selected]="isSelected(pad.uuid)"
-            [id]="'_' + pad._id">
+            [id]="'_' + pad.uuid">
             <title-input [item]="pad"
                          title-prop="title"
                          (blur)="updateItem($event)"
@@ -12,7 +12,7 @@
 
         <li *ng-for="#page of filteredPad.pages"
             [class.selected]="isSelected(page.uuid)"
-            [id]="'_' + page._id"
+            [id]="'_' + page.uuid"
             class="page-container">
 
             <ul class="notes-list">
@@ -27,7 +27,7 @@
 
                 <li *ng-for="#note of page.notes"
                     [class.selected]="isSelected(note.uuid)"
-                    [id]="'_' + note._id">
+                    [id]="'_' + note.uuid">
 
                     <note-editor [note]="note"
                                  (blur)="updateItem($event)"
