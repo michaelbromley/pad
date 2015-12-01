@@ -44,7 +44,7 @@ class PadListCmp {
 
     private loadPads() {
         this.dataService.fetchPadList().subscribe(pads => {
-            this.pads = pads.map(pad => this.padHistory.applyActions(pad, pad.history, ActionType.UPDATE_PAD));
+            this.pads = pads;
             this.filteredPads = this.filterService.filterPadList(this.pads);
             this.uiState.initUiView(this.filteredPads);
             this.uiState.deselectAll();

@@ -2,7 +2,7 @@ import {Component, CORE_DIRECTIVES} from 'angular2/angular2';
 import {RouteParams} from 'angular2/router';
 import TitleInputCmp from '../titleInput/titleInput.cmp';
 import NoteEditorCmp from '../noteEditor/noteEditor.cmp';
-import {UiState} from '../../common/uiState';
+import {UiState, UiContext} from '../../common/uiState';
 import {Type, Note, Pad, Page} from "../../common/model";
 import {PadService} from "../../common/padService";
 import {FilterService} from "../../common/filterService";
@@ -62,8 +62,12 @@ class PadCmp {
         this.padService.updateItem(item);
     }
 
-    public isSelected(uuid: string) {
-        return this.uiState.itemIsSelected(uuid);
+    public isSelected(uuid: string, isPageContainer: boolean) {
+        if (isPageContainer) {
+            return this.uiState.getUiContext() === UiContext.Pad && this.uiState.itemIsSelected(uuid);
+        } else {
+            return this.uiState.itemIsSelected(uuid);
+        }
     }
 
     public isLocked(uuid: string) {

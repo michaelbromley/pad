@@ -14,7 +14,6 @@ export class PadService {
 
     public changeEvent: EventEmitter<any> = new EventEmitter();
     private pad: Pad = <Pad>{};
-    private workingPad: Pad = <Pad>{};
 
     constructor(private dataService: DataService,
                 private padHistory: PadHistory,
@@ -27,11 +26,15 @@ export class PadService {
 
     public createPad() {
         let pad = new Pad();
-        pad.title = 'Untitled Pad ' + pad.uuid.substr(0, 5);
+        let titleAction = new Action(ActionType.UPDATE_PAD, pad.uuid);
+        titleAction.data = { title: 'Untitled Pad ' + pad.uuid.substr(0, 5) };
+        pad.history.push(titleAction);
+        pad = this.padHistory.applyAction(pad, pad.history[0]);
+        pad.historyPointer = 0;
+
         return this.dataService.createPad(pad)
             .subscribe(pad => {
                 this.pad = pad;
-                this.workingPad = clone(pad);
                 this.changeEvent.next(pad);
             });
     }
@@ -40,8 +43,7 @@ export class PadService {
         return this.dataService.fetchPad(uuid)
             .map((pad: Pad) => {
                 this.pad = pad;
-                this.workingPad = this.padHistory.applyActions(pad, pad.history);
-                return this.workingPad;
+                return this.pad;
             });
 
     }
@@ -55,7 +57,7 @@ export class PadService {
     }
 
     public getItemByUuid(itemUuid: string): IPadItem {
-        let pad = this.workingPad;
+        let pad = this.pad;
         if (pad) {
             let matchingPage = pad.pages.filter(page => page.uuid === itemUuid);
             if (matchingPage.length === 1) {
@@ -76,7 +78,7 @@ export class PadService {
         newPage.title = 'Untitled Page';
         action.data = {
             page: newPage,
-            index: index + 1
+            index: index
         };
         this.prepareAndApply(action);
         this.collabService.emitAction(action);
@@ -89,7 +91,7 @@ export class PadService {
         action.data = {
             note: newNote,
             pageUuid: pageUuid,
-            index: index + 1
+            index: index
         };
         this.prepareAndApply(action);
         this.collabService.emitAction(action);
@@ -169,9 +171,17 @@ export class PadService {
         // of the history stack for everyone.
         //this.pad.history = this.pad.history.slice(0, this.pad.historyPointer + 1);
         this.pad.history.push(action);
-        this.workingPad = this.padHistory.applyAction(this.workingPad, action);
+        this.pad = this.padHistory.applyAction(this.pad, action);
         this.pad.historyPointer = this.pad.history.length - 1;
-        this.changeEvent.next(this.workingPad);
+        this.changeEvent.next(this.pad);
+        this.dataService.updatePad({
+            uuid: this.pad.uuid,
+            title: this.pad.title,
+            pages: this.pad.pages,
+            historyPointer: this.pad.historyPointer
+        }).subscribe(() => {
+            console.log('Updated pad.');
+        });
     }
 
     public undo() {
@@ -189,14 +199,26 @@ export class PadService {
             if (delta < 0) {
                 // undoing actions
                 actions = this.pad.history.slice(0, index + 1);
-                this.workingPad = clone(this.pad);
+                this.pad = this.reset(this.pad);
             } else {
                 // redoing actions
                 actions = this.pad.history.slice(this.pad.historyPointer + 1, index + 1);
             }
-            this.workingPad = this.padHistory.applyActions(this.workingPad, actions);
+            this.pad = this.padHistory.applyActions(this.pad, actions);
             this.pad.historyPointer += delta;
-            this.changeEvent.next(this.workingPad);
+            this.changeEvent.next(this.pad);
         }
+    }
+
+    /**
+     * Create a new pad equivalent to resetting a pad back to the state it was in when first created.
+     */
+    private reset(pad: Pad): Pad {
+        let emptyPad = new Pad();
+        emptyPad.uuid = pad.uuid;
+        emptyPad.created = pad.created;
+        emptyPad.history = pad.history;
+        emptyPad.historyPointer = pad.historyPointer;
+        return emptyPad;
     }
 }

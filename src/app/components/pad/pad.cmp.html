@@ -11,7 +11,7 @@
         </li>
 
         <li *ng-for="#page of filteredPad.pages"
-            [class.selected]="isSelected(page.uuid)"
+            [class.selected]="isSelected(page.uuid, true)"
             [id]="'_' + page.uuid"
             class="page-container">
 

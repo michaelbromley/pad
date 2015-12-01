@@ -17,7 +17,6 @@ export class Pad {
     public uuid: string = '';
     public title: string = '';
     public created: number;
-    public modified: number;
     public type: string = Type.PAD;
     public pages: Page[] = [];
     public history: Action[] = [];

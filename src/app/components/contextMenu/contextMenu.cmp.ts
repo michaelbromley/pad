@@ -13,6 +13,8 @@ import SettingsPanelCmp from "../settingsPanel/settingsPanel";
 })
 class ContextMenuCmp {
 
+    private historyLength: number = 0;
+
     constructor(private uiState: UiState) {
 
     }
@@ -69,7 +71,9 @@ class ContextMenuCmp {
     }
 
     public getHistory() {
-        return this.uiState.getCurrentPadHistory().reverse();
+        let history = this.uiState.getCurrentPadHistory().reverse();
+        this.historyLength = history.length;
+        return history;
     }
 
     public isCurrentState(index: number) {

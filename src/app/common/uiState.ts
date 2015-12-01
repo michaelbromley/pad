@@ -232,7 +232,7 @@ export class UiState {
         if (context === UiContext.Pad) {
             this.padService.createPage(this.navigator.getSelectedItemAddress()[0]);
         } else if (context === UiContext.Page) {
-            this.padService.createNote(this.navigator.getCurrentPageId(), this.navigator.getSelectedItemAddress()[0])
+            this.padService.createNote(this.navigator.getCurrentPageId(), this.navigator.getSelectedItemAddress()[1])
         } else {
             this.padService.createPad();
         }

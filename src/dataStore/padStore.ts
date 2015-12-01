@@ -20,6 +20,7 @@ export class PadStore {
                 let listPads = pads.map(pad => {
                     let listPad = pad;
                     listPad.pages = pad.pages.length;
+                    listPad.history = pad.history ? pad.history.length : 0;
                     return listPad;
                 });
                 observer.onNext(listPads);
@@ -58,8 +59,12 @@ export class PadStore {
      */
     public updatePad(pad: Pad): Observable<Pad> {
         return Rx.Observable.create(observer => {
-            this.db.update({uuid: pad.uuid}, pad, () => {
-                observer.onNext(pad);
+            let updateObject = {};
+            for (let prop in pad) {
+                updateObject[prop] = pad[prop];
+            }
+            this.db.update({uuid: pad.uuid}, { $set: updateObject }, () => {
+                observer.onNext(true);
                 observer.onCompleted();
             });
         });

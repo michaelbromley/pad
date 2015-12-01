@@ -54,7 +54,7 @@ class DataService {
         }
     }
 
-    public updatePad(pad: Pad): Observable<any> {
+    public updatePad(pad: any): Observable<any> {
         if (this.localStorage) {
             return this.padStore.updatePad(pad);
         } else {

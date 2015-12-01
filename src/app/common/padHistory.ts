@@ -13,6 +13,7 @@ export class PadHistory {
      * actions that match that type.
      */
     public applyActions(pad: Pad, actions: Action[], actionType?: ActionType): Pad {
+        console.time('applyActions');
         let actionsToApply = actions;
         let outputPad = pad;
         if (typeof actionType !== 'undefined') {
@@ -21,6 +22,7 @@ export class PadHistory {
         for (let i = 0; i < actionsToApply.length; i++) {
             outputPad = this.applyAction(outputPad, actionsToApply[i]);
         }
+        console.timeEnd('applyActions');
         return outputPad;
     }
 

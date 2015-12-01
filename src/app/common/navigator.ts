@@ -93,7 +93,7 @@ class Navigator {
     }
 
     public up() {
-        if (1 === this.selectedItemAddress.length || this.selectedItemAddress[1] === 0) {
+        if (1 === this.selectedItemAddress.length) {
             this.selectedItemAddress[0] = NONE;
         } else {
             this.selectedItemAddress.pop();
@@ -103,44 +103,64 @@ class Navigator {
 
     public prev = () => {
         let prevAddress;
-        if (this.selectedItemAddress[0] === NONE) {
+        let currAddress = this.selectedItemAddress;
+        const isPage = currAddress.length === 1;
+        const isPageTitle = currAddress.length === 2 && currAddress[1] === 0;
+
+        if (currAddress[0] === NONE) {
             this.selectedItemAddress = this.getLastItemAddress();
-        } else {
-            if (this.selectedItemAddress.length === 1 || (this.selectedItemAddress.length === 2 && this.selectedItemAddress[1] === 0)) {
-                let prevPageIndex = this.selectedItemAddress[0] - 1;
-                prevAddress = [prevPageIndex, this.collectionMap[prevPageIndex] && this.collectionMap[prevPageIndex].length - 1];
-            } else {
-                prevAddress = this.decrementLast(this.selectedItemAddress);
-            }
-            if (this.getValue(this.collectionMap, prevAddress)) {
-                this.selectedItemAddress = prevAddress;
-            } else {
-                this.up();
-            }
+            return;
         }
+        if (isPageTitle) {
+            this.up();
+            return;
+        }
+
+        if (isPage) {
+            let prevPageIndex = currAddress[0] - 1;
+            let prevPage = this.collectionMap[prevPageIndex];
+            prevAddress = [prevPageIndex, (prevPage && prevPage.length - 1)];
+        } else {
+            prevAddress = this.decrementLast(currAddress);
+        }
+
+        if (this.getValue(this.collectionMap, prevAddress)) {
+            this.selectedItemAddress = prevAddress;
+        } else {
+            this.up();
+        }
+
     };
 
     public next = () => {
         if (this.down()) {
-            this.next();
+            // go down
         } else {
             let nextAddress = this.incrementLast(this.selectedItemAddress);
             let objectAtAddress = this.getValue(this.collectionMap, nextAddress);
             if (objectAtAddress instanceof Array && objectAtAddress[0]) {
                 this.selectedItemAddress = nextAddress;
             } else {
-                this.nextPage();
+                if (this.selectedItemAddress[0] === this.collectionMap.length - 1) {
+                    this.selectedItemAddress = [NONE];
+                } else {
+                    this.nextPage();
+                }
             }
         }
     };
 
     public prevPage = () => {
-        let prevAddress = [this.selectedItemAddress[0] - 1];
-        let objectAtAddress = this.getValue(this.collectionMap, prevAddress);
-        if (objectAtAddress instanceof Array && objectAtAddress[0]) {
-            this.selectedItemAddress = prevAddress;
+        if (this.selectedItemAddress[0] === NONE) {
+            this.selectedItemAddress = this.getLastItemAddress();
         } else {
-            this.up();
+            let prevAddress = [this.selectedItemAddress[0] - 1];
+            let objectAtAddress = this.getValue(this.collectionMap, prevAddress);
+            if (objectAtAddress instanceof Array && objectAtAddress[0]) {
+                this.selectedItemAddress = prevAddress;
+            } else {
+                this.up();
+            }
         }
     };
 
