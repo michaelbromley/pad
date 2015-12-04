@@ -2,6 +2,7 @@ import {Component, FORM_DIRECTIVES, CORE_DIRECTIVES, Input, Output, EventEmitter
 import {Note, IUpdateObject} from "../../common/model";
 import MarkdownPipe from "./markdownPipe";
 import {UiState} from "../../common/uiState";
+import {clone} from "../../common/utils";
 
 @Component({
     selector: 'note-editor',
@@ -15,18 +16,21 @@ class NoteEditorCmp {
     @Input() public locked: boolean;
     @Output() public blur: EventEmitter<IUpdateObject> = new EventEmitter();
     private focussed: boolean = false;
-    private originalContent: string;
+    private content: string;
     private subscriptions = [];
 
     constructor(private uiState: UiState, private elRef: ElementRef) {
-        let focusSub = uiState.focusEvent.subscribe(val => {
+    }
+
+    private onInit() {
+        let focusSub = this.uiState.focusEvent.subscribe(val => {
             if (val === this.note.uuid) {
                 this.focus();
             } else {
                 this.blurHandler();
             }
         });
-        let blurSub = uiState.blurEvent.subscribe(val => {
+        let blurSub = this.uiState.blurEvent.subscribe(val => {
             if (val === this.note.uuid) {
                 this.blurHandler();
             }
@@ -34,9 +38,13 @@ class NoteEditorCmp {
 
         this.subscriptions = [focusSub, blurSub];
     }
+
+    private onDestroy() {
+        this.subscriptions.map(sub => sub.unsubscribe());
+    }
  
     private onChanges() {
-        this.originalContent = this.note.content;
+        this.content = clone(this.note.content);
     }
 
     private focus() {
@@ -49,13 +57,12 @@ class NoteEditorCmp {
     public blurHandler() {
         if (this.focussed) {
             this.focussed = false;
-            if (this.originalContent !== this.note.content) {
+            if (this.content !== this.note.content) {
                 this.blur.next({
                     item: this.note,
-                    oldVal: this.originalContent,
-                    newVal: this.note.content
+                    oldVal: this.note.content,
+                    newVal: this.content
                 });
-                this.originalContent = this.note.content;
             }
             this.uiState.blurItem(this.note.uuid);
         }
@@ -90,9 +97,12 @@ class NoteEditorCmp {
     }
 
     private autoSize(textarea: HTMLTextAreaElement) {
+        let oldHeight = textarea.scrollHeight + 'px';
+        textarea.parentElement.style.height = oldHeight;
         setTimeout(() => {
             textarea.style.height = 'auto';
             textarea.style.height = (textarea.scrollHeight) + 'px';
+            textarea.parentElement.style.height = 'auto';
         });
     }
 }

@@ -162,6 +162,7 @@ export class UiState {
 
         if (!this.currentAddressIsFocused && !this.searchBarIsFocused) {
             this.keyboard.checkShortcuts(event);
+            this.scroller.scrollIntoView(this.navigator.getSelectedItemId());
         } else {
             if (isPressed('esc')) {
                 event.preventDefault();
@@ -174,7 +175,6 @@ export class UiState {
                 this.navigator.next();
             }
         }
-        this.scroller.scrollIntoView(this.navigator.getSelectedItemId());
     }
 
     public keyup(event: KeyboardEvent) {
@@ -214,16 +214,6 @@ export class UiState {
         }
 
         return allowed;
-    }
-
-    public selectNext() {
-        this.navigator.next();
-        this.scroller.scrollIntoView(this.navigator.getSelectedItemId());
-    }
-
-    public selectPrev() {
-        this.navigator.prev();
-        this.scroller.scrollIntoView(this.navigator.getSelectedItemId());
     }
 
     public createItem() {

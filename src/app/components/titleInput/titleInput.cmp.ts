@@ -67,11 +67,9 @@ class TitleInputCmp {
         if (this.focussed) {
             this.focussed = false;
             if (this.title !== this.item[this.titleProp]) {
-                let oldVal = this.item[this.titleProp];
-                this.item[this.titleProp] = this.title;
                 this.blur.next({
                     item: this.item,
-                    oldVal: oldVal,
+                    oldVal: this.item[this.titleProp],
                     newVal: this.title
                 });
             }

@@ -8,6 +8,7 @@ import {PadService} from "../../common/padService";
 import {FilterService} from "../../common/filterService";
 import {CollabService} from "../../common/collabService";
 import {IUpdateObject} from "../../common/model";
+import {clone} from "../../common/utils";
 
 @Component({
     selector: 'pad',
@@ -50,7 +51,7 @@ class PadCmp {
     }
 
     private loadPad(pad: Pad) {
-        this.pad = pad;
+        this.pad = clone(pad);
         this.filteredPad = this.filterService.filterPad(this.pad);
         this.uiState.initUiView(this.filteredPad);
     }
