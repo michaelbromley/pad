@@ -78,6 +78,12 @@ export class Action {
     }
 }
 
+export interface IUpdateObject {
+    item: IPadItem;
+    oldVal: string;
+    newVal: string;
+}
+
 
 export interface IMessage<T> {
     originUuid: string,

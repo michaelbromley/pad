@@ -1,5 +1,5 @@
 import {Component, FORM_DIRECTIVES, CORE_DIRECTIVES, Input, Output, EventEmitter, ElementRef} from 'angular2/angular2';
-import {Note} from "../../common/model";
+import {Note, IUpdateObject} from "../../common/model";
 import MarkdownPipe from "./markdownPipe";
 import {UiState} from "../../common/uiState";
 
@@ -13,7 +13,7 @@ class NoteEditorCmp {
 
     @Input() public note: Note;
     @Input() public locked: boolean;
-    @Output() public blur = new EventEmitter();
+    @Output() public blur: EventEmitter<IUpdateObject> = new EventEmitter();
     private focussed: boolean = false;
     private originalContent: string;
     private subscriptions = [];
@@ -50,7 +50,11 @@ class NoteEditorCmp {
         if (this.focussed) {
             this.focussed = false;
             if (this.originalContent !== this.note.content) {
-                this.blur.next(this.note);
+                this.blur.next({
+                    item: this.note,
+                    oldVal: this.originalContent,
+                    newVal: this.note.content
+                });
                 this.originalContent = this.note.content;
             }
             this.uiState.blurItem(this.note.uuid);

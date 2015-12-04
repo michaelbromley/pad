@@ -5,6 +5,7 @@ import {IPadItem, Page, Pad, Note, Type, Action, ActionType} from './model';
 import {clone} from './utils';
 import {CollabService} from "./collabService";
 import {PadHistory} from "./padHistory";
+import {IUpdateObject} from "./model";
 
 /**
  * Service which keeps the state of the current pad and is responsible for creating new actions on the pad.
@@ -27,7 +28,9 @@ export class PadService {
     public createPad() {
         let pad = new Pad();
         let titleAction = new Action(ActionType.UPDATE_PAD, pad.uuid);
-        titleAction.data = { title: 'Untitled Pad ' + pad.uuid.substr(0, 5) };
+        let title = 'Untitled Pad ' + pad.uuid.substr(0, 5);
+        let patch = this.padHistory.createPatch(titleAction.uuid, '', title);
+        titleAction.data = { patch: patch };
         pad.history.push(titleAction);
         pad = this.padHistory.applyAction(pad, pad.history[0]);
         pad.historyPointer = 0;
@@ -97,21 +100,14 @@ export class PadService {
         this.collabService.emitAction(action);
     }
 
-    public updateItem(item: IPadItem) {
-        let action;
-        switch (item.type) {
-            case Type.PAD:
-                action = new Action(ActionType.UPDATE_PAD, this.pad.uuid);
-                action.data = { title: item.title };
-                break;
-            case Type.PAGE:
-                action = new Action(ActionType.UPDATE_PAGE, this.pad.uuid);
-                action.data = { title: item.title };
-                break;
-            case Type.NOTE:
-                action = new Action(ActionType.UPDATE_NOTE, this.pad.uuid);
-                action.data = { content: item.content };
-        }
+    public updateItem(update: IUpdateObject) {
+        let item = update.item;
+        let patch = this.padHistory.createPatch(item.uuid, update.oldVal, update.newVal);
+        let actionType = item.type === Type.PAD ? ActionType.UPDATE_PAD :
+                item.type === Type.PAGE ? ActionType.UPDATE_PAGE : ActionType.UPDATE_NOTE;
+        let action = new Action(actionType, this.pad.uuid);
+
+        action.data = { patch: patch };
         action.data.uuid = item.uuid;
         this.prepareAndApply(action);
         this.collabService.emitAction(action);

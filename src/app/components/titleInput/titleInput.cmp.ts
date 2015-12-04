@@ -1,5 +1,6 @@
 import {Component, CORE_DIRECTIVES, FORM_DIRECTIVES, Input, Output, EventEmitter, ElementRef} from 'angular2/angular2';
 import {UiState} from '../../common/uiState';
+import {IUpdateObject} from "../../common/model";
 
 @Component({
     selector: 'title-input',
@@ -16,7 +17,7 @@ class TitleInputCmp {
     @Input() public titleProp: string;
     @Input() public element: string;
 
-    @Output() private blur = new EventEmitter();
+    @Output() private blur: EventEmitter<IUpdateObject> = new EventEmitter();
 
     constructor(private uiState: UiState,
                 private elRef: ElementRef) {
@@ -66,8 +67,13 @@ class TitleInputCmp {
         if (this.focussed) {
             this.focussed = false;
             if (this.title !== this.item[this.titleProp]) {
+                let oldVal = this.item[this.titleProp];
                 this.item[this.titleProp] = this.title;
-                this.blur.next(this.item); // TODO: delete?
+                this.blur.next({
+                    item: this.item,
+                    oldVal: oldVal,
+                    newVal: this.title
+                });
             }
             this.uiState.blurItem(this.item.uuid);
         }

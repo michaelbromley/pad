@@ -7,6 +7,7 @@ import {Type, Note, Pad, Page} from "../../common/model";
 import {PadService} from "../../common/padService";
 import {FilterService} from "../../common/filterService";
 import {CollabService} from "../../common/collabService";
+import {IUpdateObject} from "../../common/model";
 
 @Component({
     selector: 'pad',
@@ -58,8 +59,8 @@ class PadCmp {
         this.subscriptions.map(sub => sub.unsubscribe());
     }
 
-    public updateItem(item) {
-        this.padService.updateItem(item);
+    public updateItem(updateObject: IUpdateObject) {
+        this.padService.updateItem(updateObject);
     }
 
     public isSelected(uuid: string, isPageContainer: boolean) {

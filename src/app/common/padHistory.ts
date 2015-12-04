@@ -1,12 +1,18 @@
 import {Pad, Page, Note, Action, ActionType} from "./model";
 import {clone} from './utils';
 
+let JsDiff = require('diff');
+
 /**
  * This service is responsible for applying actions to a pad to transform it from one history state into
  * another. All public methods operate on the pad in an immutable fashion, returning a new object with
  * transformations applied.
  */
 export class PadHistory {
+
+    public createPatch(itemUuid: string, oldVal: string, newVal: string) {
+        return JsDiff.createPatch(itemUuid, oldVal, newVal, '', '');
+    }
 
     /**
      * Apply an array of Actions to a Pad. Optionally specify an actionType filter to only apply
@@ -33,7 +39,7 @@ export class PadHistory {
         let padClone: Pad = clone(pad);
         let getPageIndex = uuid => padClone.pages.map(page => page.uuid).indexOf(uuid);
         let pageIndex = -1, noteIndex = -1;
-        let page, note, newIndex;
+        let page, note, newIndex, oldVal, newVal;
 
         switch (action.type) {
             case ActionType.CREATE_PAGE:
@@ -43,14 +49,20 @@ export class PadHistory {
                 padClone.pages[getPageIndex(action.data.pageUuid)].notes.splice(action.data.index, 0, action.data.note);
                 break;
             case ActionType.UPDATE_PAD:
-                padClone.title = action.data.title;
+                newVal = JsDiff.applyPatch(padClone.title, action.data.patch);
+                padClone.title = newVal;
                 break;
             case ActionType.UPDATE_PAGE:
-                padClone.pages[getPageIndex(action.data.uuid)].title = action.data.title;
+                pageIndex = getPageIndex(action.data.uuid);
+                oldVal = padClone.pages[pageIndex].title;
+                newVal = JsDiff.applyPatch(oldVal, action.data.patch);
+                padClone.pages[pageIndex].title = newVal;
                 break;
             case ActionType.UPDATE_NOTE:
                 [pageIndex, noteIndex] = this.getIndices(padClone, action.data.uuid);
-                padClone.pages[pageIndex].notes[noteIndex].content = action.data.content;
+                oldVal = padClone.pages[pageIndex].notes[noteIndex].content;
+                newVal = JsDiff.applyPatch(oldVal, action.data.patch);
+                padClone.pages[pageIndex].notes[noteIndex].content = newVal;
                 break;
             case ActionType.DELETE_PAGE:
                 pageIndex = getPageIndex(action.data.uuid);
