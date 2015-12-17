@@ -4,7 +4,7 @@
         <li [class.selected]="isSelected(pad.uuid)"
             [id]="'_' + pad.uuid">
             <title-input [item]="pad"
-                         title-prop="title"
+                         titleProp="title"
                          (blur)="updateItem($event)"
                          element="h1"
                          [locked]="isLocked(pad.uuid)"></title-input>
@@ -18,7 +18,7 @@
             <ul class="notes-list">
                 <li [class.selected]="isSelected(page.uuid)">
                     <title-input [item]="page"
-                                 title-prop="title"
+                                 titleProp="title"
                                  (blur)="updateItem($event)"
                                  element="h2"
                                  [locked]="isLocked(page.uuid)"></title-input>
