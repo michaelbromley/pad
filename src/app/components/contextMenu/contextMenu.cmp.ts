@@ -1,4 +1,5 @@
-import {Component, CORE_DIRECTIVES, FORM_DIRECTIVES, Input, Output, EventEmitter, ElementRef} from 'angular2/angular2';
+import {Component, Input, Output, EventEmitter, ElementRef} from 'angular2/core';
+import {CORE_DIRECTIVES, FORM_DIRECTIVES} from 'angular2/common';
 import {RouterLink} from 'angular2/router';
 import {UiState, UiContext} from '../../common/uiState';
 import {Type, Action, ActionType} from "../../common/model";

@@ -1,8 +1,9 @@
 import config from '../common/config';
 import {Http, HTTP_PROVIDERS, Headers, Response} from 'angular2/http';
-import {Injectable, Observable} from 'angular2/angular2';
+import {Injectable} from 'angular2/core';
 import {Pad} from "./model";
 import {PadStore} from "../../dataStore/padStore";
+import {Observable} from 'rxjs';
 
 let NeDBDataStore = require("nedb/browser-version/out/nedb");
 
@@ -32,7 +33,7 @@ class DataService {
             return this.padStore.getPads();
         } else {
             return this.http.get(`${config.API_URL}/pads`)
-                .map((res:Response) => res.json());
+                .map((res:Response): Pad[] => res.json());
         }
     }
 
@@ -41,7 +42,7 @@ class DataService {
             return this.padStore.getPad(uuid);
         } else {
             return this.http.get(`${config.API_URL}/pads/${uuid}`)
-                .map((res:Response) => res.json());
+                .map((res:Response) => <Pad>res.json());
         }
     }
 

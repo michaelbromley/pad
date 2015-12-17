@@ -1,4 +1,3 @@
-import {Injectable} from 'angular2/angular2';
 import {Type} from './model';
 import {Pad} from "./model";
 import {Page} from "./model";
@@ -11,7 +10,6 @@ const NONE = -1; // value to show that nothing is selected
  * an abstracted way to navigate around the padCollection, and allows us to query the "selected" address at
  * any time.
  */
-@Injectable()
 class Navigator {
     private selectedItemAddress: number[] = [NONE];
     // a nested array containing item uuids, reflecting

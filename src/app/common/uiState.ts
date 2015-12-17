@@ -1,6 +1,5 @@
-import {Injectable, EventEmitter} from 'angular2/angular2';
+import {Injectable, EventEmitter} from 'angular2/core';
 import {Router, Location} from 'angular2/router';
-//import {} from 'angular2/router';
 import Navigator from './navigator';
 import {Scroller} from './scroller';
 import {Type, Pad, Page, Note, IPadItem, Action} from "./model";
@@ -155,6 +154,7 @@ export class UiState {
 
         this.keyboard.keydown(event);
         let pressedKeys = this.keyboard.getPressedKeys();
+        console.log('pressedKeys', pressedKeys);
         if (this.lastPressedKeys.toString() === pressedKeys.toString()) {
             return;
         }
@@ -257,7 +257,7 @@ export class UiState {
         this.currentAddressIsFocused = true;
         this.collabService.lockItem(this.navigator.getSelectedItemId());
         console.log('focus and lock', uuid);
-        this.focusEvent.next(uuid);
+        this.focusEvent.emit(uuid);
     }
 
     public blurItem(uuid: string) {
@@ -265,7 +265,7 @@ export class UiState {
             this.currentAddressIsFocused = false;
             this.collabService.unlockItem(uuid);
             console.log('blur and unlock', uuid);
-            this.blurEvent.next(uuid);
+            this.blurEvent.emit(uuid);
         }
     }
 
@@ -274,19 +274,19 @@ export class UiState {
             this.currentAddressIsFocused = false;
             this.collabService.unlockItem(this.navigator.getSelectedItemId());
             console.log('blur all');
-            this.blurEvent.next(this.navigator.getSelectedItemId());
+            this.blurEvent.emit(this.navigator.getSelectedItemId());
         }
     }
 
     public focusSearchBar() {
         this.searchBarIsFocused = true;
-        this.searchBarFocusChangeEvent.next(true);
+        this.searchBarFocusChangeEvent.emit(true);
     }
 
     private blurSearchBar() {
         if (this.searchBarIsFocused) {
             this.searchBarIsFocused = false;
-            this.searchBarFocusChangeEvent.next(false);
+            this.searchBarFocusChangeEvent.emit(false);
         }
     }
 

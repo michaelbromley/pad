@@ -1,4 +1,5 @@
-import {Component, NgFor} from 'angular2/angular2';
+import {Component} from 'angular2/core';
+import {NgFor} from 'angular2/common';
 import {RouterLink} from 'angular2/router';
 import {UiState} from "../../common/uiState";
 import DataService from "../../common/dataService";
@@ -27,7 +28,7 @@ class PadListCmp {
         this.filterService.clearFilter();
     }
 
-    onInit() {
+    ngOnInit() {
         let changeSub = this.padService.changeEvent.subscribe(pad => {
             this.loadPads();
         });
@@ -38,7 +39,7 @@ class PadListCmp {
         this.loadPads();
     }
 
-    onDestroy() {
+    ngOnDestroy() {
         this.subscriptions.map(sub => sub.unsubscribe());
     }
 

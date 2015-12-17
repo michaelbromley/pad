@@ -1,13 +1,13 @@
-import {Component, CORE_DIRECTIVES} from 'angular2/angular2';
+import {Component} from 'angular2/core';
+import {CORE_DIRECTIVES} from 'angular2/common';
 import {RouteParams} from 'angular2/router';
 import TitleInputCmp from '../titleInput/titleInput.cmp';
 import NoteEditorCmp from '../noteEditor/noteEditor.cmp';
 import {UiState, UiContext} from '../../common/uiState';
-import {Type, Note, Pad, Page} from "../../common/model";
+import {Type, Note, Pad, Page, IUpdateObject} from "../../common/model";
 import {PadService} from "../../common/padService";
 import {FilterService} from "../../common/filterService";
 import {CollabService} from "../../common/collabService";
-import {IUpdateObject} from "../../common/model";
 import {clone} from "../../common/utils";
 
 @Component({
@@ -31,7 +31,7 @@ class PadCmp {
         this.filterService.clearFilter();
     }
 
-    onInit() {
+    ngOnInit() {
         this.padService.fetchPad(this.params.get('id'))
             .subscribe(pad => {
                 this.loadPad(pad);
@@ -56,7 +56,7 @@ class PadCmp {
         this.uiState.initUiView(this.filteredPad);
     }
 
-    onDestroy() {
+    ngOnDestroy() {
         this.subscriptions.map(sub => sub.unsubscribe());
     }
 

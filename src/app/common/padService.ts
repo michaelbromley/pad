@@ -1,4 +1,4 @@
-import {Injectable, EventEmitter} from 'angular2/angular2';
+import {Injectable, EventEmitter} from 'angular2/core';
 import DataService from './dataService';
 import {UiState, UiContext} from './uiState';
 import {IPadItem, Page, Pad, Note, Type, Action, ActionType} from './model';
@@ -15,6 +15,7 @@ export class PadService {
 
     public changeEvent: EventEmitter<any> = new EventEmitter();
     private pad: Pad = <Pad>{};
+    private emptyArray = [];
 
     constructor(private dataService: DataService,
                 private padHistory: PadHistory,
@@ -38,7 +39,7 @@ export class PadService {
         return this.dataService.createPad(pad)
             .subscribe(pad => {
                 this.pad = pad;
-                this.changeEvent.next(pad);
+                this.changeEvent.emit(pad);
             });
     }
 
@@ -52,7 +53,7 @@ export class PadService {
     }
 
     public getCurrentHistory(): Action[] {
-        return this.pad.history ? this.pad.history.slice(0) : [];
+        return this.pad.history ? this.pad.history : this.emptyArray;
     }
 
     public getCurrentHistoryPointer(): number {
@@ -116,7 +117,7 @@ export class PadService {
     // TODO: refactor out all "pad list" type operations.
     public deletePad(padUuid: string) {
         this.dataService.deletePad(padUuid)
-            .subscribe(() => this.changeEvent.next({}));
+            .subscribe(() => this.changeEvent.emit({}));
     }
 
     public deleteItem(itemUuid: string) {
@@ -169,7 +170,7 @@ export class PadService {
         this.pad.history.push(action);
         this.pad = this.padHistory.applyAction(this.pad, action);
         this.pad.historyPointer = this.pad.history.length - 1;
-        this.changeEvent.next(this.pad);
+        this.changeEvent.emit(this.pad);
         this.dataService.updatePad({
             uuid: this.pad.uuid,
             title: this.pad.title,
@@ -202,7 +203,7 @@ export class PadService {
             }
             this.pad = this.padHistory.applyActions(this.pad, actions);
             this.pad.historyPointer += delta;
-            this.changeEvent.next(this.pad);
+            this.changeEvent.emit(this.pad);
         }
     }
 

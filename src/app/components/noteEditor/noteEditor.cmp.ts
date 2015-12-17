@@ -1,4 +1,5 @@
-import {Component, FORM_DIRECTIVES, CORE_DIRECTIVES, Input, Output, EventEmitter, ElementRef} from 'angular2/angular2';
+import {Component, Input, Output, EventEmitter, ElementRef} from 'angular2/core';
+import {CORE_DIRECTIVES, FORM_DIRECTIVES} from 'angular2/common';
 import {Note, IUpdateObject} from "../../common/model";
 import MarkdownPipe from "./markdownPipe";
 import {UiState} from "../../common/uiState";
@@ -22,7 +23,7 @@ class NoteEditorCmp {
     constructor(private uiState: UiState, private elRef: ElementRef) {
     }
 
-    private onInit() {
+    private ngOnInit() {
         let focusSub = this.uiState.focusEvent.subscribe(val => {
             if (val === this.note.uuid) {
                 this.focus();
@@ -39,11 +40,11 @@ class NoteEditorCmp {
         this.subscriptions = [focusSub, blurSub];
     }
 
-    private onDestroy() {
+    private ngOnDestroy() {
         this.subscriptions.map(sub => sub.unsubscribe());
     }
  
-    private onChanges() {
+    private ngOnChanges() {
         this.content = clone(this.note.content);
     }
 
@@ -58,7 +59,7 @@ class NoteEditorCmp {
         if (this.focussed) {
             this.focussed = false;
             if (this.content !== this.note.content) {
-                this.blur.next({
+                this.blur.emit({
                     item: this.note,
                     oldVal: this.note.content,
                     newVal: this.content

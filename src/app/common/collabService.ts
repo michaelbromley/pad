@@ -1,4 +1,4 @@
-import {Injectable, EventEmitter, NgZone} from 'angular2/angular2';
+import {Injectable, EventEmitter, NgZone} from 'angular2/core';
 import SockJSClass = __SockJSClient.SockJSClass;
 import {Action, IMessage, MessageType} from "./model";
 let uuid = require('uuid');
@@ -77,7 +77,7 @@ export class CollabService {
 
     private receiveAction(message: IMessage<Action>) {
         if (message.originUuid !== this.instanceUuid) {
-            this.action.next(message.data);
+            this.action.emit(message.data);
         }
     }
 

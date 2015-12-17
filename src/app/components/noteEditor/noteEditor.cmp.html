@@ -1,12 +1,12 @@
 <div class="note-editor"
-     [ng-class]="{ focus: focussed, locked: locked }"
+     [ngClass]="{ focus: focussed, locked: locked }"
      (click)="clickHandler($event)">
 
                <textarea class="input"
-                         [(ng-model)]="content"
+                         [(ngModel)]="content"
                          [disabled]="locked"
                          (keydown)="keyHandler($event)">
                </textarea>
 
-    <div class="preview" [inner-html]="note.content | markdown"></div>
+    <div class="preview" [innerHtml]="note.content | markdown"></div>
 </div>

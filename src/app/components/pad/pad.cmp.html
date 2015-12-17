@@ -10,7 +10,7 @@
                          [locked]="isLocked(pad.uuid)"></title-input>
         </li>
 
-        <li *ng-for="#page of filteredPad.pages"
+        <li *ngFor="#page of filteredPad.pages"
             [class.selected]="isSelected(page.uuid, true)"
             [id]="'_' + page.uuid"
             class="page-container">
@@ -25,7 +25,7 @@
                     <small>{{ page.uuid }}</small>
                 </li>
 
-                <li *ng-for="#note of page.notes"
+                <li *ngFor="#note of page.notes"
                     [class.selected]="isSelected(note.uuid)"
                     [id]="'_' + note.uuid">
 

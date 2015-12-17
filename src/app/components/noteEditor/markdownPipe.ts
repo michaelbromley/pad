@@ -1,4 +1,4 @@
-import {Pipe} from 'angular2/angular2'
+import {Pipe} from 'angular2/core'
 //import marked from 'marked';
 let marked = require('marked');
 

@@ -1,6 +1,6 @@
-import {Component, CORE_DIRECTIVES, FORM_DIRECTIVES, Input, Output, EventEmitter, ElementRef} from 'angular2/angular2';
-//import {UiState, UiContext} from '../../common/uiState';
-let Rx: Rx = require('rx');
+import {Component, Input, Output, EventEmitter, ElementRef} from 'angular2/core';
+import {CORE_DIRECTIVES, FORM_DIRECTIVES} from 'angular2/common';
+import * as Rx from 'rxjs';
 import {Type} from "../../common/model";
 import {PadService} from "../../common/padService";
 import {UiState} from "../../common/uiState";
@@ -43,7 +43,7 @@ class SearchBarCmp {
         this.subscriptions = [focusSub, clearSub];
     }
 
-    onDestroy() {
+    ngOnDestroy() {
         this.subscriptions.map(sub => sub.unsubscribe());
     }
 

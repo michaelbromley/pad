@@ -1,7 +1,7 @@
 import {Pad} from "../app/common/model";
-import {Observable} from 'angular2/angular2';
+import {Observable} from 'rxjs';
 import {Action} from "../app/common/model";
-let Rx: Rx = require('rx');
+import * as Rx from 'rxjs';
 
 /**
  * Performs CRUD on the NEDB data store that is passed to it in the constructor.

@@ -1,4 +1,4 @@
-import {Injectable, EventEmitter} from 'angular2/angular2';
+import {Injectable, EventEmitter} from 'angular2/core';
 import {Pad, Page, Note} from './model';
 import {clone} from './utils';
 
@@ -12,13 +12,13 @@ export class FilterService {
     public setFilterTerm(val: string) {
         if (val !== this.filterTerm) {
             this.filterTerm = val.toLowerCase();
-            this.filterChangeEvent.next(this.filterTerm);
+            this.filterChangeEvent.emit(this.filterTerm);
         }
     }
 
     public clearFilter() {
         this.filterTerm = '';
-        this.clearFilterEvent.next(true);
+        this.clearFilterEvent.emit(true);
     }
 
     /**

@@ -11,8 +11,7 @@ module.exports = {
     entry: {
         app: path.join(srcPath, 'app.ts'),
         common: [
-            'angular2/node_modules/reflect-metadata',
-            'angular2/node_modules/zone.js'
+            'angular2/bundles/angular2-polyfills.js'
         ]
     },
     resolve: {

@@ -1,4 +1,5 @@
-import {Component, CORE_DIRECTIVES, FORM_DIRECTIVES, Input, Output, EventEmitter, ElementRef} from 'angular2/angular2';
+import {Component, Input, Output, EventEmitter, ElementRef} from 'angular2/core';
+import {CORE_DIRECTIVES, FORM_DIRECTIVES} from 'angular2/common';
 import {UiState} from '../../common/uiState';
 import {IUpdateObject} from "../../common/model";
 
@@ -37,12 +38,12 @@ class TitleInputCmp {
         this.subscriptions = [focusSub, blurSub];
     }
 
-    onDestroy() {
+    ngOnDestroy() {
         this.subscriptions.map(sub => sub.unsubscribe());
     }
 
 
-    private onChanges() {
+    private ngOnChanges() {
         this.title = this.item[this.titleProp];
     }
 
@@ -67,7 +68,7 @@ class TitleInputCmp {
         if (this.focussed) {
             this.focussed = false;
             if (this.title !== this.item[this.titleProp]) {
-                this.blur.next({
+                this.blur.emit({
                     item: this.item,
                     oldVal: this.item[this.titleProp],
                     newVal: this.title

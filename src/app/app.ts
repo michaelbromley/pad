@@ -1,8 +1,6 @@
 // Bootstrapping module
-import {Component, bootstrap, provide, bind, HostListener} from 'angular2/angular2';
-// batarangle dependencies
-import {AppViewListener} from 'angular2/src/core/linker/view_listener.js';
-import {DebugElementViewListener, inspectNativeElement} from 'angular2/src/core/debug/debug_element_view_listener';
+import {Component, provide, bind, HostListener} from 'angular2/core';
+import {bootstrap} from 'angular2/platform/browser';
 
 import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS, LocationStrategy, HashLocationStrategy} from 'angular2/router';
 import {HTTP_PROVIDERS, RequestOptions, BaseRequestOptions, Headers} from 'angular2/http';
@@ -69,8 +67,6 @@ bootstrap(AppComponent, [
     ROUTER_PROVIDERS,
     provide(LocationStrategy, {useClass: HashLocationStrategy}),
     provide(RequestOptions, {useClass: appRequestOptions}),
-    // batarangle
-    bind(AppViewListener).toClass(DebugElementViewListener),
 
     UiState,
     Scroller,
